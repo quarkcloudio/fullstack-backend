@@ -20,8 +20,6 @@
 
 ## 官方支持
 
-积木云QQ群：4110211
-
 github地址:https://github.com/tangtanglove/fullstack
 
 
