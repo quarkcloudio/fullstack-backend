@@ -1,48 +1,30 @@
-# 腾讯云开发者平台 fullstack_framework
+# Fullstack CMS
 
-> 技术赋能，助力开发
+鉴于市面上CMS都已陈旧的情况，作者用更先进的laravel和ant-design重新设计、架构新时代的CMS。开源不易，请尊重版权！ 
 
-腾讯云开发者平台免费为开发者提供高效便捷的开发工具与优质的开发管理服务。
+## 安装说明
 
-包括项目协作、Git/SVN 代码托管、在线编辑器、持续集成等工具。
+首先需要将web环境的默认目录指向public目录
 
-![平台截图](https://dn-coding-net-production-pp.codehub.cn/4ba18ace-ccc9-45a7-a802-655283eb648a.png)
+命令行安装系统
 
-## 安装
+编辑.env文件，配置数据库信息
 
-1. 准备一个微信
-2. 准备一台电脑
-3. 访问 https://dev.tencent.com
+命令行下执行数据迁移
 
+第一步：php artisan migrate(您需要将php加入到环境变量)
 
+第二步：php artisan db:seed(注意: 如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。)
 
-## 使用
+默认用户名：administrator 密码：123456
 
-[帮助文档](https://dev.tencent.com/help/)
+## 官方支持
 
-[开发者社区](https://feedback.coding.net/)
+积木云QQ群：4110211
 
-[官方博客](https://blog.coding.net/)
-
-
-
-## 开发
-
-打开 [Cloud Studio](https://studio.dev.tencent.com/)。
+github地址:https://github.com/tangtanglove/fullstack
 
 
+## License
 
-## 发布历史
-
-
-
-### v4.0710.1
-
-- 新增持续集成 beta 版
-- 优化官网首页及调整导航结构
-- 优化 UI 细节
-
-### v4.0529.1
-- 上线 Pages 验证域名所有权的功能
-- 优化登录注册流程
-- 修复若干已知 bug
+未获商业授权之前，不得将本软件用于商业用途（包括但不限于企业网站、经营性网站、以营利为目或实现盈利的网站）不得对本软件或与之关联的商业授权进行出租、出售、抵押或发放子许可证。 禁止在 Fullstack 的整体或任何部分基础上以发展任何派生版本、修改版本或第三方版本用于重新分发。 如果您未能遵守本协议的条款，您的授权将被终止，所被许可的权利将被收回，并承担相应法律责任。
