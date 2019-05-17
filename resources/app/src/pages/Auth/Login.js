@@ -149,12 +149,6 @@ class LoginPage extends Component {
           <Submit loading={submitting}>
             <FormattedMessage id="app.login.login" />
           </Submit>
-          <div className={styles.other}>
-            <FormattedMessage id="app.login.sign-in-with" />
-            <Icon type="wechat" className={styles.icon} theme="outlined" />
-            <Icon type="qq" className={styles.icon} theme="outlined" />
-            <Icon type="weibo" className={styles.icon} theme="outlined" />
-          </div>
         </Login>
       </div>
     );
