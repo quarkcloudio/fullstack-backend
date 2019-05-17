@@ -1268,13 +1268,33 @@ class Helper
     * 导出Excel
     * @author tangtanglove <dai_hang_love@126.com>
     */
-    static function export($fileName,$title,$lists)
+    static function export($fileName,$titles,$lists)
     {
-        Excel::create($fileName.'_'.date('YmdHis'),function($excel) use ($fileName,$title,$lists) {
-            $excel->sheet($fileName, function($sheet) use ($title,$lists) {
+        $getTitles = [];
+        $getLists  = [];
+
+        if (!(count($titles) == count($titles, 1))) { // 标题为二维数组
+            foreach ($titles as $key => $value) {
+                $getTitles[] = $value['title'];
+                $fileds[] = $value['filed'];
+            }
+
+            foreach ($lists as $key1 => $value1) {
+                foreach ($fileds as $key2 => $value2) {
+                    $rows[$value2] = $value1[$value2];
+                }
+                $getLists[$key1] = $rows;
+            }
+        } else {
+            $getTitles = $titles;
+            $getLists  = $lists;
+        }
+
+        Excel::create($fileName.'_'.date('YmdHis'),function($excel) use ($fileName,$getTitles,$getLists) {
+            $excel->sheet($fileName, function($sheet) use ($getTitles,$getLists) {
                 $sheet->setAutoSize(true);
-                $sheet->prependRow($title);
-                $sheet->rows($lists);
+                $sheet->prependRow($getTitles);
+                $sheet->rows($getLists);
             });
         })->export('xls');
     }
