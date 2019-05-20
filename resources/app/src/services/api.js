@@ -9,6 +9,14 @@ export async function accountLogin(params) {
   });
 }
 
+// 获取手机验证码
+export async function getCaptcha(params) {
+  return request('/api/admin/tool/sms', {
+    method: 'POST',
+    body: params,
+  });
+}
+
 // 当前用户信息
 export async function getAccountInfo() {
   return request('/api/admin/account/info');
@@ -45,7 +53,6 @@ export async function getAccountMenus() {
 
 // 获取网站设置
 export async function getWebsiteConfig(params) {
-  console.log('xxx');
   return request(`/api/admin/config/website?${stringify(params)}`);
 }
 

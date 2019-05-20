@@ -1,6 +1,7 @@
 import { routerRedux } from 'dva/router';
 import { stringify } from 'qs';
-import { accountLogin } from '@/services/api';
+import { message } from 'antd';
+import { accountLogin,getCaptcha } from '@/services/api';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized';
@@ -46,7 +47,12 @@ export default {
     },
 
     *getCaptcha({ payload }, { call }) {
-      yield call(getFakeCaptcha, payload);
+      const response = yield call(getCaptcha, payload);
+      if (response.status === 'success') {
+        message.success(response.msg, 3);
+      } else {
+        message.error(response.msg, 3);
+      }
     },
 
     *logout(_, { put }) {

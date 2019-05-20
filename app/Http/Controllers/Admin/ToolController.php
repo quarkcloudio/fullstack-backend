@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
@@ -48,7 +48,7 @@ class ToolController extends BaseController
     {
         $phrase = new PhraseBuilder;
         // 设置验证码位数
-        $code = Helper::createRand(4);
+        $code = Helper::makeRand(4);
         // 生成验证码图片的Builder对象，配置相应属性
         $builder = new CaptchaBuilder($code, $phrase);
         // 设置背景颜色
@@ -231,7 +231,7 @@ class ToolController extends BaseController
         }
 
         // 图片名称
-        $name = Helper::createRand(40,true).$fileType;
+        $name = Helper::makeRand(40,true).$fileType;
 
         $ossOpen = Helper::config('OSS_OPEN');
 
@@ -421,7 +421,7 @@ class ToolController extends BaseController
         }
 
         // 生成验证码
-        $code = Helper::createRand();
+        $code = Helper::makeRand();
         $content = '验证码：'.$code.'，请及时输入完成验证。如非本人操作，请忽略。';
 
         switch ($type) {
@@ -586,7 +586,7 @@ class ToolController extends BaseController
             print $e->getMessage();
         }
 
-        $object = 'pictures/'.Helper::createRand(40,true).'.'.$file->getClientOriginalExtension();
+        $object = 'pictures/'.Helper::makeRand(40,true).'.'.$file->getClientOriginalExtension();
         $content = file_get_contents($file->getRealPath());
 
         $md5 = md5($content);
@@ -818,7 +818,7 @@ class ToolController extends BaseController
             print $e->getMessage();
         }
 
-        $object = 'files/'.Helper::createRand(40,true).'.'.$file->getClientOriginalExtension();
+        $object = 'files/'.Helper::makeRand(40,true).'.'.$file->getClientOriginalExtension();
         $content = file_get_contents($file->getRealPath());
 
         $md5 = md5($content);

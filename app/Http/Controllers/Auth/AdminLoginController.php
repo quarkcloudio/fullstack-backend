@@ -209,9 +209,9 @@ class AdminLoginController extends Controller
         }
 
         // 通过uid登录
-        $result = Auth::guard('admin')->loginUsingId($uid);
+        $loginResult = Auth::guard('admin')->loginUsingId($uid);
 
-        if($result) {
+        if($loginResult) {
 
             $user = Auth::guard('admin')->user();
 
@@ -232,7 +232,7 @@ class AdminLoginController extends Controller
             $result['token'] = $user->createToken('FullStack')->accessToken;
 
             // 将认证信息写入缓存，这里用hack方法做后台api登录认证
-            cache([$result['token'] => $result],3600*3);
+            cache([$result['token'] => $result],60*60*3);
 
             return $this->success('登录成功！','',$result);
         } else {
