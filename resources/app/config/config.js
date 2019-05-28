@@ -66,7 +66,7 @@ export default {
   },
   history: 'hash', // url模式
   base:'/admin/',
-  // publicPath:'/admin/',
+  publicPath:'/admin/',
   outputPath:'../../public/admin/', // 打包路径
   treeShaking: true,
   targets: {
