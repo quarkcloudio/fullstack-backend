@@ -34,6 +34,20 @@ export default [
         ],
       },
       {
+        path: '/builderDemo',
+        name: 'builderDemo',
+        routes: [
+          {
+            path: '/builder/index',
+            component: './Builder/Index',
+          },
+          {
+            path: '/builder/form',
+            component: './Builder/Form',
+          },
+        ],
+      },
+      {
         path: '/article',
         name: 'article',
         icon: 'file-word',

@@ -90,4 +90,9 @@ export default {
   'menu.admin.user': '管理员列表',
   'menu.admin.permission': '权限列表',
   'menu.admin.role': '角色列表',
+
+  // 创建器
+  'menu.builder': '创建器',
+  'menu.builder.index': '列表页',
+  'menu.builder.form': '表单',
 };
