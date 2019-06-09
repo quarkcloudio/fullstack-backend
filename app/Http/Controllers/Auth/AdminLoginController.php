@@ -75,7 +75,9 @@ class AdminLoginController extends Controller
                 $loginResult = $this->mobileLogin($request);
                 break;
             default:
-                return $this->error('参数错误!');
+
+                // 账号登录
+                $loginResult = $this->accountLogin($request);
                 break;
         }
 
@@ -173,7 +175,7 @@ class AdminLoginController extends Controller
             // 清除验证码
             session(['captcha'=>null]);
 
-            return $this->error('登录失败！');
+            return $this->error('用户名或密码错误！');
         }
     }
 
