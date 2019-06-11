@@ -17,35 +17,45 @@ export interface CurrentUser {
   unreadCount?: number;
 }
 
-export interface UserModelState {
+export interface AccountModelState {
   currentUser?: CurrentUser;
 }
 
-export interface UserModelType {
+export interface AccountModelType {
   namespace: 'account';
-  state: UserModelState;
+  state: AccountModelState;
   effects: {
+    fetch: Effect;
     getAccountInfo: Effect;
     changeAccountProfile: Effect;
     changeAccountPassword: Effect;
   };
   reducers: {
-    save: Reducer<UserModelState>;
-    changeNotifyCount: Reducer<UserModelState>;
+    save: Reducer<AccountModelState>;
+    changeNotifyCount: Reducer<AccountModelState>;
   };
 }
 
-const AccountModel: UserModelType = {
+const AccountModel: AccountModelType = {
   namespace: 'account',
 
   state: {
-    accountInfo: {},
+    currentUser: {},
   },
 
   effects: {
+    *fetch(_, { call, put }) {
+      const response = yield call(getAccountInfo);
+      console.log(response);
+      yield put({
+        type: 'save',
+        payload: response,
+      });
+    },
     // 登录账号信息
     *getAccountInfo({ callback }, { put, call }) {
       const response = yield call(getAccountInfo);
+      console.log(response);
       if (response.status === 'success') {
         yield put({
           type: 'save',
@@ -84,7 +94,7 @@ const AccountModel: UserModelType = {
     save(state, action) {
       return {
         ...state,
-        accountInfo: action.payload || {},
+        currentUser: action.payload || {},
       };
     },
     changeNotifyCount(
