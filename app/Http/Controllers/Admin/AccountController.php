@@ -26,10 +26,10 @@ class AccountController extends Controller
         // 获取用户信息
         if(!empty($admin)) {
             // 获取用户头像
-            if(!empty($admin['cover_id'])) {
-                $admin['cover_path'] = Helper::getPicture($admin['cover_id']);
+            if(!empty($admin['avatar'])) {
+                $admin['avatar'] = Helper::getPicture($admin['avatar']);
             } else {
-                $admin['cover_path'] = '//'.$_SERVER['HTTP_HOST'].'/images/user.png';
+                $admin['avatar'] = '//'.$_SERVER['HTTP_HOST'].'/images/user.png';
             }
             return $this->success('获取成功！','',$admin);
         } else {

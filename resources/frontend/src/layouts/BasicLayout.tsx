@@ -75,7 +75,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   useState(() => {
     if (dispatch) {
       dispatch({
-        type: 'user/fetchCurrent',
+        type: 'account/getAccountInfo', // 获取用户信息
       });
       dispatch({
         type: 'settings/getSetting',

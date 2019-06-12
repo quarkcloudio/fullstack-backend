@@ -5,7 +5,7 @@ import { Reducer } from 'redux';
 
 export interface CurrentUser {
   avatar?: string;
-  name?: string;
+  nickname?: string;
   title?: string;
   group?: string;
   signature?: string;
@@ -46,7 +46,6 @@ const AccountModel: AccountModelType = {
   effects: {
     *fetch(_, { call, put }) {
       const response = yield call(getAccountInfo);
-      console.log(response);
       yield put({
         type: 'save',
         payload: response,
@@ -55,7 +54,6 @@ const AccountModel: AccountModelType = {
     // 登录账号信息
     *getAccountInfo({ callback }, { put, call }) {
       const response = yield call(getAccountInfo);
-      console.log(response);
       if (response.status === 'success') {
         yield put({
           type: 'save',

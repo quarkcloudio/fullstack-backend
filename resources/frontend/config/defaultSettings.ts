@@ -47,14 +47,15 @@ export default {
   primaryColor: '#1890FF',
   layout: 'sidemenu',
   contentWidth: 'Fluid',
-  fixedHeader: false,
+  fixedHeader: true,
   autoHideHeader: false,
-  fixSiderbar: false,
-  colorWeak: false,
+  fixSiderbar: true,
   menu: {
-    locale: true,
+    locale: true
   },
   title: 'Ant Design Pro',
   pwa: false,
   iconfontUrl: '',
+  collapse: true,
+  language: 'zh-CN'
 } as DefaultSettings;

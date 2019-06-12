@@ -3,7 +3,7 @@ import { Avatar, Menu, Spin, Icon } from 'antd';
 import { FormattedMessage } from 'umi-plugin-react/locale';
 import { ClickParam } from 'antd/es/menu';
 import { ConnectProps, ConnectState } from '@/models/connect';
-import { CurrentUser } from '@/models/user';
+import { CurrentUser } from '@/models/account';
 import { connect } from 'dva';
 import router from 'umi/router';
 import HeaderDropdown from '../HeaderDropdown';
@@ -28,6 +28,13 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
 
       return;
     }
+
+    if (key === 'settings') {
+      router.push('/account/settings/info');
+      
+      return;
+    }
+
     router.push(`/account/${key}`);
   };
   render() {
@@ -36,16 +43,12 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
       return (
         <span className={`${styles.action} ${styles.account}`}>
           <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
-          <span className={styles.name}>{currentUser.name}</span>
+          <span className={styles.name}>{currentUser.nickname}</span>
         </span>
       );
     }
     const menuHeaderDropdown = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item key="center">
-          <Icon type="user" />
-          <FormattedMessage id="menu.account.center" defaultMessage="account center" />
-        </Menu.Item>
         <Menu.Item key="settings">
           <Icon type="setting" />
           <FormattedMessage id="menu.account.settings" defaultMessage="account settings" />
@@ -58,11 +61,11 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
       </Menu>
     );
 
-    return currentUser && currentUser.name ? (
+    return currentUser && currentUser.nickname ? (
       <HeaderDropdown overlay={menuHeaderDropdown}>
         <span className={`${styles.action} ${styles.account}`}>
           <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
-          <span className={styles.name}>{currentUser.name}</span>
+          <span className={styles.name}>{currentUser.nickname}</span>
         </span>
       </HeaderDropdown>
     ) : (
@@ -70,6 +73,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     );
   }
 }
-export default connect(({ user }: ConnectState) => ({
-  currentUser: user.currentUser,
+export default connect(({ account }: ConnectState) => ({
+  currentUser: account.currentUser,
+  menu: true,
 }))(AvatarDropdown);

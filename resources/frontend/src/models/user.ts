@@ -43,7 +43,6 @@ const UserModel: UserModelType = {
   effects: {
     *fetch(_, { call, put }) {
       const response = yield call(queryUsers);
-      console.log(response);
       yield put({
         type: 'save',
         payload: response,

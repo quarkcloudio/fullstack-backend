@@ -6,6 +6,7 @@ import HeaderSearch from '../HeaderSearch';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
 import Avatar from './AvatarDropdown';
+import NoticeIconView from './NoticeIconView';
 import { connect } from 'dva';
 
 export type SiderTheme = 'light' | 'dark';
@@ -62,6 +63,7 @@ class GlobalHeaderRight extends Component<GlobalHeaderRightProps> {
             <Icon type="question-circle-o" />
           </a>
         </Tooltip>
+        <NoticeIconView />
         <Avatar />
         <SelectLang className={styles.action} />
       </div>

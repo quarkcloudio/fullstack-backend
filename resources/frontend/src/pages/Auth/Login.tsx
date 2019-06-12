@@ -50,7 +50,8 @@ class LoginPage extends Component<IFormComponentProps> {
           <Form.Item>
             {getFieldDecorator('password')(
               <Input
-                prefix={<Icon type="password" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                type="password"
                 placeholder="密码"
               />,
             )}
