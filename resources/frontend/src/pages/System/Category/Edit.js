@@ -276,7 +276,12 @@ class EditPage extends PureComponent {
       <PageHeaderWrapper>
         <div className={styles.container}>
           <Form onSubmit={this.handleSubmit}>
-            <Tabs defaultActiveKey="1" tabBarExtraContent={<a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>}>
+            <Tabs
+              defaultActiveKey="1"
+              tabBarExtraContent={
+                <a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>
+              }
+            >
               {/* tab */}
               <TabPane tab="基本" key="1">
                 <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="标题">
@@ -288,7 +293,7 @@ class EditPage extends PureComponent {
                       },
                       {
                         rules: [{ required: true, message: '请输入标题！' }],
-                      }
+                      },
                     )(<Input className={styles.smallItem} placeholder="请输入标题" />)}
                   </Form.Item>
                 </Form.Item>
@@ -310,7 +315,7 @@ class EditPage extends PureComponent {
                       className={styles.middleItem}
                       placeholder="请输入描述"
                       autosize={{ minRows: 3, maxRows: 6 }}
-                    />
+                    />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="排序">
@@ -322,7 +327,7 @@ class EditPage extends PureComponent {
                       placeholder="0"
                       min={0}
                       max={100000}
-                    />
+                    />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="父节点">
@@ -333,7 +338,7 @@ class EditPage extends PureComponent {
                       {this.state.data.categorys.length !== 0
                         ? this.state.data.categorys.map(d => <Option key={d.id}>{d.title}</Option>)
                         : console.log('select data null')}
-                    </Select>
+                    </Select>,
                   )}
                 </Form.Item>
               </TabPane>
@@ -378,7 +383,7 @@ class EditPage extends PureComponent {
                       min={0}
                       placeholder="10"
                       max={100000}
-                    />
+                    />,
                   )}
                 </Form.Item>
               </TabPane>

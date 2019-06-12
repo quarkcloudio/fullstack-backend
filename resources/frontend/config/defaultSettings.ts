@@ -51,11 +51,11 @@ export default {
   autoHideHeader: false,
   fixSiderbar: true,
   menu: {
-    locale: true
+    locale: true,
   },
   title: 'Ant Design Pro',
   pwa: false,
   iconfontUrl: '',
   collapse: true,
-  language: 'zh-CN'
+  language: 'zh-CN',
 } as DefaultSettings;

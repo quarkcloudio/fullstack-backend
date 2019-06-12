@@ -50,8 +50,7 @@ class EditPage extends PureComponent {
     previewVisible: false,
     previewImage: '',
     coverList: [], // 封面图列表
-    data : {
-    },
+    data: {},
     status: '',
     pagination: {},
     loading: false,
@@ -283,7 +282,7 @@ class EditPage extends PureComponent {
             bordered={false}
             extra={<a href="javascript:history.go(-1)">返回上一页</a>}
           >
-            <Form onSubmit={this.handleSubmit} style={{marginTop: 8 }}>
+            <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
               <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="标题">
                 <Form.Item style={{ display: 'inline-block', marginBottom: 8 }}>
                   {getFieldDecorator(
@@ -293,16 +292,30 @@ class EditPage extends PureComponent {
                     },
                     {
                       rules: [{ message: '请输入标题！' }],
-                    }
+                    },
                   )(<Input className={styles.middleItem} placeholder="请输入标题" />)}
                 </Form.Item>
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="晒图">
-                {
-                  this.state.coverList.length !== 0 ? 
-                    this.state.coverList.map(d => <img key={d.uid} src={d.url} style={{width:'100px',height:'100px',overflow:'hidden',paddingLeft:'5px'}} />) : 
-                    (<img src={this.state.data.cover_path} style={{width:'100px',height:'100px'}}/>)
-                }
+                {this.state.coverList.length !== 0 ? (
+                  this.state.coverList.map(d => (
+                    <img
+                      key={d.uid}
+                      src={d.url}
+                      style={{
+                        width: '100px',
+                        height: '100px',
+                        overflow: 'hidden',
+                        paddingLeft: '5px',
+                      }}
+                    />
+                  ))
+                ) : (
+                  <img
+                    src={this.state.data.cover_path}
+                    style={{ width: '100px', height: '100px' }}
+                  />
+                )}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="类型">
                 {getFieldDecorator('type', {
@@ -317,28 +330,30 @@ class EditPage extends PureComponent {
                     className={styles.middleItem}
                     placeholder="请输入内容"
                     autosize={{ minRows: 3, maxRows: 6 }}
-                  />
+                  />,
                 )}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="顶">
-                {getFieldDecorator('ding',{
-                    initialValue: this.state.data.ding
-                },
-                {
-                  rules: [{ type: 'number', message: '必须为数字' }],
-                })(
-                  <InputNumber min={0} max={100000} />
-                )}                              
+                {getFieldDecorator(
+                  'ding',
+                  {
+                    initialValue: this.state.data.ding,
+                  },
+                  {
+                    rules: [{ type: 'number', message: '必须为数字' }],
+                  },
+                )(<InputNumber min={0} max={100000} />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="踩">
-                {getFieldDecorator('cai',{
-                    initialValue: this.state.data.cai
-                },
-                {
-                  rules: [{ type: 'number', message: '必须为数字' }],
-                })(
-                  <InputNumber min={0} max={100000} />
-                )}                              
+                {getFieldDecorator(
+                  'cai',
+                  {
+                    initialValue: this.state.data.cai,
+                  },
+                  {
+                    rules: [{ type: 'number', message: '必须为数字' }],
+                  },
+                )(<InputNumber min={0} max={100000} />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="举报">
                 {getFieldDecorator('report', {
@@ -359,7 +374,7 @@ class EditPage extends PureComponent {
                     locale={locale}
                     format="YYYY-MM-DD HH:mm:ss"
                     placeholder="请选择时间"
-                  />
+                  />,
                 )}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="更新时间">
@@ -371,7 +386,7 @@ class EditPage extends PureComponent {
                     locale={locale}
                     format="YYYY-MM-DD HH:mm:ss"
                     placeholder="请选择时间"
-                  />
+                  />,
                 )}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="状态">

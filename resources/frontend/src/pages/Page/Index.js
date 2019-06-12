@@ -79,7 +79,7 @@ class IndexPage extends PureComponent {
     dispatch(
       routerRedux.push({
         pathname: '/' + this.modelName + '/create',
-      })
+      }),
     );
   };
 
@@ -90,7 +90,7 @@ class IndexPage extends PureComponent {
       routerRedux.push({
         pathname: '/' + this.modelName + '/edit',
         query: { id: id },
-      })
+      }),
     );
   };
 
@@ -466,12 +466,12 @@ class IndexPage extends PureComponent {
                           <Option key={0}>所有状态</Option>
                           <Option key={1}>正常</Option>
                           <Option key={2}>已禁用</Option>
-                        </Select>
+                        </Select>,
                       )}
                     </Form.Item>
                     <Form.Item style={{ display: 'inline-block' }}>
                       {getFieldDecorator('title')(
-                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />
+                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />,
                       )}
                     </Form.Item>
                     <Form.Item style={{ display: 'inline-block' }}>
@@ -497,12 +497,12 @@ class IndexPage extends PureComponent {
                 <Form layout="inline" onSubmit={this.handleSearch}>
                   <Form.Item label="标题" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('title')(
-                      <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />
+                      <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />,
                     )}
                   </Form.Item>
                   <Form.Item label="作者" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('author')(
-                      <Input placeholder="请输入作者" style={{ width: 160 }} />
+                      <Input placeholder="请输入作者" style={{ width: 160 }} />,
                     )}
                   </Form.Item>
 
@@ -518,7 +518,7 @@ class IndexPage extends PureComponent {
                         <Option key={0}>所有状态</Option>
                         <Option key={1}>正常</Option>
                         <Option key={2}>已禁用</Option>
-                      </Select>
+                      </Select>,
                     )}
                   </Form.Item>
                   <Form.Item>

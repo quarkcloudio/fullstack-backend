@@ -21,7 +21,7 @@ import {
   Divider,
   Popconfirm,
   DatePicker,
-  TimePicker
+  TimePicker,
 } from 'antd';
 
 const Search = Input.Search;
@@ -33,27 +33,24 @@ const Option = Select.Option;
 @connect(({ model }) => ({
   model,
 }))
-
 @Form.create()
-
 class IndexPage extends PureComponent {
-
   // 定义要操作的模型名称
   modelName = 'comment';
 
   state = {
-    msg : '',
-    url : '',
-    data : {
-      'types':[]
+    msg: '',
+    url: '',
+    data: {
+      types: [],
     },
-    status : '',
+    status: '',
     pagination: {},
     loading: false,
     previewVisible: false,
     previewImage: '',
     expand: false, // 高级搜索是否展开
-    selectedRowKeys: []
+    selectedRowKeys: [],
   };
 
   // 当挂在模板时，初始化数据
@@ -63,89 +60,86 @@ class IndexPage extends PureComponent {
 
     // 调用model
     this.props.dispatch({
-        type: 'model/index',
-        payload:{
-          modelName:this.modelName
-        },
-        callback: (res) => {
-          // 执行成功后，进行回调
-          if (res) {
-            this.setState({ ...res,loading:false });
-          }
+      type: 'model/index',
+      payload: {
+        modelName: this.modelName,
+      },
+      callback: res => {
+        // 执行成功后，进行回调
+        if (res) {
+          this.setState({ ...res, loading: false });
         }
+      },
     });
   }
 
   // 编辑操作
-  handleEdit = (id) => {
+  handleEdit = id => {
     const { dispatch } = this.props;
     dispatch(
       routerRedux.push({
-        pathname: '/plugin/'+this.modelName+'/edit',
-        query: {id: id}
-      })
+        pathname: '/plugin/' + this.modelName + '/edit',
+        query: { id: id },
+      }),
     );
-  }
+  };
 
   // 删除操作
-  handleDestroy = (id) => {
-
+  handleDestroy = id => {
     const { dispatch } = this.props;
     dispatch({
       type: 'model/destroy',
-      payload:{
-        modelName:this.modelName,
-        id:id
-      }
+      payload: {
+        modelName: this.modelName,
+        id: id,
+      },
     }).then(() => {
       // 操作成功
-      if(this.state.status === 'success') {
-
+      if (this.state.status === 'success') {
         // 过滤数据
-        this.state.data.lists = this.state.data.lists.filter(item => item.id !== id)
-        
+        this.state.data.lists = this.state.data.lists.filter(item => item.id !== id);
+
         // 更新数据
         this.setState({ ...this.state.data });
       }
     });
-  }
+  };
 
   // 改变数据状态操作
-  handleStatusChange = (id,status) => {
+  handleStatusChange = (id, status) => {
     // loading
     this.setState({ loading: true });
 
     const { dispatch } = this.props;
     dispatch({
       type: 'model/changeStatus',
-      payload:{
-        modelName:this.modelName,
-        id:id,
-        status:status
-      }
+      payload: {
+        modelName: this.modelName,
+        id: id,
+        status: status,
+      },
     }).then(() => {
       const { dispatch } = this.props;
       // 调用model
       dispatch({
-          type: 'model/index',
-          payload:{
-            modelName:this.modelName,
-            ...this.state.pagination,
-            search:this.state.search
-          },
-          callback: (res) => {
-            // 执行成功后，进行回调
-            if (res) {
-              this.setState({ ...res,loading:false });
-            }
+        type: 'model/index',
+        payload: {
+          modelName: this.modelName,
+          ...this.state.pagination,
+          search: this.state.search,
+        },
+        callback: res => {
+          // 执行成功后，进行回调
+          if (res) {
+            this.setState({ ...res, loading: false });
           }
+        },
       });
     });
-  }
+  };
 
   // 删除多个操作
   handleMultiDestroy = () => {
-
     const that = this;
     confirm({
       title: '确定删除这些数据吗？',
@@ -158,27 +152,27 @@ class IndexPage extends PureComponent {
         const { dispatch } = that.props;
         dispatch({
           type: 'model/destroy',
-          payload:{
-            modelName:that.modelName,
-            id:ids
-          }
+          payload: {
+            modelName: that.modelName,
+            id: ids,
+          },
         }).then(() => {
           // 操作成功
-          if(that.state.status === 'success') {
-            ids.map((id) => {
-              that.state.data.lists = that.state.data.lists.filter(item => item.id !== id)
-            })
+          if (that.state.status === 'success') {
+            ids.map(id => {
+              that.state.data.lists = that.state.data.lists.filter(item => item.id !== id);
+            });
             // 更新数据
-            that.setState({ ...that.state.data, selectedRowKeys:[]});
+            that.setState({ ...that.state.data, selectedRowKeys: [] });
           }
         });
       },
       onCancel() {},
     });
-  }
+  };
 
   // 改变多个数据状态操作
-  handleMultiStatusChange = (status) => {
+  handleMultiStatusChange = status => {
     // loading
     this.setState({ loading: true });
 
@@ -187,31 +181,30 @@ class IndexPage extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'model/changeStatus',
-      payload:{
-        modelName:this.modelName,
-        id:ids,
-        status:status
-      }
+      payload: {
+        modelName: this.modelName,
+        id: ids,
+        status: status,
+      },
     }).then(() => {
       const { dispatch } = this.props;
       // 调用model
       dispatch({
-          type: 'model/index',
-          payload:{
-            modelName:this.modelName,
-            ...this.state.pagination,
-            search:this.state.search
-          },
-          callback: (res) => {
-            // 执行成功后，进行回调
-            if (res) {
-              this.setState({ ...res, loading:false});
-            }
+        type: 'model/index',
+        payload: {
+          modelName: this.modelName,
+          ...this.state.pagination,
+          search: this.state.search,
+        },
+        callback: res => {
+          // 执行成功后，进行回调
+          if (res) {
+            this.setState({ ...res, loading: false });
           }
+        },
       });
-
     });
-  }
+  };
 
   // 分页切换
   handleTableChange = (pagination, filters, sorter) => {
@@ -220,67 +213,64 @@ class IndexPage extends PureComponent {
     const { dispatch } = this.props;
     // 调用model
     dispatch({
-        type: 'model/index',
-        payload:{
-          modelName:this.modelName,
-          pageSize:pagination.pageSize, // 分页数量
-          current:pagination.current, // 当前页码
-          sortField: sorter.field, // 排序字段
-          sortOrder: sorter.order, // 排序规则
-          ...filters, // 筛选
-          search:this.state.search
-        },
-        callback: (res) => {
-          // 执行成功后，进行回调
-          if (res) {
-            this.setState({ ...res,loading:false, selectedRowKeys:[]});
-          }
+      type: 'model/index',
+      payload: {
+        modelName: this.modelName,
+        pageSize: pagination.pageSize, // 分页数量
+        current: pagination.current, // 当前页码
+        sortField: sorter.field, // 排序字段
+        sortOrder: sorter.order, // 排序规则
+        ...filters, // 筛选
+        search: this.state.search,
+      },
+      callback: res => {
+        // 执行成功后，进行回调
+        if (res) {
+          this.setState({ ...res, loading: false, selectedRowKeys: [] });
         }
+      },
     });
-  }
+  };
 
   // 展开或收缩高级搜索
   toggle = () => {
     const { expand } = this.state;
     this.setState({ expand: !expand });
-  }
+  };
 
   // 全选
   handleSelectAll = () => {
+    let rowKeys = this.state.data.lists.map(item => {
+      return item.id;
+    });
 
-    let rowKeys = this.state.data.lists.map((item) => {
-        return item.id
-    })
-
-    console.log(rowKeys)
+    console.log(rowKeys);
 
     this.setState({
-      selectedRowKeys: rowKeys
+      selectedRowKeys: rowKeys,
     });
-  }
+  };
 
   // 取消全选
   handleCancelSelectAll = () => {
-
     this.setState({
-      selectedRowKeys: []
+      selectedRowKeys: [],
     });
-  }
+  };
 
   // 选择事件
-  onSelectChange = (selectedRowKeys) => {
+  onSelectChange = selectedRowKeys => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     this.setState({ selectedRowKeys });
-  }
+  };
 
   // 搜索
-  handleSearch = (e) => {
+  handleSearch = e => {
     e.preventDefault();
 
     this.props.form.validateFields((err, values) => {
-
-      if(values.dateRange) {
-        if(values.dateRange[0] && values.dateRange[1]) {
+      if (values.dateRange) {
+        if (values.dateRange[0] && values.dateRange[1]) {
           // 时间标准化
           let dateStart = values.dateRange[0].format('YYYY-MM-DD');
           let dateEnd = values.dateRange[1].format('YYYY-MM-DD');
@@ -289,7 +279,7 @@ class IndexPage extends PureComponent {
           values.dateRange = [];
 
           // 重新赋值对象
-          values.dateRange = [dateStart,dateEnd];
+          values.dateRange = [dateStart, dateEnd];
         }
       }
 
@@ -298,31 +288,29 @@ class IndexPage extends PureComponent {
         const { dispatch } = this.props;
         // 调用model
         dispatch({
-            type: 'model/index',
-            payload:{
-              modelName:this.modelName,
-              ...this.state.pagination,
-              search:values
-            },
-            callback: (res) => {
-              // 执行成功后，进行回调
-              if (res) {
-                this.setState({ ...res, loading:false});
-              }
+          type: 'model/index',
+          payload: {
+            modelName: this.modelName,
+            ...this.state.pagination,
+            search: values,
+          },
+          callback: res => {
+            // 执行成功后，进行回调
+            if (res) {
+              this.setState({ ...res, loading: false });
             }
+          },
         });
       }
-
     });
-  }
+  };
 
   // 搜索重置
   handleResetSearch = () => {
     this.props.form.resetFields();
-  }
+  };
 
   render() {
-
     const { getFieldDecorator } = this.props.form;
 
     // 默认选中的行
@@ -335,16 +323,20 @@ class IndexPage extends PureComponent {
       getCheckboxProps: record => ({
         name: record.name,
       }),
-      fixed:'left',
+      fixed: 'left',
     };
-    
+
     const columns = [
       {
         title: '对象标题',
         dataIndex: 'object_title',
         key: 'object_title',
         width: 160,
-        render: (text, record ) => <a href="javascript:;" onClick={() => this.handleEdit(record.id)}>{text}</a>,
+        render: (text, record) => (
+          <a href="javascript:;" onClick={() => this.handleEdit(record.id)}>
+            {text}
+          </a>
+        ),
       },
       {
         title: '类型',
@@ -367,16 +359,16 @@ class IndexPage extends PureComponent {
         title: '内容',
         dataIndex: 'content',
         key: 'content',
-        render: (text) => <span >{text}</span>,
-        width:220,
+        render: text => <span>{text}</span>,
+        width: 220,
       },
       {
         title: '状态',
         key: 'status',
         dataIndex: 'status',
-        render: (text, record ) => (
+        render: (text, record) => (
           <span>
-            <Tag color={text === '已禁用' ? "red" : "blue"}>{text}</Tag>
+            <Tag color={text === '已禁用' ? 'red' : 'blue'}>{text}</Tag>
           </span>
         ),
       },
@@ -390,18 +382,25 @@ class IndexPage extends PureComponent {
         key: 'action',
         fixed: 'right',
         width: 260,
-        render: (text, record ) => (
+        render: (text, record) => (
           <span>
-            <a href="javascript:;" onClick={() => this.handleStatusChange(record.id,record.status == '正常' ? 2 : 1)}>{record.status == '正常' ? '禁用' : '审核'}</a>
+            <a
+              href="javascript:;"
+              onClick={() => this.handleStatusChange(record.id, record.status == '正常' ? 2 : 1)}
+            >
+              {record.status == '正常' ? '禁用' : '审核'}
+            </a>
             <Divider type="vertical" />
-            <a href="javascript:;" onClick={() => this.handleEdit(record.id)}>编辑</a>
+            <a href="javascript:;" onClick={() => this.handleEdit(record.id)}>
+              编辑
+            </a>
             <Divider type="vertical" />
             <Popconfirm title="确定删除吗？" onConfirm={() => this.handleDestroy(record.id)}>
               <a href="javascript:;">删除</a>
             </Popconfirm>
           </span>
         ),
-      }
+      },
     ];
 
     const rangeConfig = {
@@ -429,55 +428,45 @@ class IndexPage extends PureComponent {
                 <Divider type="vertical" />
                 <Button onClick={() => this.handleMultiStatusChange(1)}>审核</Button>&nbsp;
                 <Button onClick={() => this.handleMultiStatusChange(2)}>禁用</Button>&nbsp;
-                <Button onClick={() => this.handleMultiDestroy()} type="danger" >删除</Button>
+                <Button onClick={() => this.handleMultiDestroy()} type="danger">
+                  删除
+                </Button>
               </Col>
               <Col span={16}>
                 <div className={styles.floatRight}>
                   <Form layout="inline" onSubmit={this.handleSearch}>
                     <Form.Item style={{ marginBottom: 0 }}>
-                      {getFieldDecorator('typeid',
-                        {
-                          initialValue: '0'
-                        })(
-                          <Select
-                            style={{ width: 160 }}
-                            placeholder="选择分类"
-                          >
-                            <Option key={0}>所有分类</Option>
-                            {
-                              this.state.data.types.length !== 0 ? this.state.data.types.map(d => <Option key={d.type}>{d.typeT}</Option>) : console.log('select data null')
-                            }
-                          </Select>
+                      {getFieldDecorator('typeid', {
+                        initialValue: '0',
+                      })(
+                        <Select style={{ width: 160 }} placeholder="选择分类">
+                          <Option key={0}>所有分类</Option>
+                          {this.state.data.types.length !== 0
+                            ? this.state.data.types.map(d => (
+                                <Option key={d.type}>{d.typeT}</Option>
+                              ))
+                            : console.log('select data null')}
+                        </Select>,
                       )}
                     </Form.Item>
                     <Form.Item style={{ marginBottom: 0 }}>
-                      {getFieldDecorator('status',
-                        {
-                          initialValue: '0'
-                        })(
-                          <Select
-                            style={{ width: 160 }}
-                            placeholder="所选状态"
-                          >
-                            <Option key={0}>所有状态</Option>
-                            <Option key={1}>正常</Option>
-                            <Option key={2}>已禁用</Option>
-                          </Select>
+                      {getFieldDecorator('status', {
+                        initialValue: '0',
+                      })(
+                        <Select style={{ width: 160 }} placeholder="所选状态">
+                          <Option key={0}>所有状态</Option>
+                          <Option key={1}>正常</Option>
+                          <Option key={2}>已禁用</Option>
+                        </Select>,
                       )}
                     </Form.Item>
-                    <Form.Item
-                      style={{ display: 'inline-block'}}
-                    >
+                    <Form.Item style={{ display: 'inline-block' }}>
                       {getFieldDecorator('title')(
-                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />
+                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />,
                       )}
                     </Form.Item>
-                    <Form.Item
-                      style={{ display: 'inline-block'}}
-                    >
-                    <Button htmlType="submit">
-                      搜索
-                    </Button>
+                    <Form.Item style={{ display: 'inline-block' }}>
+                      <Button htmlType="submit">搜索</Button>
                     </Form.Item>
                     <Form.Item style={{ marginRight: 10 }}>
                       <a style={{ fontSize: 12 }} onClick={this.toggle}>
@@ -490,56 +479,44 @@ class IndexPage extends PureComponent {
             </Row>
           </div>
 
-          <div className={styles.tableAdvancedSearchBar} style={{ display: this.state.expand ? 'block' : 'none' }}>
+          <div
+            className={styles.tableAdvancedSearchBar}
+            style={{ display: this.state.expand ? 'block' : 'none' }}
+          >
             <Row>
               <Col span={24}>
                 <Form layout="inline" onSubmit={this.handleSearch}>
-                  <Form.Item
-                    label="标题"
-                    style={{ display: 'inline-block'}}
-                  >
+                  <Form.Item label="标题" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('title')(
-                      <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />
+                      <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />,
                     )}
                   </Form.Item>
                   <Form.Item label="分类" style={{ marginBottom: 0 }}>
-                    {getFieldDecorator('typeid',
-                      {
-                        initialValue: '0'
-                      })(
-                        <Select
-                          style={{ width: 160 }}
-                          placeholder="选择分类"
-                        >
-                          <Option key={0}>所有分类</Option>
-                          {
-                            this.state.data.types.length !== 0 ? this.state.data.types.map(d => <Option key={d.type}>{d.type}</Option>) : console.log('select data null')
-                          }
-                        </Select>
+                    {getFieldDecorator('typeid', {
+                      initialValue: '0',
+                    })(
+                      <Select style={{ width: 160 }} placeholder="选择分类">
+                        <Option key={0}>所有分类</Option>
+                        {this.state.data.types.length !== 0
+                          ? this.state.data.types.map(d => <Option key={d.type}>{d.type}</Option>)
+                          : console.log('select data null')}
+                      </Select>,
                     )}
                   </Form.Item>
 
-                  <Form.Item
-                    label="评论日期"
-                  >
-                    {getFieldDecorator('dateRange')(
-                      <RangePicker />
-                    )}
+                  <Form.Item label="评论日期">
+                    {getFieldDecorator('dateRange')(<RangePicker />)}
                   </Form.Item>
 
                   <Form.Item label="状态" style={{ marginBottom: 0 }}>
-                    {getFieldDecorator('status',
-                      {
-                        initialValue: '0'
-                      })(
-                        <Select
-                          style={{ width: 160 }}
-                          placeholder="所选状态"
-                        >
-                          <Option key={0}>所有状态</Option>
-                          <Option key={1}>正常</Option>
-                          <Option key={2}>已禁用</Option>
-                        </Select>
+                    {getFieldDecorator('status', {
+                      initialValue: '0',
+                    })(
+                      <Select style={{ width: 160 }} placeholder="所选状态">
+                        <Option key={0}>所有状态</Option>
+                        <Option key={1}>正常</Option>
+                        <Option key={2}>已禁用</Option>
+                      </Select>,
                     )}
                   </Form.Item>
                   <Form.Item>
@@ -547,9 +524,7 @@ class IndexPage extends PureComponent {
                       高级搜索
                     </Button>
                     &nbsp;
-                    <Button onClick={this.handleResetSearch}>
-                      重置
-                    </Button>
+                    <Button onClick={this.handleResetSearch}>重置</Button>
                   </Form.Item>
                 </Form>
               </Col>

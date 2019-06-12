@@ -21,7 +21,7 @@ import {
   Divider,
   Popconfirm,
   DatePicker,
-  TimePicker
+  TimePicker,
 } from 'antd';
 
 const Search = Input.Search;
@@ -33,29 +33,26 @@ const Option = Select.Option;
 @connect(({ model }) => ({
   model,
 }))
-
 @Form.create()
-
 class IndexPage extends PureComponent {
-
   // 定义要操作的模型名称
   modelName = 'permission';
   // 定义guardName
   guardName = 'admin';
 
   state = {
-    msg : '',
-    url : '',
-    data : {
-      'categorys':[]
+    msg: '',
+    url: '',
+    data: {
+      categorys: [],
     },
-    status : '',
+    status: '',
     pagination: {},
     loading: false,
     previewVisible: false,
     previewImage: '',
     expand: false, // 高级搜索是否展开
-    selectedRowKeys: []
+    selectedRowKeys: [],
   };
 
   // 当挂在模板时，初始化数据
@@ -65,79 +62,74 @@ class IndexPage extends PureComponent {
 
     // 调用model
     this.props.dispatch({
-        type: 'model/index',
-        payload:{
-          modelName:this.modelName,
-          guardName:this.guardName
-        },
-        callback: (res) => {
-          // 执行成功后，进行回调
-          if (res) {
-            this.setState({ ...res,loading:false });
-          }
+      type: 'model/index',
+      payload: {
+        modelName: this.modelName,
+        guardName: this.guardName,
+      },
+      callback: res => {
+        // 执行成功后，进行回调
+        if (res) {
+          this.setState({ ...res, loading: false });
         }
+      },
     });
   }
 
   // 同步权限
   handleCreate = () => {
-
     const { dispatch } = this.props;
     dispatch({
       type: 'model/store',
-      payload:{
-        modelName:this.modelName
-      }
+      payload: {
+        modelName: this.modelName,
+      },
     }).then(() => {
       // 操作成功
-      if(this.state.status === 'success') {
-
+      if (this.state.status === 'success') {
         const { dispatch } = this.props;
         // 调用model
         dispatch({
-            type: 'model/index',
-            payload:{
-              modelName:this.modelName,
-              ...this.state.pagination,
-              search:this.state.search
-            },
-            callback: (res) => {
-              // 执行成功后，进行回调
-              if (res) {
-                this.setState({ ...res, loading:false});
-              }
+          type: 'model/index',
+          payload: {
+            modelName: this.modelName,
+            ...this.state.pagination,
+            search: this.state.search,
+          },
+          callback: res => {
+            // 执行成功后，进行回调
+            if (res) {
+              this.setState({ ...res, loading: false });
             }
+          },
         });
       }
     });
-  }
+  };
 
   // 删除操作
-  handleDestroy = (id) => {
-
+  handleDestroy = id => {
     const { dispatch } = this.props;
     dispatch({
       type: 'model/destroy',
-      payload:{
-        modelName:this.modelName,
-        id:id
-      }
+      payload: {
+        modelName: this.modelName,
+        id: id,
+      },
     }).then(() => {
       // 操作成功
-      if(this.state.status === 'success') {
-
+      if (this.state.status === 'success') {
         // 过滤数据
-        this.state.data.lists = this.state.data.lists.filter(item => item.id !== id)
-        
+        this.state.data.lists = this.state.data.lists.filter(item => item.id !== id);
+
         // 更新数据
         this.setState({ ...this.state.data });
       }
     });
-  }
+  };
 
   // 删除多个操作
   handleMultiDestroy = () => {
-
     const that = this;
     confirm({
       title: '确定删除这些数据吗？',
@@ -150,27 +142,27 @@ class IndexPage extends PureComponent {
         const { dispatch } = that.props;
         dispatch({
           type: 'model/destroy',
-          payload:{
-            modelName:that.modelName,
-            id:ids
-          }
+          payload: {
+            modelName: that.modelName,
+            id: ids,
+          },
         }).then(() => {
           // 操作成功
-          if(that.state.status === 'success') {
-            ids.map((id) => {
-              that.state.data.lists = that.state.data.lists.filter(item => item.id !== id)
-            })
+          if (that.state.status === 'success') {
+            ids.map(id => {
+              that.state.data.lists = that.state.data.lists.filter(item => item.id !== id);
+            });
             // 更新数据
-            that.setState({ ...that.state.data, selectedRowKeys:[]});
+            that.setState({ ...that.state.data, selectedRowKeys: [] });
           }
         });
       },
       onCancel() {},
     });
-  }
+  };
 
   // 改变多个数据状态操作
-  handleMultiStatusChange = (status) => {
+  handleMultiStatusChange = status => {
     // loading
     this.setState({ loading: true });
 
@@ -179,31 +171,30 @@ class IndexPage extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'model/changeStatus',
-      payload:{
-        modelName:this.modelName,
-        id:ids,
-        status:status
-      }
+      payload: {
+        modelName: this.modelName,
+        id: ids,
+        status: status,
+      },
     }).then(() => {
       const { dispatch } = this.props;
       // 调用model
       dispatch({
-          type: 'model/index',
-          payload:{
-            modelName:this.modelName,
-            ...this.state.pagination,
-            search:this.state.search
-          },
-          callback: (res) => {
-            // 执行成功后，进行回调
-            if (res) {
-              this.setState({ ...res, loading:false});
-            }
+        type: 'model/index',
+        payload: {
+          modelName: this.modelName,
+          ...this.state.pagination,
+          search: this.state.search,
+        },
+        callback: res => {
+          // 执行成功后，进行回调
+          if (res) {
+            this.setState({ ...res, loading: false });
           }
+        },
       });
-
     });
-  }
+  };
 
   // 分页切换
   handleTableChange = (pagination, filters, sorter) => {
@@ -212,68 +203,65 @@ class IndexPage extends PureComponent {
     const { dispatch } = this.props;
     // 调用model
     dispatch({
-        type: 'model/index',
-        payload:{
-          modelName:this.modelName,
-          pageSize:pagination.pageSize, // 分页数量
-          current:pagination.current, // 当前页码
-          sortField: sorter.field, // 排序字段
-          sortOrder: sorter.order, // 排序规则
-          ...filters, // 筛选
-          search:this.state.search,
-          guardName:this.guardName
-        },
-        callback: (res) => {
-          // 执行成功后，进行回调
-          if (res) {
-            this.setState({ ...res,loading:false, selectedRowKeys:[]});
-          }
+      type: 'model/index',
+      payload: {
+        modelName: this.modelName,
+        pageSize: pagination.pageSize, // 分页数量
+        current: pagination.current, // 当前页码
+        sortField: sorter.field, // 排序字段
+        sortOrder: sorter.order, // 排序规则
+        ...filters, // 筛选
+        search: this.state.search,
+        guardName: this.guardName,
+      },
+      callback: res => {
+        // 执行成功后，进行回调
+        if (res) {
+          this.setState({ ...res, loading: false, selectedRowKeys: [] });
         }
+      },
     });
-  }
+  };
 
   // 展开或收缩高级搜索
   toggle = () => {
     const { expand } = this.state;
     this.setState({ expand: !expand });
-  }
+  };
 
   // 全选
   handleSelectAll = () => {
+    let rowKeys = this.state.data.lists.map(item => {
+      return item.id;
+    });
 
-    let rowKeys = this.state.data.lists.map((item) => {
-        return item.id
-    })
-
-    console.log(rowKeys)
+    console.log(rowKeys);
 
     this.setState({
-      selectedRowKeys: rowKeys
+      selectedRowKeys: rowKeys,
     });
-  }
+  };
 
   // 取消全选
   handleCancelSelectAll = () => {
-
     this.setState({
-      selectedRowKeys: []
+      selectedRowKeys: [],
     });
-  }
+  };
 
   // 选择事件
-  onSelectChange = (selectedRowKeys) => {
+  onSelectChange = selectedRowKeys => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     this.setState({ selectedRowKeys });
-  }
+  };
 
   // 搜索
-  handleSearch = (e) => {
+  handleSearch = e => {
     e.preventDefault();
 
     this.props.form.validateFields((err, values) => {
-
-      if(values.dateRange) {
-        if(values.dateRange[0] && values.dateRange[1]) {
+      if (values.dateRange) {
+        if (values.dateRange[0] && values.dateRange[1]) {
           // 时间标准化
           let dateStart = values.dateRange[0].format('YYYY-MM-DD');
           let dateEnd = values.dateRange[1].format('YYYY-MM-DD');
@@ -282,7 +270,7 @@ class IndexPage extends PureComponent {
           values.dateRange = [];
 
           // 重新赋值对象
-          values.dateRange = [dateStart,dateEnd];
+          values.dateRange = [dateStart, dateEnd];
         }
       }
 
@@ -291,32 +279,30 @@ class IndexPage extends PureComponent {
         const { dispatch } = this.props;
         // 调用model
         dispatch({
-            type: 'model/index',
-            payload:{
-              modelName:this.modelName,
-              ...this.state.pagination,
-              search:values,
-              guardName:this.guardName
-            },
-            callback: (res) => {
-              // 执行成功后，进行回调
-              if (res) {
-                this.setState({ ...res, loading:false});
-              }
+          type: 'model/index',
+          payload: {
+            modelName: this.modelName,
+            ...this.state.pagination,
+            search: values,
+            guardName: this.guardName,
+          },
+          callback: res => {
+            // 执行成功后，进行回调
+            if (res) {
+              this.setState({ ...res, loading: false });
             }
+          },
         });
       }
-
     });
-  }
+  };
 
   // 搜索重置
   handleResetSearch = () => {
     this.props.form.resetFields();
-  }
+  };
 
   render() {
-
     const { getFieldDecorator } = this.props.form;
 
     // 默认选中的行
@@ -329,9 +315,9 @@ class IndexPage extends PureComponent {
       getCheckboxProps: record => ({
         name: record.name,
       }),
-      fixed:'left',
+      fixed: 'left',
     };
-    
+
     const columns = [
       {
         title: '名称',
@@ -348,14 +334,14 @@ class IndexPage extends PureComponent {
         key: 'action',
         fixed: 'right',
         width: 260,
-        render: (text, record ) => (
+        render: (text, record) => (
           <span>
             <Popconfirm title="确定删除吗？" onConfirm={() => this.handleDestroy(record.id)}>
               <a href="javascript:;">删除</a>
             </Popconfirm>
           </span>
         ),
-      }
+      },
     ];
 
     const rangeConfig = {
@@ -372,9 +358,25 @@ class IndexPage extends PureComponent {
               </Col>
               <Col span={12}>
                 <div className={styles.floatRight}>
-                  <Button type="primary" onClick={() => this.handleCreate()}><Icon type="sync" />同步权限</Button>
+                  <Button type="primary" onClick={() => this.handleCreate()}>
+                    <Icon type="sync" />
+                    同步权限
+                  </Button>
                   &nbsp;
-                  <a href={'/api/admin/'+this.modelName+'/export?'+stringify({search:this.state.search})} target="_blank"><Button><Icon type="export"/>导出数据</Button></a>
+                  <a
+                    href={
+                      '/api/admin/' +
+                      this.modelName +
+                      '/export?' +
+                      stringify({ search: this.state.search })
+                    }
+                    target="_blank"
+                  >
+                    <Button>
+                      <Icon type="export" />
+                      导出数据
+                    </Button>
+                  </a>
                 </div>
               </Col>
             </Row>
@@ -388,24 +390,20 @@ class IndexPage extends PureComponent {
                   <Button onClick={() => this.handleCancelSelectAll()}>取消</Button>
                 </ButtonGroup>
                 <Divider type="vertical" />
-                <Button onClick={() => this.handleMultiDestroy()} type="danger" >删除</Button>
+                <Button onClick={() => this.handleMultiDestroy()} type="danger">
+                  删除
+                </Button>
               </Col>
               <Col span={16}>
                 <div className={styles.floatRight}>
                   <Form layout="inline" onSubmit={this.handleSearch}>
-                    <Form.Item
-                      style={{ display: 'inline-block'}}
-                    >
+                    <Form.Item style={{ display: 'inline-block' }}>
                       {getFieldDecorator('query')(
-                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />
+                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />,
                       )}
                     </Form.Item>
-                    <Form.Item
-                      style={{ display: 'inline-block'}}
-                    >
-                    <Button htmlType="submit">
-                      搜索
-                    </Button>
+                    <Form.Item style={{ display: 'inline-block' }}>
+                      <Button htmlType="submit">搜索</Button>
                     </Form.Item>
                     <Form.Item style={{ marginRight: 10 }}>
                       <a style={{ fontSize: 12 }} onClick={this.toggle}>
@@ -418,11 +416,12 @@ class IndexPage extends PureComponent {
             </Row>
           </div>
 
-          <div className={styles.tableAdvancedSearchBar} style={{ display: this.state.expand ? 'block' : 'none' }}>
+          <div
+            className={styles.tableAdvancedSearchBar}
+            style={{ display: this.state.expand ? 'block' : 'none' }}
+          >
             <Row>
-              <Col span={24}>
-
-              </Col>
+              <Col span={24}></Col>
             </Row>
           </div>
 

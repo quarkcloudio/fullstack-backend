@@ -297,7 +297,12 @@ class EditPage extends PureComponent {
       <PageHeaderWrapper>
         <div className={styles.container}>
           <Form onSubmit={this.handleSubmit}>
-            <Tabs defaultActiveKey="1" tabBarExtraContent={<a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>}>
+            <Tabs
+              defaultActiveKey="1"
+              tabBarExtraContent={
+                <a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>
+              }
+            >
               {/* tab */}
               <TabPane tab="基本" key="1">
                 <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="标题">
@@ -309,7 +314,7 @@ class EditPage extends PureComponent {
                       },
                       {
                         rules: [{ required: true, message: '请输入标题！' }],
-                      }
+                      },
                     )(<Input className={styles.middleItem} placeholder="请输入标题" />)}
                   </Form.Item>
                   <Form.Item style={{ display: 'inline-block', marginBottom: 8, marginLeft: 10 }}>
@@ -327,7 +332,7 @@ class EditPage extends PureComponent {
                       className={styles.middleItem}
                       placeholder="请输入描述"
                       autosize={{ minRows: 3, maxRows: 6 }}
-                    />
+                    />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="标签">
@@ -338,7 +343,7 @@ class EditPage extends PureComponent {
                       className={styles.middleItem}
                       placeholder="请输入标签"
                       autosize={{ minRows: 3, maxRows: 6 }}
-                    />
+                    />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="作者">
@@ -362,7 +367,7 @@ class EditPage extends PureComponent {
                       },
                       {
                         rules: [{ type: 'number', message: '必须为数字' }],
-                      }
+                      },
                     )(<InputNumber min={0} max={100000} />)}{' '}
                     (越大越靠前)
                   </Form.Item>
@@ -376,7 +381,7 @@ class EditPage extends PureComponent {
                       <Checkbox value={2}>频道推荐</Checkbox>
                       <Checkbox value={4}>列表推荐</Checkbox>
                       <Checkbox value={8}>详情推荐</Checkbox>
-                    </Checkbox.Group>
+                    </Checkbox.Group>,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="展现形式">
@@ -388,7 +393,7 @@ class EditPage extends PureComponent {
                       <Radio value={2}>单图（小）</Radio>
                       <Radio value={3}>多图</Radio>
                       <Radio value={4}>单图（大）</Radio>
-                    </RadioGroup>
+                    </RadioGroup>,
                   )}
                 </Form.Item>
 
@@ -413,7 +418,7 @@ class EditPage extends PureComponent {
                       {this.state.data.categorys.length !== 0
                         ? this.state.data.categorys.map(d => <Option key={d.id}>{d.title}</Option>)
                         : console.log('select data null')}
-                    </Select>
+                    </Select>,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="允许评论">
@@ -444,7 +449,7 @@ class EditPage extends PureComponent {
                       locale={locale}
                       format="YYYY-MM-DD HH:mm:ss"
                       placeholder="请选择时间"
-                    />
+                    />,
                   )}
                 </Form.Item>
               </TabPane>

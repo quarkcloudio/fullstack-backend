@@ -291,24 +291,29 @@ class CreatePage extends PureComponent {
       <PageHeaderWrapper>
         <div className={styles.container}>
           <Form onSubmit={this.handleSubmit}>
-            <Tabs defaultActiveKey="1" tabBarExtraContent={<a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>}>
+            <Tabs
+              defaultActiveKey="1"
+              tabBarExtraContent={
+                <a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>
+              }
+            >
               {/* tab */}
               <TabPane tab="基本" key="1">
                 <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="标题">
                   <Form.Item style={{ display: 'inline-block', marginBottom: 8 }}>
                     {getFieldDecorator('title')(
-                      <Input className={styles.smallItem} placeholder="请输入标题" />
+                      <Input className={styles.smallItem} placeholder="请输入标题" />,
                     )}
                   </Form.Item>
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="名称">
                   {getFieldDecorator('name')(
-                    <Input className={styles.smallItem} placeholder="请输入名称" />
+                    <Input className={styles.smallItem} placeholder="请输入名称" />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="分类类型">
                   {getFieldDecorator('type')(
-                    <Input className={styles.smallItem} placeholder="请输入分类" />
+                    <Input className={styles.smallItem} placeholder="请输入分类" />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="描述">
@@ -317,19 +322,13 @@ class CreatePage extends PureComponent {
                       className={styles.middleItem}
                       placeholder="请输入描述"
                       autosize={{ minRows: 3, maxRows: 6 }}
-                    />
+                    />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="排序">
                   {getFieldDecorator('sort', {
                     initialValue: 0,
-                  })(
-                    <InputNumber
-                      className={styles.smallItem}
-                      min={0}
-                      max={100000}
-                    />
-                  )}
+                  })(<InputNumber className={styles.smallItem} min={0} max={100000} />)}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="父节点">
                   {getFieldDecorator('pid')(
@@ -337,7 +336,7 @@ class CreatePage extends PureComponent {
                       {this.state.data.categorys.length !== 0
                         ? this.state.data.categorys.map(d => <Option key={d.id}>{d.title}</Option>)
                         : console.log('select data null')}
-                    </Select>
+                    </Select>,
                   )}
                 </Form.Item>
               </TabPane>
@@ -360,17 +359,17 @@ class CreatePage extends PureComponent {
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="频道模板">
                   {getFieldDecorator('indexTpl')(
-                    <Input className={styles.smallItem} placeholder="请输入模板" />
+                    <Input className={styles.smallItem} placeholder="请输入模板" />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="列表模板">
                   {getFieldDecorator('listsTpl')(
-                    <Input className={styles.smallItem} placeholder="请输入模板" />
+                    <Input className={styles.smallItem} placeholder="请输入模板" />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="详情模板">
                   {getFieldDecorator('detailTpl')(
-                    <Input className={styles.smallItem} placeholder="请输入模板" />
+                    <Input className={styles.smallItem} placeholder="请输入模板" />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="分页数量">
@@ -382,18 +381,16 @@ class CreatePage extends PureComponent {
                       min={0}
                       placeholder="10"
                       max={100000}
-                    />
+                    />,
                   )}
                 </Form.Item>
               </TabPane>
             </Tabs>
             <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="状态">
-              {getFieldDecorator('status',{
+              {getFieldDecorator('status', {
                 initialValue: true,
                 valuePropName: 'checked',
-              })(
-                <Switch checkedChildren="正常" unCheckedChildren="禁用" />
-              )}
+              })(<Switch checkedChildren="正常" unCheckedChildren="禁用" />)}
             </Form.Item>
             <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
               <Button type="primary" htmlType="submit">

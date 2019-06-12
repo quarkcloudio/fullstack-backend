@@ -1,28 +1,28 @@
 import { message } from 'antd';
-import { index,destroy,changeStatus,create,store,edit,save } from '@/services/builder';
+import { index, destroy, changeStatus, create, store, edit, save } from '@/services/builder';
 import { routerRedux } from 'dva/router';
 
 export default {
   namespace: 'builder',
 
-  state: { 
-    msg : '',
-    url : '',
-    data : [],
-    pagination : [],
-    status : '',
+  state: {
+    msg: '',
+    url: '',
+    data: [],
+    pagination: [],
+    status: '',
   },
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname, query }) => {
         //打开页面时，进行操作
-        console.log('subscriptions')
+        console.log('subscriptions');
       });
     },
   },
   effects: {
-    *index({ payload, callback}, { put, call }) {
-      const response = yield call(index,payload);
+    *index({ payload, callback }, { put, call }) {
+      const response = yield call(index, payload);
       if (response.status === 'success') {
         yield put({
           type: 'updateState',
@@ -35,9 +35,9 @@ export default {
       }
     },
     *destroy({ type, payload }, { put, call, select }) {
-      const response = yield call(destroy,payload);
+      const response = yield call(destroy, payload);
       // 操作成功
-      if(response.status ==='success') {
+      if (response.status === 'success') {
         // 提示信息
         message.success(response.msg, 3);
       } else {
@@ -45,9 +45,9 @@ export default {
       }
     },
     *changeStatus({ payload, callback }, { put, call, select }) {
-      const response = yield call(changeStatus,payload);
+      const response = yield call(changeStatus, payload);
       // 操作成功
-      if(response.status ==='success') {
+      if (response.status === 'success') {
         // 提示信息
         message.success(response.msg, 3);
 
@@ -64,7 +64,7 @@ export default {
       }
     },
     *create({ payload, callback }, { put, call, select }) {
-      const response = yield call(create,payload);
+      const response = yield call(create, payload);
       if (response.status === 'success') {
         yield put({
           type: 'updateState',
@@ -77,24 +77,23 @@ export default {
       }
     },
     *store({ type, payload }, { put, call, select }) {
-      const response = yield call(store,payload);
+      const response = yield call(store, payload);
       // 操作成功
-      if(response.status ==='success') {
+      if (response.status === 'success') {
         // 提示信息
         message.success(response.msg, 3);
         // 页面跳转
         yield put(
           routerRedux.push({
-            pathname: response.url
-          })
+            pathname: response.url,
+          }),
         );
-
       } else {
         message.error(response.msg, 3);
       }
     },
     *edit({ payload, callback }, { put, call, select }) {
-      const response = yield call(edit,payload);
+      const response = yield call(edit, payload);
       if (response.status === 'success') {
         yield put({
           type: 'updateState',
@@ -107,25 +106,24 @@ export default {
       }
     },
     *save({ type, payload }, { put, call, select }) {
-      const response = yield call(save,payload);
+      const response = yield call(save, payload);
       // 操作成功
-      if(response.status ==='success') {
+      if (response.status === 'success') {
         // 提示信息
         message.success(response.msg, 3);
         // 页面跳转
         yield put(
           routerRedux.push({
-            pathname: response.url
-          })
+            pathname: response.url,
+          }),
         );
-
       } else {
         message.error(response.msg, 3);
       }
     },
     // 弹窗创建数据
     *modalCreate({ payload, callback }, { put, call, select }) {
-      const response = yield call(create,payload);
+      const response = yield call(create, payload);
       if (response.status === 'success') {
         yield put({
           type: 'updateState',
@@ -139,9 +137,9 @@ export default {
     },
     // 弹窗保存数据
     *modalStore({ type, payload }, { put, call, select }) {
-      const response = yield call(store,payload);
+      const response = yield call(store, payload);
       // 操作成功
-      if(response.status ==='success') {
+      if (response.status === 'success') {
         // 提示信息
         message.success(response.msg, 3);
       } else {
@@ -150,7 +148,7 @@ export default {
     },
     // 弹窗编辑数据
     *modalEdit({ payload, callback }, { put, call, select }) {
-      const response = yield call(edit,payload);
+      const response = yield call(edit, payload);
       if (response.status === 'success') {
         yield put({
           type: 'updateState',
@@ -164,9 +162,9 @@ export default {
     },
     // 弹窗保存编辑数据
     *modalSave({ type, payload }, { put, call, select }) {
-      const response = yield call(save,payload);
+      const response = yield call(save, payload);
       // 操作成功
-      if(response.status ==='success') {
+      if (response.status === 'success') {
         // 提示信息
         message.success(response.msg, 3);
       } else {
@@ -174,8 +172,8 @@ export default {
       }
     },
 
-    *myPublished({ payload, callback}, { put, call }) {
-      const response = yield call(myPublished,payload);
+    *myPublished({ payload, callback }, { put, call }) {
+      const response = yield call(myPublished, payload);
       if (response.status === 'success') {
         yield put({
           type: 'updateState',
@@ -195,4 +193,4 @@ export default {
       };
     },
   },
-}
+};

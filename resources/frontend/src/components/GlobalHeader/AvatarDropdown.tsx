@@ -31,7 +31,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
 
     if (key === 'settings') {
       router.push('/account/settings/info');
-      
+
       return;
     }
 

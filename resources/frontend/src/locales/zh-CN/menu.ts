@@ -36,7 +36,7 @@ export default {
   'menu.plugin.comment': '评论管理',
   'menu.plugin.link': '友情链接',
   'menu.plugin.printer': '打印机管理',
-  
+
   // 系统
   'menu.system': '系统配置',
   //设置管理
@@ -58,8 +58,8 @@ export default {
   //短信列表
   'menu.system.sms.index': '短信列表',
   //日志列表
-  'menu.system.actionLog.index': '操作日志',  
-  
+  'menu.system.actionLog.index': '操作日志',
+
   // 附件管理
   'menu.attachment': '附件空间',
   'menu.attachment.file': '文件管理',
@@ -73,7 +73,7 @@ export default {
   'menu.result': '结果页',
   'menu.result.success': '成功页',
   'menu.result.fail': '失败页',
-  
+
   'menu.exception': '异常页',
   'menu.exception.not-permission': '403',
   'menu.exception.not-find': '404',

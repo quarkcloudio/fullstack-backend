@@ -26,7 +26,7 @@ import {
   Radio,
   Upload,
   message,
-  Modal
+  Modal,
 } from 'antd';
 
 const { TextArea } = Input;
@@ -37,33 +37,29 @@ const RadioGroup = Radio.Group;
 @connect(({ model }) => ({
   model,
 }))
-
 @Form.create()
-
 class CreatePage extends PureComponent {
-
   // 定义要操作的模型名称
   modelName = 'user';
 
   state = {
-    msg : '',
-    url : '',
-    data : {
-      'categorys':[],
-      'file_id':null,
-      'file_name':null,
-      'file_path':null,
+    msg: '',
+    url: '',
+    data: {
+      categorys: [],
+      file_id: null,
+      file_name: null,
+      file_path: null,
     },
-    status : '',
+    status: '',
     pagination: {},
     loading: false,
   };
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
 
     this.props.form.validateFields((err, values) => {
-
       // 数据id
       values.id = this.state.data.id;
       // 封面图id
@@ -73,17 +69,16 @@ class CreatePage extends PureComponent {
       if (!err) {
         this.props.dispatch({
           type: 'model/store',
-          payload:{
-            modelName:this.modelName,
-            ...values
-          }
+          payload: {
+            modelName: this.modelName,
+            ...values,
+          },
         });
       }
     });
-  }
+  };
 
   render() {
-
     const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
@@ -111,14 +106,14 @@ class CreatePage extends PureComponent {
     // 图片上传
     const uploadPictureProps = {
       name: 'file',
-      listType: "picture-card",
+      listType: 'picture-card',
       showUploadList: false,
       action: '/api/admin/picture/upload',
       headers: {
         authorization: 'Bearer ' + sessionStorage['token'],
       },
-      beforeUpload: (file)=> {
-        if ((file.type !== 'image/jpeg') && (file.type !== 'image/png')) {
+      beforeUpload: file => {
+        if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
           message.error('请上传jpg或png格式的图片!');
           return false;
         }
@@ -129,8 +124,7 @@ class CreatePage extends PureComponent {
         }
         return true;
       },
-      onChange: (info)=> {
-
+      onChange: info => {
         if (info.file.status === 'uploading') {
           this.setState({ loading: true });
           return;
@@ -138,13 +132,12 @@ class CreatePage extends PureComponent {
 
         if (info.file.status === 'done') {
           // Get this url from response in real world.
-          if(info.file.response.status === 'success') {
-
+          if (info.file.response.status === 'success') {
             let stateData = this.state.data;
             stateData.cover_id = info.file.response.data.id;
             stateData.cover_path = info.file.response.data.url;
 
-            this.setState({data:stateData,loading: false});
+            this.setState({ data: stateData, loading: false });
           } else {
             message.error(info.file.response.msg);
           }
@@ -157,7 +150,7 @@ class CreatePage extends PureComponent {
       name: 'file',
       action: '/api/admin/file/upload',
       headers: {
-        authorization: 'Bearer '+sessionStorage['token'],
+        authorization: 'Bearer ' + sessionStorage['token'],
       },
       onChange(info) {
         if (info.file.status !== 'uploading') {
@@ -183,67 +176,55 @@ class CreatePage extends PureComponent {
             <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="头像">
                 <Upload {...uploadPictureProps}>
-                  {this.state.data.cover_path ? <img src={this.state.data.cover_path} alt="avatar" width={80} /> : uploadButton}
+                  {this.state.data.cover_path ? (
+                    <img src={this.state.data.cover_path} alt="avatar" width={80} />
+                  ) : (
+                    uploadButton
+                  )}
                 </Upload>
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="用户名">
-                {getFieldDecorator('name',{
-                      rules: [{ required: true, message: '用户名必填！' }],
-                  })(
-                  <Input className={styles.smallItem} placeholder="请输入用户名" />
-                )}
+                {getFieldDecorator('name', {
+                  rules: [{ required: true, message: '用户名必填！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入用户名" />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="昵称">
-                {getFieldDecorator('nickname',{
-                      rules: [{ required: true, message: '昵称必填！' }],
-                  })(
-                  <Input className={styles.smallItem} placeholder="请输入昵称" />
-                )}
+                {getFieldDecorator('nickname', {
+                  rules: [{ required: true, message: '昵称必填！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入昵称" />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="邮箱">
-                {getFieldDecorator('email',{
-                      rules: [{ required: true, message: '邮箱必填！' }],
-                  })(
-                  <Input className={styles.smallItem} placeholder="请输入邮箱" />
-                )}
+                {getFieldDecorator('email', {
+                  rules: [{ required: true, message: '邮箱必填！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入邮箱" />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="性别">
                 {getFieldDecorator('sex', {
-                    initialValue: 1,
-                  })(
+                  initialValue: 1,
+                })(
                   <RadioGroup>
                     <Radio value={1}>男</Radio>
                     <Radio value={2}>女</Radio>
-                  </RadioGroup>
+                  </RadioGroup>,
                 )}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="密码">
-                {getFieldDecorator('password',{
-                      rules: [{ required: true, message: '密码必填！' }],
-                  })(
-                  <Input className={styles.smallItem} type="password" placeholder="请输入密码" />
-                )}
+                {getFieldDecorator('password', {
+                  rules: [{ required: true, message: '密码必填！' }],
+                })(<Input className={styles.smallItem} type="password" placeholder="请输入密码" />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="手机号">
-                {getFieldDecorator('phone',{
-                      rules: [{ required: true, message: '手机号必填！' }],
-                  })(
-                  <Input className={styles.smallItem} placeholder="请输入手机号" />
-                )}
+                {getFieldDecorator('phone', {
+                  rules: [{ required: true, message: '手机号必填！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入手机号" />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="状态">
-                {
-                  getFieldDecorator('status',{
-                    initialValue: true,
-                    valuePropName: 'checked',
-                    })(
-                    <Switch checkedChildren="正常" unCheckedChildren="禁用" />
-                  )
-                }
+                {getFieldDecorator('status', {
+                  initialValue: true,
+                  valuePropName: 'checked',
+                })(<Switch checkedChildren="正常" unCheckedChildren="禁用" />)}
               </Form.Item>
-              <Form.Item
-                wrapperCol={{ span: 12, offset: 5 }}
-              >
+              <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
                 <Button type="primary" htmlType="submit">
                   提交
                 </Button>

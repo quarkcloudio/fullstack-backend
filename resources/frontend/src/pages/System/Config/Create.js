@@ -296,39 +296,41 @@ class CreatePage extends PureComponent {
             bordered={false}
             extra={<a href="javascript:history.go(-1)">返回上一页</a>}
           />
-           <Form onSubmit={this.handleSubmit}>
+          <Form onSubmit={this.handleSubmit}>
             <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="标题">
               <Form.Item style={{ display: 'inline-block', marginBottom: 8 }}>
-                {getFieldDecorator('title',{
-                    rules: [{ required: true, message: '请输入标题！' }],
-                  })(<Input className={styles.smallItem} placeholder="请输入标题" />)}
+                {getFieldDecorator('title', {
+                  rules: [{ required: true, message: '请输入标题！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入标题" />)}
               </Form.Item>
             </Form.Item>
             <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="表单类型">
               <Form.Item style={{ display: 'inline-block', marginBottom: 8 }}>
-                {getFieldDecorator('type',{
-                    rules: [{ required: true, message: '选择表单类型' }],
-                  })(<Select style={{ width: 200 }} placeholder="选择表单类型">
-                      <Option value="text">输入框</Option>
-                      <Option value="textarea">文本域</Option>
-                      <Option value="picture">图片</Option>
-                      <Option value="file">文件</Option>
-                      <Option value="switch">开关</Option>
-                </Select>)}
+                {getFieldDecorator('type', {
+                  rules: [{ required: true, message: '选择表单类型' }],
+                })(
+                  <Select style={{ width: 200 }} placeholder="选择表单类型">
+                    <Option value="text">输入框</Option>
+                    <Option value="textarea">文本域</Option>
+                    <Option value="picture">图片</Option>
+                    <Option value="file">文件</Option>
+                    <Option value="switch">开关</Option>
+                  </Select>,
+                )}
               </Form.Item>
             </Form.Item>
             <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="名称">
               <Form.Item style={{ display: 'inline-block', marginBottom: 8 }}>
-                {getFieldDecorator('name',{
-                    rules: [{ required: true, message: '请输入名称！' }],
-                  })(<Input className={styles.smallItem} placeholder="请输入名称" />)}
+                {getFieldDecorator('name', {
+                  rules: [{ required: true, message: '请输入名称！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入名称" />)}
               </Form.Item>
             </Form.Item>
             <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="分组名称">
               <Form.Item style={{ display: 'inline-block', marginBottom: 8 }}>
-                {getFieldDecorator('groupName',{
-                    rules: [{ required: true, message: '请输入分组名称！' }],
-                  })(<Input className={styles.smallItem} placeholder="请输入分组名称" />)}
+                {getFieldDecorator('groupName', {
+                  rules: [{ required: true, message: '请输入分组名称！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入分组名称" />)}
               </Form.Item>
             </Form.Item>
             <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="备注">
@@ -337,11 +339,11 @@ class CreatePage extends PureComponent {
                   className={styles.middleItem}
                   placeholder="请输入备注"
                   autosize={{ minRows: 3, maxRows: 6 }}
-                />
+                />,
               )}
             </Form.Item>
             <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="启用">
-            {getFieldDecorator('status',{
+              {getFieldDecorator('status', {
                 initialValue: true,
                 valuePropName: 'checked',
               })(<Switch checkedChildren="是" unCheckedChildren="否" />)}

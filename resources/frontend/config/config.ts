@@ -168,7 +168,7 @@ export default {
               path: '/article/edit',
               name: 'edit',
               component: './Article/Edit',
-              hideInMenu:true,
+              hideInMenu: true,
             },
             {
               path: '/article/myPublished',
@@ -196,7 +196,7 @@ export default {
               path: '/page/edit',
               name: 'edit',
               component: './Page/Edit',
-              hideInMenu:true,
+              hideInMenu: true,
             },
           ],
         },
@@ -219,15 +219,15 @@ export default {
               path: '/user/edit',
               name: 'edit',
               component: './User/Edit',
-              hideInMenu:true,
+              hideInMenu: true,
             },
             {
               path: '/user/recharge',
               name: 'recharge',
               component: './User/Recharge',
-              hideInMenu:true,
-            }
-          ]
+              hideInMenu: true,
+            },
+          ],
         },
         {
           path: '/admin',
@@ -292,7 +292,7 @@ export default {
                 },
               ],
             },
-          ]
+          ],
         },
         {
           path: '/banner',
@@ -343,7 +343,7 @@ export default {
                 },
               ],
             },
-          ]
+          ],
         },
         {
           path: '/plugin',
@@ -572,7 +572,7 @@ export default {
                   path: '/account/settings/security',
                   component: './Account/Settings/Security',
                 },
-              ]
+              ],
             },
           ],
         },

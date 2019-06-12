@@ -292,7 +292,12 @@ class CreatePage extends PureComponent {
       <PageHeaderWrapper>
         <div className={styles.container}>
           <Form onSubmit={this.handleSubmit}>
-            <Tabs defaultActiveKey="1" tabBarExtraContent={<a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>}>
+            <Tabs
+              defaultActiveKey="1"
+              tabBarExtraContent={
+                <a href="javascript:history.go(-1)">返回上一页&nbsp;&nbsp;&nbsp;&nbsp;</a>
+              }
+            >
               {/* tab */}
               <TabPane tab="基本" key="1">
                 <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="标题">
@@ -304,7 +309,7 @@ class CreatePage extends PureComponent {
                   <Form.Item style={{ display: 'inline-block', marginBottom: 8, marginLeft: 10 }}>
                     简略标题：
                     {getFieldDecorator('name')(
-                      <Input className={styles.smallItem} placeholder="请输入简略标题" />
+                      <Input className={styles.smallItem} placeholder="请输入简略标题" />,
                     )}
                   </Form.Item>
                 </Form.Item>
@@ -314,7 +319,7 @@ class CreatePage extends PureComponent {
                       className={styles.middleItem}
                       placeholder="请输入描述"
                       autosize={{ minRows: 3, maxRows: 6 }}
-                    />
+                    />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="标签">
@@ -323,19 +328,19 @@ class CreatePage extends PureComponent {
                       className={styles.middleItem}
                       placeholder="请输入标签"
                       autosize={{ minRows: 3, maxRows: 6 }}
-                    />
+                    />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="作者">
                   <Form.Item style={{ display: 'inline-block', marginBottom: 8 }}>
                     {getFieldDecorator('author')(
-                      <Input className={styles.smallItem} placeholder="请输入作者" />
+                      <Input className={styles.smallItem} placeholder="请输入作者" />,
                     )}
                   </Form.Item>
                   <Form.Item style={{ display: 'inline-block', marginBottom: 8, marginLeft: 10 }}>
                     来源：
                     {getFieldDecorator('source')(
-                      <Input className={styles.smallItem} placeholder="请输入来源" />
+                      <Input className={styles.smallItem} placeholder="请输入来源" />,
                     )}
                   </Form.Item>
                   <Form.Item style={{ display: 'inline-block', marginBottom: 8, marginLeft: 10 }}>
@@ -347,7 +352,7 @@ class CreatePage extends PureComponent {
                       },
                       {
                         rules: [{ type: 'number', message: '必须为数字' }],
-                      }
+                      },
                     )(<InputNumber min={0} max={100000} />)}{' '}
                     (越大越靠前)
                   </Form.Item>
@@ -359,19 +364,19 @@ class CreatePage extends PureComponent {
                       <Checkbox value={2}>频道推荐</Checkbox>
                       <Checkbox value={4}>列表推荐</Checkbox>
                       <Checkbox value={8}>详情推荐</Checkbox>
-                    </Checkbox.Group>
+                    </Checkbox.Group>,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="展现形式">
-                  {getFieldDecorator('show_type',{
-                    initialValue: 1
+                  {getFieldDecorator('show_type', {
+                    initialValue: 1,
                   })(
                     <RadioGroup>
                       <Radio value={1}>无图</Radio>
                       <Radio value={2}>单图（小）</Radio>
                       <Radio value={3}>多图</Radio>
                       <Radio value={4}>单图（大）</Radio>
-                    </RadioGroup>
+                    </RadioGroup>,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="封面图">
@@ -392,7 +397,7 @@ class CreatePage extends PureComponent {
                       {this.state.data.categorys.length !== 0
                         ? this.state.data.categorys.map(d => <Option key={d.id}>{d.title}</Option>)
                         : console.log('select data null')}
-                    </Select>
+                    </Select>,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="允许评论">
@@ -421,7 +426,7 @@ class CreatePage extends PureComponent {
                       locale={locale}
                       format="YYYY-MM-DD HH:mm:ss"
                       placeholder="请选择时间"
-                    />
+                    />,
                   )}
                 </Form.Item>
               </TabPane>
@@ -438,7 +443,7 @@ class CreatePage extends PureComponent {
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="访问密码">
                   {getFieldDecorator('password')(
-                    <Input className={styles.smallItem} placeholder="请输入访问密码" />
+                    <Input className={styles.smallItem} placeholder="请输入访问密码" />,
                   )}
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="附件">

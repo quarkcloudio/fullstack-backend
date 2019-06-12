@@ -79,7 +79,7 @@ class IndexPage extends PureComponent {
     dispatch(
       routerRedux.push({
         pathname: '/system/config/create',
-      })
+      }),
     );
   };
 
@@ -90,7 +90,7 @@ class IndexPage extends PureComponent {
       routerRedux.push({
         pathname: '/system/config/edit',
         query: { id: id },
-      })
+      }),
     );
   };
 
@@ -439,12 +439,12 @@ class IndexPage extends PureComponent {
                           <Option key={0}>所有状态</Option>
                           <Option key={1}>正常</Option>
                           <Option key={2}>已禁用</Option>
-                        </Select>
+                        </Select>,
                       )}
                     </Form.Item>
                     <Form.Item style={{ display: 'inline-block' }}>
                       {getFieldDecorator('title')(
-                        <Input placeholder="请输入要搜索的配置标题" style={{ width: 200 }} />
+                        <Input placeholder="请输入要搜索的配置标题" style={{ width: 200 }} />,
                       )}
                     </Form.Item>
                     <Form.Item style={{ display: 'inline-block' }}>
@@ -468,14 +468,14 @@ class IndexPage extends PureComponent {
             <Row>
               <Col span={24}>
                 <Form layout="inline" onSubmit={this.handleSearch}>
-                <Form.Item label="标题" style={{ display: 'inline-block'}}>
+                  <Form.Item label="标题" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('title')(
-                      <Input placeholder="请输入要搜索的配置标题" style={{ width: 200 }} />
+                      <Input placeholder="请输入要搜索的配置标题" style={{ width: 200 }} />,
                     )}
                   </Form.Item>
-                  <Form.Item label="备注" style={{ display: 'inline-block'}}>
+                  <Form.Item label="备注" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('remark')(
-                      <Input placeholder="请输入要搜索的备注信息" style={{ width: 200 }} />
+                      <Input placeholder="请输入要搜索的备注信息" style={{ width: 200 }} />,
                     )}
                   </Form.Item>
                   <Form.Item label="状态" style={{ marginBottom: 0 }}>
@@ -486,13 +486,11 @@ class IndexPage extends PureComponent {
                         <Option key={0}>所有状态</Option>
                         <Option key={1}>正常</Option>
                         <Option key={2}>已禁用</Option>
-                      </Select>
+                      </Select>,
                     )}
                   </Form.Item>
                   <Form.Item label="创建时间">
-                    {getFieldDecorator('dateRange')(
-                      <RangePicker />
-                    )}
+                    {getFieldDecorator('dateRange')(<RangePicker />)}
                   </Form.Item>
                   <Form.Item>
                     <Button type="primary" icon="search" htmlType="submit">

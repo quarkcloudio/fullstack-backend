@@ -27,7 +27,7 @@ import {
   Radio,
   Upload,
   message,
-  Modal
+  Modal,
 } from 'antd';
 
 const { TextArea } = Input;
@@ -39,26 +39,23 @@ const { TreeNode } = Tree;
 @connect(({ model }) => ({
   model,
 }))
-
 @Form.create()
-
 class CreatePage extends PureComponent {
-
   // 定义要操作的模型名称
   modelName = 'role';
   // guardName
   guardlName = 'admin';
 
   state = {
-    msg : '',
-    url : '',
-    data : {
-      'menus':[],
+    msg: '',
+    url: '',
+    data: {
+      menus: [],
     },
-    status : '',
+    status: '',
     pagination: {},
     loading: false,
-    checkedKeys:[]
+    checkedKeys: [],
   };
 
   // 当挂在模板时，初始化数据
@@ -67,31 +64,29 @@ class CreatePage extends PureComponent {
     this.setState({ loading: true });
 
     // 获得url参数
-    const params  = this.props.location.query;
+    const params = this.props.location.query;
 
     // 调用model
     this.props.dispatch({
       type: 'model/create',
-      payload:{
-        modelName:this.modelName,
-        ...params
+      payload: {
+        modelName: this.modelName,
+        ...params,
       },
-      callback: (res) => {
-
+      callback: res => {
         // 执行成功后，进行回调
         if (res) {
           // 接口得到数据，放到state里
-          this.setState({ data:res.data,loading:false});
+          this.setState({ data: res.data, loading: false });
         }
-      }
+      },
     });
   }
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
 
     this.props.form.validateFields((err, values) => {
-
       // 数据id
       values.id = this.state.data.id;
       values.menuIds = this.state.checkedKeys;
@@ -100,33 +95,33 @@ class CreatePage extends PureComponent {
       if (!err) {
         this.props.dispatch({
           type: 'model/store',
-          payload:{
-            modelName:this.modelName,
-            guard_name:this.guardlName,
-            ...values
-          }
+          payload: {
+            modelName: this.modelName,
+            guard_name: this.guardlName,
+            ...values,
+          },
         });
       }
     });
-  }
+  };
 
-  renderTreeNodes = data => data.map((item) => {
-    if (item.children) {
-      return (
-        <TreeNode title={item.title} key={item.key} dataRef={item}>
-          {this.renderTreeNodes(item.children)}
-        </TreeNode>
-      );
-    }
-    return <TreeNode {...item} />;
-  })
+  renderTreeNodes = data =>
+    data.map(item => {
+      if (item.children) {
+        return (
+          <TreeNode title={item.title} key={item.key} dataRef={item}>
+            {this.renderTreeNodes(item.children)}
+          </TreeNode>
+        );
+      }
+      return <TreeNode {...item} />;
+    });
 
-  onCheck = (checkedKeys) => {
-    this.setState({ checkedKeys:checkedKeys});
-  }
+  onCheck = checkedKeys => {
+    this.setState({ checkedKeys: checkedKeys });
+  };
 
   render() {
-
     const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
@@ -155,11 +150,9 @@ class CreatePage extends PureComponent {
           >
             <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
               <Form.Item {...formItemLayout} label="名称">
-                {getFieldDecorator('name',{
-                      rules: [{ required: true, message: '名称必填！' }],
-                  })(
-                  <Input className={styles.smallItem} placeholder="请输入名称" />
-                )}
+                {getFieldDecorator('name', {
+                  rules: [{ required: true, message: '名称必填！' }],
+                })(<Input className={styles.smallItem} placeholder="请输入名称" />)}
               </Form.Item>
               <Form.Item {...formItemLayout} label="权限">
                 <Tree
@@ -171,9 +164,7 @@ class CreatePage extends PureComponent {
                   {this.renderTreeNodes(this.state.data.menus)}
                 </Tree>
               </Form.Item>
-              <Form.Item
-                wrapperCol={{ span: 12, offset: 5 }}
-              >
+              <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
                 <Button type="primary" htmlType="submit">
                   提交
                 </Button>

@@ -28,7 +28,7 @@ import {
   Radio,
   Upload,
   message,
-  Modal
+  Modal,
 } from 'antd';
 
 const { TextArea } = Input;
@@ -39,39 +39,36 @@ const RadioGroup = Radio.Group;
 @connect(({ model }) => ({
   model,
 }))
-
 @Form.create()
-
 class CreatePage extends PureComponent {
-
   // 定义要操作的模型名称
   modelName = 'bannerCategory';
 
   state = {
-    msg : '',
-    url : '',
+    msg: '',
+    url: '',
     previewVisible: false,
     previewImage: '',
-    coverList:[], // 封面图列表
-    data : {
-      'categorys':[],
-      'file_id':null,
-      'file_name':null,
-      'file_path':null,
+    coverList: [], // 封面图列表
+    data: {
+      categorys: [],
+      file_id: null,
+      file_name: null,
+      file_path: null,
     },
-    status : '',
+    status: '',
     pagination: {},
     loading: false,
   };
 
-  handleCancel = () => this.setState({ previewVisible: false })
+  handleCancel = () => this.setState({ previewVisible: false });
 
-  handlePreview = (file) => {
+  handlePreview = file => {
     this.setState({
       previewImage: file.url || file.thumbUrl,
       previewVisible: true,
     });
-  }
+  };
 
   // 当挂在模板时，初始化数据
   componentDidMount() {
@@ -79,31 +76,29 @@ class CreatePage extends PureComponent {
     this.setState({ loading: true });
 
     // 获得url参数
-    const params  = this.props.location.query;
+    const params = this.props.location.query;
 
     // 调用model
     this.props.dispatch({
       type: 'model/create',
-      payload:{
-        modelName:this.modelName,
-        ...params
+      payload: {
+        modelName: this.modelName,
+        ...params,
       },
-      callback: (res) => {
-
+      callback: res => {
         // 执行成功后，进行回调
         if (res) {
           // 接口得到数据，放到state里
-          this.setState({ data:res.data,loading:false});
+          this.setState({ data: res.data, loading: false });
         }
-      }
+      },
     });
   }
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
 
     this.props.form.validateFields((err, values) => {
-
       // 时间标准化
       // values.deadline = values.deadline.format('YYYY-MM-DD HH:mm:ss');
       // 编辑器内容
@@ -119,39 +114,38 @@ class CreatePage extends PureComponent {
       if (!err) {
         this.props.dispatch({
           type: 'model/store',
-          payload:{
-            modelName:this.modelName,
-            ...values
+          payload: {
+            modelName: this.modelName,
+            ...values,
           },
         });
       }
     });
-  }
+  };
 
   submitContent = async () => {
     // 在编辑器获得焦点时按下ctrl+s会执行此方法
     // 编辑器内容提交到服务端之前，可直接调用editorState.toHTML()来获取HTML格式的内容
-    const htmlContent = this.state.content.toHTML()
+    const htmlContent = this.state.content.toHTML();
     // const result = await saveEditorContent(htmlContent)
-  }
+  };
 
-  handleEditorChange = (htmlContent) => {
-    this.state.data.content = htmlContent.toHTML()
-  }
+  handleEditorChange = htmlContent => {
+    this.state.data.content = htmlContent.toHTML();
+  };
 
-  handleEditorUpload = (param) => {
+  handleEditorUpload = param => {
+    const serverURL = '/api/admin/picture/upload';
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData();
 
-    const serverURL = '/api/admin/picture/upload'
-    const xhr = new XMLHttpRequest
-    const fd = new FormData()
-  
-    const successFn = (response) => {
+    const successFn = response => {
       // 假设服务端直接返回文件上传后的地址
       // 上传成功后调用param.success并传入上传后的文件地址
 
       const responseObj = JSON.parse(xhr.responseText);
 
-      if(responseObj.status === 'success') {
+      if (responseObj.status === 'success') {
         param.success({
           url: responseObj.data.url,
           meta: {
@@ -162,41 +156,40 @@ class CreatePage extends PureComponent {
             autoPlay: true, // 指定音视频是否自动播放
             controls: true, // 指定音视频是否显示控制栏
             poster: responseObj.data.url, // 指定视频播放器的封面
-          }
-        })
+          },
+        });
       } else {
         // 上传发生错误时调用param.error
         param.error({
-          msg: responseObj.msg
-        })
+          msg: responseObj.msg,
+        });
       }
-    }
-  
-    const progressFn = (event) => {
+    };
+
+    const progressFn = event => {
       // 上传进度发生变化时调用param.progress
-      param.progress(event.loaded / event.total * 100)
-    }
-  
-    const errorFn = (response) => {
+      param.progress((event.loaded / event.total) * 100);
+    };
+
+    const errorFn = response => {
       // 上传发生错误时调用param.error
       param.error({
-        msg: 'unable to upload.'
-      })
-    }
-  
-    xhr.upload.addEventListener("progress", progressFn, false)
-    xhr.addEventListener("load", successFn, false)
-    xhr.addEventListener("error", errorFn, false)
-    xhr.addEventListener("abort", errorFn, false)
-  
-    fd.append('file', param.file)
-    xhr.open('POST', serverURL, true)
-    xhr.setRequestHeader('Authorization','Bearer '+sessionStorage['token']);
-    xhr.send(fd)
-  }
-  
-  render() {
+        msg: 'unable to upload.',
+      });
+    };
 
+    xhr.upload.addEventListener('progress', progressFn, false);
+    xhr.addEventListener('load', successFn, false);
+    xhr.addEventListener('error', errorFn, false);
+    xhr.addEventListener('abort', errorFn, false);
+
+    fd.append('file', param.file);
+    xhr.open('POST', serverURL, true);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + sessionStorage['token']);
+    xhr.send(fd);
+  };
+
+  render() {
     const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
@@ -224,9 +217,9 @@ class CreatePage extends PureComponent {
     // 图片上传
     const uploadPictureProps = {
       name: 'file',
-      listType: "picture-card",
+      listType: 'picture-card',
       fileList: this.state.coverList,
-      onPreview:  (file)=> {
+      onPreview: file => {
         this.setState({
           previewImage: file.url || file.thumbUrl,
           previewVisible: true,
@@ -236,8 +229,8 @@ class CreatePage extends PureComponent {
       headers: {
         authorization: 'Bearer ' + sessionStorage['token'],
       },
-      beforeUpload: (file)=> {
-        if ((file.type !== 'image/jpeg') && (file.type !== 'image/png')) {
+      beforeUpload: file => {
+        if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
           message.error('请上传jpg或png格式的图片!');
           return false;
         }
@@ -248,33 +241,32 @@ class CreatePage extends PureComponent {
         }
         return true;
       },
-      onChange: (info)=> {
-        
+      onChange: info => {
         let fileList = info.fileList;
 
         // 1. Limit the number of uploaded files
         // Only to show two recent uploaded files, and old ones will be replaced by the new
         fileList = fileList.slice(-3);
-    
+
         // 2. Read from response and show file link
-        fileList = fileList.map((file) => {
+        fileList = fileList.map(file => {
           if (file.response) {
             // Component will show file.url as link
             file.url = file.response.data.url;
             file.uid = file.response.data.id;
-          } 
+          }
           return file;
         });
-    
+
         // 3. Filter successfully uploaded files according to response from server
-        fileList = fileList.filter((file) => {
+        fileList = fileList.filter(file => {
           if (file.response) {
             return file.response.status === 'success';
           }
           return true;
         });
-    
-        this.setState({coverList:fileList});
+
+        this.setState({ coverList: fileList });
       },
     };
 
@@ -283,7 +275,7 @@ class CreatePage extends PureComponent {
       name: 'file',
       action: '/api/admin/file/upload',
       headers: {
-        authorization: 'Bearer '+sessionStorage['token'],
+        authorization: 'Bearer ' + sessionStorage['token'],
       },
       onChange(info) {
         if (info.file.status !== 'uploading') {
@@ -306,22 +298,26 @@ class CreatePage extends PureComponent {
             bordered={false}
             extra={<a href="javascript:history.go(-1)">返回上一页</a>}
           >
-            <Form onSubmit={this.handleSubmit} style={{marginTop: 8 }}>
+            <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
               <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="标题">
-                {getFieldDecorator('title',{
-                      rules: [{ required: true, message: '请输入标题！' }],
+                {getFieldDecorator('title', {
+                  rules: [{ required: true, message: '请输入标题！' }],
                 })(<Input className={styles.middleItem} placeholder="请输入标题" />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="名称">
-                {getFieldDecorator('name',{
-                      rules: [{ required: true, message: '请输入名称！' }],
+                {getFieldDecorator('name', {
+                  rules: [{ required: true, message: '请输入名称！' }],
                 })(<Input className={styles.middleItem} placeholder="请输入名称" />)}
               </Form.Item>
               <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="宽度">
-                {getFieldDecorator('width')(<Input className={styles.smallItem} placeholder="请输入宽度" />)}
+                {getFieldDecorator('width')(
+                  <Input className={styles.smallItem} placeholder="请输入宽度" />,
+                )}
               </Form.Item>
               <Form.Item style={{ marginBottom: 0 }} {...formItemLayout} label="高度">
-                {getFieldDecorator('height')(<Input className={styles.smallItem} placeholder="请输入高度" />)}
+                {getFieldDecorator('height')(
+                  <Input className={styles.smallItem} placeholder="请输入高度" />,
+                )}
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="状态">
                 {getFieldDecorator('status', {
@@ -329,9 +325,7 @@ class CreatePage extends PureComponent {
                   valuePropName: 'checked',
                 })(<Switch checkedChildren="正常" unCheckedChildren="禁用" />)}
               </Form.Item>
-              <Form.Item
-                wrapperCol={{ span: 12, offset: 5 }}
-              >
+              <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
                 <Button type="primary" htmlType="submit">
                   提交
                 </Button>
@@ -343,6 +337,5 @@ class CreatePage extends PureComponent {
     );
   }
 }
-
 
 export default CreatePage;

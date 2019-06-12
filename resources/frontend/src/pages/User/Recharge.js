@@ -30,24 +30,21 @@ const { TextArea } = Input;
 @connect(({ model }) => ({
   model,
 }))
-
 @Form.create()
-
 class RechargePage extends PureComponent {
-
   // 定义要操作的模型名称
   modelName = 'user';
 
   state = {
-    msg : '',
-    url : '',
-    data : {
-      'categorys':[],
-      'file_id':null,
-      'file_name':null,
-      'file_path':null,
+    msg: '',
+    url: '',
+    data: {
+      categorys: [],
+      file_id: null,
+      file_name: null,
+      file_path: null,
     },
-    status : '',
+    status: '',
     pagination: {},
     loading: false,
   };
@@ -58,31 +55,29 @@ class RechargePage extends PureComponent {
     this.setState({ loading: true });
 
     // 获得url参数
-    const params  = this.props.location.query;
+    const params = this.props.location.query;
 
     // 调用model
     this.props.dispatch({
-        type: 'model/edit',
-        payload:{
-          modelName:this.modelName,
-          ...params
-        },
-        callback: (res) => {
-
-          // 执行成功后，进行回调
-          if (res) {
-            // 接口得到数据，放到state里
-            this.setState({ data:res.data,loading:false});
-          }
+      type: 'model/edit',
+      payload: {
+        modelName: this.modelName,
+        ...params,
+      },
+      callback: res => {
+        // 执行成功后，进行回调
+        if (res) {
+          // 接口得到数据，放到state里
+          this.setState({ data: res.data, loading: false });
         }
+      },
     });
   }
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
 
     this.props.form.validateFields((err, values) => {
-
       // 数据id
       values.id = this.state.data.id;
 
@@ -90,17 +85,16 @@ class RechargePage extends PureComponent {
       if (!err) {
         this.props.dispatch({
           type: 'user/recharge',
-          payload:{
-            modelName:this.modelName,
-            ...values
-          }
+          payload: {
+            modelName: this.modelName,
+            ...values,
+          },
         });
       }
     });
-  }
+  };
 
   render() {
-
     const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
@@ -132,35 +126,35 @@ class RechargePage extends PureComponent {
                 {this.state.data.name}（{this.state.data.nickname}）
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="当前余额">
-                <span style={{ color:'#f81d22' }}>{this.state.data.money}</span>
+                <span style={{ color: '#f81d22' }}>{this.state.data.money}</span>
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="当前积分">
-              <span style={{ color:'#0b8235' }}>{this.state.data.point}</span>
+                <span style={{ color: '#0b8235' }}>{this.state.data.point}</span>
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="余额充值">
-                {getFieldDecorator('money',{
-                      initialValue: 0,
-                  })(
-                  <Input className={styles.smallItem} placeholder="请输入充值金额" />
-                )}（正数为充值，负数为扣款）
+                {getFieldDecorator('money', {
+                  initialValue: 0,
+                })(<Input className={styles.smallItem} placeholder="请输入充值金额" />)}
+                （正数为充值，负数为扣款）
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="积分充值">
-                {getFieldDecorator('point',{
-                      initialValue: 0,
-                  })(
-                  <Input className={styles.smallItem} placeholder="请输入充值数量" />
-                )}（正数为充值，负数为扣除）
+                {getFieldDecorator('point', {
+                  initialValue: 0,
+                })(<Input className={styles.smallItem} placeholder="请输入充值数量" />)}
+                （正数为充值，负数为扣除）
               </Form.Item>
               <Form.Item style={{ marginBottom: 8 }} {...formItemLayout} label="充值理由">
                 {getFieldDecorator('remark', {
-                    rules: [{ required: true, message: '充值理由必填！' }],
-                  })(
-                  <TextArea className={styles.middleItem} placeholder="请输入充值理由" autosize={{ minRows: 3, maxRows: 6 }} />
+                  rules: [{ required: true, message: '充值理由必填！' }],
+                })(
+                  <TextArea
+                    className={styles.middleItem}
+                    placeholder="请输入充值理由"
+                    autosize={{ minRows: 3, maxRows: 6 }}
+                  />,
                 )}
               </Form.Item>
-              <Form.Item
-                wrapperCol={{ span: 12, offset: 5 }}
-              >
+              <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
                 <Button type="primary" htmlType="submit">
                   提交
                 </Button>

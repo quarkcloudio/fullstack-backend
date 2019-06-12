@@ -79,7 +79,7 @@ class IndexPage extends PureComponent {
     dispatch(
       routerRedux.push({
         pathname: '/system/' + this.modelName + '/create',
-      })
+      }),
     );
   };
 
@@ -90,7 +90,7 @@ class IndexPage extends PureComponent {
       routerRedux.push({
         pathname: '/system/' + this.modelName + '/edit',
         query: { id: id },
-      })
+      }),
     );
   };
 
@@ -451,12 +451,12 @@ class IndexPage extends PureComponent {
                           <Option key={0}>所有状态</Option>
                           <Option key={1}>正常</Option>
                           <Option key={2}>已禁用</Option>
-                        </Select>
+                        </Select>,
                       )}
                     </Form.Item>
                     <Form.Item style={{ display: 'inline-block' }}>
                       {getFieldDecorator('title')(
-                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />
+                        <Input placeholder="请输入要搜索的内容" style={{ width: 200 }} />,
                       )}
                     </Form.Item>
                     <Form.Item style={{ display: 'inline-block' }}>
@@ -482,12 +482,12 @@ class IndexPage extends PureComponent {
                 <Form layout="inline" onSubmit={this.handleSearch}>
                   <Form.Item label="标题" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('title')(
-                      <Input placeholder="请输入要搜索的标题" style={{ width: 200 }} />
+                      <Input placeholder="请输入要搜索的标题" style={{ width: 200 }} />,
                     )}
                   </Form.Item>
                   <Form.Item label="名称" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('name')(
-                      <Input placeholder="请输入要搜索的名称" style={{ width: 160 }} />
+                      <Input placeholder="请输入要搜索的名称" style={{ width: 160 }} />,
                     )}
                   </Form.Item>
                   <Form.Item label="发布日期">
@@ -501,7 +501,7 @@ class IndexPage extends PureComponent {
                         <Option key={0}>所有状态</Option>
                         <Option key={1}>正常</Option>
                         <Option key={2}>已禁用</Option>
-                      </Select>
+                      </Select>,
                     )}
                   </Form.Item>
                   <Form.Item>

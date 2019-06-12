@@ -399,7 +399,7 @@ class IndexPage extends PureComponent {
                   <Form layout="inline" onSubmit={this.handleSearch}>
                     <Form.Item style={{ display: 'inline-block' }}>
                       {getFieldDecorator('phone')(
-                        <Input placeholder="请输入要搜索的手机号" style={{ width: 200 }} />
+                        <Input placeholder="请输入要搜索的手机号" style={{ width: 200 }} />,
                       )}
                     </Form.Item>
                     <Form.Item style={{ display: 'inline-block' }}>
@@ -424,7 +424,7 @@ class IndexPage extends PureComponent {
                 <Form layout="inline" onSubmit={this.handleSearch}>
                   <Form.Item label="手机号" style={{ display: 'inline-block' }}>
                     {getFieldDecorator('phone')(
-                      <Input placeholder="请输入要搜索的手机号码" style={{ width: 200 }} />
+                      <Input placeholder="请输入要搜索的手机号码" style={{ width: 200 }} />,
                     )}
                   </Form.Item>
                   <Form.Item label="发送时间">
