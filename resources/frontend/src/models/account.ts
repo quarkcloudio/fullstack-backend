@@ -25,7 +25,6 @@ export interface AccountModelType {
   namespace: 'account';
   state: AccountModelState;
   effects: {
-    fetch: Effect;
     getAccountInfo: Effect;
     changeAccountProfile: Effect;
     changeAccountPassword: Effect;
@@ -44,13 +43,7 @@ const AccountModel: AccountModelType = {
   },
 
   effects: {
-    *fetch(_, { call, put }) {
-      const response = yield call(getAccountInfo);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
-    },
+    
     // 登录账号信息
     *getAccountInfo({ callback }, { put, call }) {
       const response = yield call(getAccountInfo);

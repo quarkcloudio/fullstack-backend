@@ -22,6 +22,11 @@ export async function getAccountInfo() {
   return request('/api/admin/account/info');
 }
 
+// 当前用户消息
+export async function getNotices(): Promise<any> {
+  return request('/api/notices');
+}
+
 // 修改当前用户的资料
 export async function changeAccountProfile(params: any) {
   return request(`/api/admin/account/profile`, {

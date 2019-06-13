@@ -30,16 +30,6 @@ export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
     [path: string]: MenuDataItem;
   };
 };
-/**
- * use Authorized check all menu item
- */
-
-const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
-  return menuList.map(item => {
-    const localItem = { ...item, children: item.children ? menuDataRender(item.children) : [] };
-    return Authorized.check(item.authority, localItem, null) as MenuDataItem;
-  });
-};
 
 const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
   if (!isAntDesignPro()) {
@@ -78,10 +68,24 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
         type: 'account/getAccountInfo', // 获取用户信息
       });
       dispatch({
-        type: 'settings/getSetting',
+        type: 'settings/getSetting', // 获取设置
+      });
+      dispatch({
+        type: 'global/getMenuData', // 获取菜单
       });
     }
   });
+
+  /**
+   * use Authorized check all menu item
+   */
+
+  const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
+    return menuList.map(item => {
+      const localItem = { ...item, children: item.children ? menuDataRender(item.children) : [] };
+      return Authorized.check(item.authority, localItem, null) as MenuDataItem;
+    });
+  };
 
   /**
    * init variables
@@ -127,4 +131,5 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
 export default connect(({ global, settings }: ConnectState) => ({
   collapsed: global.collapsed,
   settings,
+  menuData: global.menuData,
 }))(BasicLayout);

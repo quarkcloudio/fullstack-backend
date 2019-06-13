@@ -1,8 +1,41 @@
-import { message } from 'antd';
-import { index, destroy, changeStatus, create, store, edit, save } from '@/services/builder';
 import { routerRedux } from 'dva/router';
+import { Reducer } from 'redux';
+import { Effect,Subscription } from 'dva';
+import { message } from 'antd';
+import { 
+  index,
+  destroy,
+  changeStatus,
+  create,
+  store,
+  edit,
+  save,
+} from '@/services/builder';
 
-export default {
+export interface ModelType {
+  namespace: string;
+  state: {};
+  subscriptions:{ setup: Subscription };
+  effects: {
+    index: Effect;
+    destroy: Effect;
+    changeStatus: Effect;
+    create: Effect;
+    store: Effect;
+    edit: Effect;
+    save: Effect;
+    modalCreate: Effect;
+    modalStore: Effect;
+    modalEdit: Effect;
+    modalSave: Effect;
+    myPublished: Effect;
+  };
+  reducers: {
+    updateState: Reducer<{}>;
+  };
+}
+
+const Builder: ModelType = {
   namespace: 'builder',
 
   state: {
@@ -12,14 +45,16 @@ export default {
     pagination: [],
     status: '',
   },
+
   subscriptions: {
     setup({ dispatch, history }) {
-      return history.listen(({ pathname, query }) => {
+      return history.listen(({ pathname }) => {
         //打开页面时，进行操作
         console.log('subscriptions');
       });
     },
   },
+
   effects: {
     *index({ payload, callback }, { put, call }) {
       const response = yield call(index, payload);
@@ -186,6 +221,7 @@ export default {
       }
     },
   },
+
   reducers: {
     updateState(state, action) {
       return {
@@ -194,3 +230,5 @@ export default {
     },
   },
 };
+
+export default Builder;

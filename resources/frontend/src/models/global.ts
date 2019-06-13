@@ -1,4 +1,4 @@
-import { queryNotices } from '@/services/user';
+import { getNotices,getAccountMenus } from '@/services/api';
 import { Subscription } from 'dva';
 import { Reducer } from 'redux';
 import { Effect } from './connect';
@@ -14,6 +14,7 @@ export interface NoticeItem extends NoticeIconData {
 export interface GlobalModelState {
   collapsed: boolean;
   notices: NoticeItem[];
+  menuData:any;
 }
 
 export interface GlobalModelType {
@@ -23,11 +24,13 @@ export interface GlobalModelType {
     fetchNotices: Effect;
     clearNotices: Effect;
     changeNoticeReadState: Effect;
+    getMenuData:Effect;
   };
   reducers: {
     changeLayoutCollapsed: Reducer<GlobalModelState>;
     saveNotices: Reducer<GlobalModelState>;
     saveClearedNotices: Reducer<GlobalModelState>;
+    save: Reducer<GlobalModelState>;
   };
   subscriptions: { setup: Subscription };
 }
@@ -38,11 +41,12 @@ const GlobalModel: GlobalModelType = {
   state: {
     collapsed: false,
     notices: [],
+    menuData: [],
   },
 
   effects: {
     *fetchNotices(_, { call, put, select }) {
-      const data = yield call(queryNotices);
+      const data = yield call(getNotices);
       yield put({
         type: 'saveNotices',
         payload: data,
@@ -51,7 +55,7 @@ const GlobalModel: GlobalModelType = {
         state => state.global.notices.filter(item => !item.read).length,
       );
       yield put({
-        type: 'user/changeNotifyCount',
+        type: 'account/changeNotifyCount',
         payload: {
           totalCount: data.length,
           unreadCount,
@@ -68,7 +72,7 @@ const GlobalModel: GlobalModelType = {
         state => state.global.notices.filter(item => !item.read).length,
       );
       yield put({
-        type: 'user/changeNotifyCount',
+        type: 'account/changeNotifyCount',
         payload: {
           totalCount: count,
           unreadCount,
@@ -90,17 +94,27 @@ const GlobalModel: GlobalModelType = {
         payload: notices,
       });
       yield put({
-        type: 'user/changeNotifyCount',
+        type: 'account/changeNotifyCount',
         payload: {
           totalCount: notices.length,
           unreadCount: notices.filter(item => !item.read).length,
         },
       });
     },
+    *getMenuData({ payload }, { put, call}) {
+      const response = yield call(getAccountMenus);
+      if (response.status === 'success') {
+        const menuData = response.data;
+        yield put({
+          type: 'save',
+          payload: { menuData:menuData },
+        });
+      }
+    },
   },
 
   reducers: {
-    changeLayoutCollapsed(state = { notices: [], collapsed: true }, { payload }) {
+    changeLayoutCollapsed(state = { notices: [], collapsed: true ,menuData: []}, { payload }) {
       return {
         ...state,
         collapsed: payload,
@@ -113,11 +127,17 @@ const GlobalModel: GlobalModelType = {
         notices: payload,
       };
     },
-    saveClearedNotices(state = { notices: [], collapsed: true }, { payload }) {
+    saveClearedNotices(state = { notices: [], collapsed: true,menuData: [] }, { payload }) {
       return {
         collapsed: false,
         ...state,
         notices: state.notices.filter(item => item.type !== payload),
+      };
+    },
+    save(state, action) {
+      return {
+        ...state,
+        ...action.payload,
       };
     },
   },

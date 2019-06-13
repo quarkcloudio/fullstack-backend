@@ -1,85 +1,182 @@
-import { query as queryUsers, queryCurrent } from '@/services/user';
-import { Effect } from 'dva';
+import { routerRedux } from 'dva/router';
 import { Reducer } from 'redux';
+import { Effect,Subscription } from 'dva';
+import { message } from 'antd';
+import {
+  index,
+  destroy,
+  changeStatus,
+  create,
+  store,
+  edit,
+  save,
+} from '@/services/action';
+import { recharge } from '@/services/api';
 
-export interface CurrentUser {
-  avatar?: string;
-  name?: string;
-  title?: string;
-  group?: string;
-  signature?: string;
-  geographic?: any;
-  tags?: {
-    key: string;
-    label: string;
-  }[];
-  unreadCount?: number;
-}
-
-export interface UserModelState {
-  currentUser?: CurrentUser;
-}
-
-export interface UserModelType {
-  namespace: 'user';
-  state: UserModelState;
+export interface ModelType {
+  namespace: string;
+  state: {};
+  subscriptions:{ setup: Subscription };
   effects: {
-    fetch: Effect;
-    fetchCurrent: Effect;
+    index: Effect;
+    destroy: Effect;
+    changeStatus: Effect;
+    create: Effect;
+    store: Effect;
+    edit: Effect;
+    save: Effect;
+    recharge: Effect;
   };
   reducers: {
-    saveCurrentUser: Reducer<UserModelState>;
-    changeNotifyCount: Reducer<UserModelState>;
+    updateState: Reducer<{}>;
   };
 }
 
-const UserModel: UserModelType = {
+const User: ModelType = {
   namespace: 'user',
 
   state: {
-    currentUser: {},
+    msg : '',
+    url : '',
+    data : [],
+    pagination : [],
+    status : '',
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      return history.listen(({ pathname }) => {
+        //打开页面时，进行操作
+        console.log('subscriptions');
+      });
+    },
   },
 
   effects: {
-    *fetch(_, { call, put }) {
-      const response = yield call(queryUsers);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
+    *index({ payload, callback}, { put, call }) {
+      const response = yield call(index,payload);
+      if (response.status === 'success') {
+        yield put({
+          type: 'updateState',
+          payload: response,
+        });
+
+        if (callback && typeof callback === 'function') {
+          callback(response); // 返回结果
+        }
+      }
     },
-    *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
-      yield put({
-        type: 'saveCurrentUser',
-        payload: response,
-      });
+    *destroy({ type, payload }, { put, call, select }) {
+      const response = yield call(destroy,payload);
+      // 操作成功
+      if(response.status ==='success') {
+        // 提示信息
+        message.success(response.msg, 3);
+      } else {
+        message.error(response.msg, 3);
+      }
+    },
+    *changeStatus({ type, payload }, { put, call, select }) {
+      const response = yield call(changeStatus,payload);
+      // 操作成功
+      if(response.status ==='success') {
+        // 提示信息
+        message.success(response.msg, 3);
+        // 页面状态
+        yield put({
+          type: 'updateState',
+          payload: response,
+        });
+      } else {
+        message.error(response.msg, 3);
+      }
+    },
+    *create({ payload, callback }, { put, call, select }) {
+      const response = yield call(create,payload);
+      if (response.status === 'success') {
+        yield put({
+          type: 'updateState',
+          payload: response,
+        });
+
+        if (callback && typeof callback === 'function') {
+          callback(response); // 返回结果
+        }
+      }
+    },
+    *store({ type, payload }, { put, call, select }) {
+      const response = yield call(store,payload);
+      // 操作成功
+      if(response.status ==='success') {
+        // 提示信息
+        message.success(response.msg, 3);
+        // 页面跳转
+        yield put(
+          routerRedux.push({
+            pathname: response.url
+          })
+        );
+
+      } else {
+        message.error(response.msg, 3);
+      }
+    },
+    *edit({ payload, callback }, { put, call, select }) {
+      const response = yield call(edit,payload);
+      if (response.status === 'success') {
+        yield put({
+          type: 'updateState',
+          payload: response,
+        });
+
+        if (callback && typeof callback === 'function') {
+          callback(response); // 返回结果
+        }
+      }
+    },
+    *save({ type, payload }, { put, call, select }) {
+      const response = yield call(save,payload);
+      // 操作成功
+      if(response.status ==='success') {
+        // 提示信息
+        message.success(response.msg, 3);
+        // 页面跳转
+        yield put(
+          routerRedux.push({
+            pathname: response.url
+          })
+        );
+
+      } else {
+        message.error(response.msg, 3);
+      }
+    },
+    *recharge({ type, payload }, { put, call, select }) {
+      const response = yield call(recharge,payload);
+      // 操作成功
+      if(response.status ==='success') {
+        // 提示信息
+        message.success(response.msg, 3);
+        // 页面跳转
+        yield put(
+          routerRedux.push({
+            pathname: response.url
+          })
+        );
+
+      } else {
+        message.error(response.msg, 3);
+      }
     },
   },
 
   reducers: {
-    saveCurrentUser(state, action) {
+    updateState(state, action) {
       return {
-        ...state,
-        currentUser: action.payload || {},
-      };
-    },
-    changeNotifyCount(
-      state = {
-        currentUser: {},
-      },
-      action,
-    ) {
-      return {
-        ...state,
-        currentUser: {
-          ...state.currentUser,
-          notifyCount: action.payload.totalCount,
-          unreadCount: action.payload.unreadCount,
-        },
+        ...action.payload,
       };
     },
   },
 };
 
-export default UserModel;
+export default User;

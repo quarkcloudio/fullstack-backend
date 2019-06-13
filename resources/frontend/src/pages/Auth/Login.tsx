@@ -14,6 +14,7 @@ interface IFormComponentProps extends FormComponentProps {
 @connect(({ loading }: { loading: { effects: { [key: string]: string } } }) => ({
   submitting: loading.effects['login/login'],
 }))
+
 class LoginPage extends Component<IFormComponentProps> {
   handleSubmit = (e: React.FormEvent) => {
     const { dispatch, form } = this.props;
