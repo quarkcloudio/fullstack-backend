@@ -48,11 +48,11 @@ class Controller extends BaseController
             $result['url'] = $url;
             $result['data'] = $data;
     
-            if(count($pagination)>0) {
+            if(!(empty($pagination))) {
                 $result['pagination'] = $pagination;
             }
     
-            if(count($search)>0) {
+            if(!(empty($search))) {
                 $result['search'] = $search;
             }
             $result['status'] = $status;
