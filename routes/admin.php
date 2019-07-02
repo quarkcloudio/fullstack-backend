@@ -211,13 +211,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/role/destroy', 'Admin\\RoleController@destroy')->name('api/admin/role/destroy');
     Route::post('admin/role/changeStatus', 'Admin\\RoleController@changeStatus')->name('api/admin/role/changeStatus');
 
-    Route::get('admin/builderDemo/index', 'Admin\\BuilderDemoController@index')->name('api/admin/builderDemo/index');
-    Route::get('admin/builderDemo/create', 'Admin\\BuilderDemoController@create')->name('api/admin/builderDemo/create');
-    Route::post('admin/builderDemo/store', 'Admin\\BuilderDemoController@store')->name('api/admin/builderDemo/store');
-    Route::get('admin/builderDemo/edit', 'Admin\\BuilderDemoController@edit')->name('api/admin/builderDemo/edit');
-    Route::post('admin/builderDemo/save', 'Admin\\BuilderDemoController@save')->name('api/admin/builderDemo/save');
-    Route::post('admin/builderDemo/destroy', 'Admin\\BuilderDemoController@destroy')->name('api/admin/builderDemo/destroy');
-    Route::post('admin/builderDemo/changeStatus', 'Admin\\BuilderDemoController@changeStatus')->name('api/admin/builderDemo/changeStatus');
+    Route::get('admin/demo/builderForm', 'Admin\\DemoController@builderForm')->name('api/admin/demo/builderForm');
 });
 
 // 文章文件导出
