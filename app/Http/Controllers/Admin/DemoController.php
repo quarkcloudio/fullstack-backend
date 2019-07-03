@@ -33,8 +33,8 @@ class DemoController extends Controller
         $data = Form::make('form')
         ->action('admin/demo/store')
         ->controls($controls)
-        ->wrapperCol($wrapperCol)
-        ->labelCol($labelCol);
+        ->labelCol($labelCol)
+        ->wrapperCol($wrapperCol);
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data);
