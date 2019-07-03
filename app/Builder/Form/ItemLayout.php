@@ -1,26 +1,33 @@
 <?php
 
-namespace App\Builder\Fields;
+namespace App\Builder\Form;
 
-class Text
+class ItemLayout
 {
     public  $labelName,
-            $fieldName,
+            $name,
             $value,
             $placeholder,
-            $size;
+            $size,
+            $rules,
+            $wrapperCol,
+            $labelCol,
+            $type;
 
     function __construct() {
         $this->size = 'default';
+        $this->type = 'text';
     }
 
-    static function make($labelName,$fieldName)
+    static function make($labelName,$name)
     {
         $self = new self();
 
         $self->labelName = $labelName;
-        $self->fieldName = $fieldName;
-        $self->unsetNullValue();
+        $self->name = $name;
+
+        // 删除空属性
+        $self->unsetNullProperty();
         return $self;
     }
 
@@ -42,7 +49,25 @@ class Text
         return $this;
     }
 
-    protected function unsetNullValue()
+    public function rule($rules)
+    {
+        $this->rules = $rules;
+        return $this;
+    }
+
+    public function wrapperCol($col)
+    {
+        $this->wrapperCol = $col;
+        return $this;
+    }
+
+    public function labelCol($col)
+    {
+        $this->labelCol = $col;
+        return $this;
+    }
+
+    protected function unsetNullProperty()
     {
         foreach ($this as $key => $value) {
             if(empty($value)) {

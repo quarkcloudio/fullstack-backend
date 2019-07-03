@@ -211,7 +211,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/role/destroy', 'Admin\\RoleController@destroy')->name('api/admin/role/destroy');
     Route::post('admin/role/changeStatus', 'Admin\\RoleController@changeStatus')->name('api/admin/role/changeStatus');
 
-    Route::get('admin/demo/builderForm', 'Admin\\DemoController@builderForm')->name('api/admin/demo/builderForm');
+    Route::get('admin/demo/getFormInfo', 'Admin\\DemoController@getFormInfo')->name('api/admin/demo/getFormInfo');
 });
 
 // 文章文件导出
