@@ -2,10 +2,11 @@
 
 namespace App\Builder\Form\Controls;
 
-class Text extends Control
+class Editor extends Control
 {
     function __construct() {
-        $this->type = 'text';
+        $this->type = 'editor';
+        $this->style = ['height' => 400, 'boxShadow' => 'inset 0 1px 3px rgba(0,0,0,.1)'];
     }
 
     static function make($labelName,$name)

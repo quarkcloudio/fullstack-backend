@@ -2,10 +2,14 @@
 
 namespace App\Builder\Form\Controls;
 
-class Text extends Control
+class TextArea extends Control
 {
+    public  $autosize,
+            $rows,
+            $type;
+
     function __construct() {
-        $this->type = 'text';
+        $this->type = 'textArea';
     }
 
     static function make($labelName,$name)
@@ -20,5 +24,17 @@ class Text extends Control
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
+    }
+
+    public function autosize($autosize)
+    {
+        $this->autosize = $autosize;
+        return $this;
+    }
+
+    public function rows($rows)
+    {
+        $this->rows = $rows;
+        return $this;
     }
 }

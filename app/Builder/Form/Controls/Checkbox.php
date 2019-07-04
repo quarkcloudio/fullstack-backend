@@ -2,10 +2,13 @@
 
 namespace App\Builder\Form\Controls;
 
-class Text extends Control
+class Checkbox extends Control
 {
+    public  $list,
+            $type;
+
     function __construct() {
-        $this->type = 'text';
+        $this->type = 'checkbox';
     }
 
     static function make($labelName,$name)
@@ -15,10 +18,14 @@ class Text extends Control
         $self->labelName = $labelName;
         $self->name = $name;
 
-        $self->placeholder = '请输入'.$labelName;
-
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
+    }
+
+    public function list($list)
+    {
+        $this->list = $list;
+        return $this;
     }
 }

@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
 use App\Builder\Form\Controls\Text;
+use App\Builder\Form\Controls\TextArea;
+use App\Builder\Form\Controls\InputNumber;
+use App\Builder\Form\Controls\Checkbox;
+use App\Builder\Form\Controls\Radio;
+use App\Builder\Form\Controls\Select;
+use App\Builder\Form\Controls\SwitchButton;
+use App\Builder\Form\Controls\DatePicker;
+use App\Builder\Form\Controls\Editor;
+use App\Builder\Form\Controls\Image;
 use App\Builder\Form\Form;
 use App\Models\Post;
 use App\Models\Category;
@@ -25,9 +34,69 @@ class DemoController extends Controller
         $labelCol['sm'] = ['span'=>2];
         $wrapperCol['sm'] = ['span'=>22];
 
+        $checkboxList = [
+            [
+                'name'=>'首页推荐',
+                'value'=>1,
+            ],
+            [
+                'name'=>'列表页推荐',
+                'value'=>2,
+            ],
+        ];
+
+        $radioList = [
+            [
+                'name'=>'无图',
+                'value'=>1,
+            ],
+            [
+                'name'=>'单图（小）',
+                'value'=>2,
+            ],
+            [
+                'name'=>'多图',
+                'value'=>3,
+            ],
+        ];
+
+        $categorys = [
+            [
+                'name'=>'无图',
+                'value'=>1,
+            ],
+            [
+                'name'=>'单图（小）',
+                'value'=>2,
+            ],
+            [
+                'name'=>'多图',
+                'value'=>3,
+            ],
+        ];
+
+        $defaultList[0]['uid'] = 2;
+        $defaultList[0]['name'] = Helper::getPicture(2,0,'name');
+        $defaultList[0]['url'] = Helper::getPicture(2);
+        $defaultList[0]['status'] = 'done';
+        $defaultList[1]['uid'] = 3;
+        $defaultList[1]['name'] = Helper::getPicture(2,0,'name');
+        $defaultList[1]['url'] = Helper::getPicture(2);
+        $defaultList[1]['status'] = 'done';
+
         $controls = [
-            Text::make('姓名','username')->value('love'),
-            Text::make('密码','password')->value('love'),
+            Text::make('姓名','username')->style(['width'=>200])->value('love'),
+            Text::make('密码','password')->extra('请输入6-8为字符')->value('love'),
+            TextArea::make('描述','des')->value('love'),
+            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
+            Checkbox::make('推荐位','position')->list($checkboxList)->value([1,2]),
+            Radio::make('展现形式','show_type')->list($radioList)->value(1),
+            Select::make('分类','category')->option($categorys)->value(2),
+            SwitchButton::make('开关','switch')->checkedText('是')->unCheckedText('否')->value(true),
+            DatePicker::make('创建时间','create_time')->format("YYYY-MM-DD HH:mm:ss")->value('2019'),
+            Editor::make('内容','content')->value('2019'),
+            Image::make('封面图','cover_id')->mode('multiple'),
+            Image::make('效果图','cover')->mode('multiple'),
         ];
 
         $data = Form::make('form')
