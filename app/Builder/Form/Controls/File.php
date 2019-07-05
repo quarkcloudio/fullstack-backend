@@ -2,17 +2,16 @@
 
 namespace App\Builder\Form\Controls;
 
-class Image extends Control
+class File extends Control
 {
-    public  $mode,$list,$button,$limitSize,$limitType,$limitNum;
+    public  $list,$button,$limitSize,$limitType,$limitNum;
 
     function __construct() {
-        $this->mode = 'single';
-        $this->button = '上传图片';
-        $this->limitNum = 3; // 默认上传个数
+        $this->button = '上传文件';
         $this->limitSize = 2; // 默认文件大小2M
         $this->limitType = ['image/jpeg','image/png'];
-        $this->type = 'image';
+        $this->limitNum = 3; // 默认上传个数
+        $this->type = 'file';
     }
 
     static function make($labelName,$name)
@@ -25,12 +24,6 @@ class Image extends Control
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
-    }
-
-    public function mode($mode)
-    {
-        $this->mode = $mode;
-        return $this;
     }
 
     public function list($list)
