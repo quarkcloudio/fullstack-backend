@@ -212,6 +212,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/role/changeStatus', 'Admin\\RoleController@changeStatus')->name('api/admin/role/changeStatus');
 
     Route::get('admin/demo/getFormInfo', 'Admin\\DemoController@getFormInfo')->name('api/admin/demo/getFormInfo');
+    Route::get('admin/demo/getListInfo', 'Admin\\DemoController@getListInfo')->name('api/admin/demo/getListInfo');
 });
 
 // 文章文件导出

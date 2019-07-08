@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Builder\Form;
+namespace App\Builder\Forms;
 
-class Form
+class FormBuilder
 {
     public  $name,
+            $pageTitle,
             $controls,
             $wrapperCol,
             $labelCol,
@@ -14,6 +15,7 @@ class Form
             $action;
 
     function __construct() {
+        $this->pageTitle = 'default title';
         $this->name = 'default form';
         $this->controls = [];
         $this->submitName = '提交';
@@ -30,6 +32,12 @@ class Form
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
+    }
+
+    public function pageTitle($title)
+    {
+        $this->pageTitle = $title;
+        return $this;
     }
 
     public function controls($controls)

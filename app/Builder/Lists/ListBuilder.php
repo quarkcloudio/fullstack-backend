@@ -1,29 +1,26 @@
 <?php
 
-namespace App\Builder\Form;
+namespace App\Builder\Lists;
 
-class ItemLayout
+class ListBuilder
 {
-    public  $labelName,
-            $name,
-            $value,
-            $placeholder,
-            $size,
-            $rules,
+    public  $name,
+            $pageTitle,
+            $controls,
             $wrapperCol,
             $labelCol,
-            $type;
+            $action;
 
     function __construct() {
-        $this->size = 'default';
-        $this->type = 'text';
+        $this->pageTitle = 'default title';
+        $this->name = 'default list';
+        $this->controls = [];
     }
 
-    static function make($labelName,$name)
+    static function make($name)
     {
         $self = new self();
 
-        $self->labelName = $labelName;
         $self->name = $name;
 
         // 删除空属性
@@ -31,27 +28,15 @@ class ItemLayout
         return $self;
     }
 
-    public function value($value)
+    public function pageTitle($title)
     {
-        $this->value = $value;
+        $this->pageTitle = $title;
         return $this;
     }
 
-    public function placeholder($text)
+    public function controls($controls)
     {
-        $this->placeholder = $text;
-        return $this;
-    }
-
-    public function size($size)
-    {
-        $this->size = $size;
-        return $this;
-    }
-
-    public function rule($rules)
-    {
-        $this->rules = $rules;
+        $this->controls = $controls;
         return $this;
     }
 
@@ -64,6 +49,12 @@ class ItemLayout
     public function labelCol($col)
     {
         $this->labelCol = $col;
+        return $this;
+    }
+
+    public function action($url)
+    {
+        $this->action = $url;
         return $this;
     }
 
