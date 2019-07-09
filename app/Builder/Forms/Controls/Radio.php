@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class Radio extends Control
 {
-    public  $list,
-            $type;
+    public  $list;
 
     function __construct() {
-        $this->type = 'radio';
+        $this->controlType = 'radio';
     }
 
     static function make($labelName,$name)

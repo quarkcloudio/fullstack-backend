@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class Select extends Control
 {
     public  $options,
-            $mode,
-            $type;
+            $mode;
 
     function __construct() {
-        $this->type = 'select';
+        $this->controlType = 'select';
     }
 
     static function make($labelName,$name)

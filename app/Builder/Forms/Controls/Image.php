@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class Image extends Control
 {
@@ -12,7 +12,7 @@ class Image extends Control
         $this->limitNum = 3; // 默认上传个数
         $this->limitSize = 2; // 默认文件大小2M
         $this->limitType = ['image/jpeg','image/png'];
-        $this->type = 'image';
+        $this->controlType = 'image';
     }
 
     static function make($labelName,$name)

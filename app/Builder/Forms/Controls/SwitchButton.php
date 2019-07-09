@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class SwitchButton extends Control
 {
     public  $checkedChildren,
-            $unCheckedChildren,
-            $type;
+            $unCheckedChildren;
 
     function __construct() {
-        $this->type = 'switch';
+        $this->controlType = 'switch';
     }
 
     static function make($labelName,$name)

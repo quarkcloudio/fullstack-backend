@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class Text extends Control
 {
     function __construct() {
-        $this->type = 'text';
+        $this->controlType = 'text';
     }
 
     static function make($labelName,$name)

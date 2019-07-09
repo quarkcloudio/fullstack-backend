@@ -6,15 +6,19 @@ class ListBuilder
 {
     public  $name,
             $pageTitle,
-            $controls,
-            $wrapperCol,
-            $labelCol,
-            $action;
+            $search,
+            $advancedSearch,
+            $headerButtons,
+            $toolbarButtons,
+            $formModel,
+            $table;
 
     function __construct() {
         $this->pageTitle = 'default title';
         $this->name = 'default list';
-        $this->controls = [];
+        $this->search = [];
+        $this->advancedSearch = [];
+        $this->table = [];
     }
 
     static function make($name)
@@ -34,27 +38,45 @@ class ListBuilder
         return $this;
     }
 
-    public function controls($controls)
+    public function search($controls,$url='')
     {
-        $this->controls = $controls;
+        $search['controls'] = $controls;
+        $search['url'] = $url;
+        $this->search = $search;
         return $this;
     }
 
-    public function wrapperCol($col)
+    public function advancedSearch($controls,$url='')
     {
-        $this->wrapperCol = $col;
+        $advancedSearch['controls'] = $controls;
+        $advancedSearch['url'] = $url;
+        $this->advancedSearch = $advancedSearch;
         return $this;
     }
 
-    public function labelCol($col)
+    public function headerButton($buttons)
     {
-        $this->labelCol = $col;
+        $this->headerButtons = $buttons;
         return $this;
     }
 
-    public function action($url)
+    public function toolbarButton($buttons)
     {
-        $this->action = $url;
+        $this->toolbarButtons = $buttons;
+        return $this;
+    }
+
+    public function table($table)
+    {
+        $this->table = $table;
+        return $this;
+    }
+
+    public function formModel($controls,$url)
+    {
+        $formModel['controls'] = $controls;
+        $formModel['url'] = $url;
+        $this->formModel = $formModel;
         return $this;
     }
 

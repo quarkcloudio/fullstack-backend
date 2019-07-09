@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class TextArea extends Control
 {
     public  $autosize,
-            $rows,
-            $type;
+            $rows;
 
     function __construct() {
-        $this->type = 'textArea';
+        $this->controlType = 'textArea';
     }
 
     static function make($labelName,$name)

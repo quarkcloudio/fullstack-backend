@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class Control
 {
@@ -14,7 +14,7 @@ class Control
             $labelCol,
             $style,
             $extra,
-            $type;
+            $controlType;
 
     function __construct() {
         $this->size = 'default';

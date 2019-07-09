@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class Checkbox extends Control
 {
-    public  $list,
-            $type;
+    public  $list;
 
     function __construct() {
-        $this->type = 'checkbox';
+        $this->controlType = 'checkbox';
     }
 
     static function make($labelName,$name)

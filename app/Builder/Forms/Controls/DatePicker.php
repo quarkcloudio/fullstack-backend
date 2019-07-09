@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class DatePicker extends Control
 {
     public  $format,
             $showTime,
-            $mode,
-            $type;
+            $mode;
 
     function __construct() {
-        $this->type = 'datePicker';
+        $this->controlType = 'datePicker';
         $this->showTime = true;
         $this->mode = 'date';
     }

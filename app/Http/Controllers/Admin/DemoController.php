@@ -17,7 +17,10 @@ use App\Builder\Forms\Controls\DatePicker;
 use App\Builder\Forms\Controls\Editor;
 use App\Builder\Forms\Controls\Image;
 use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
 use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
 use App\Builder\Lists\ListBuilder;
 use App\Models\Post;
 use App\Models\Category;
@@ -125,12 +128,6 @@ class DemoController extends Controller
      */
     public function getListInfo(Request $request)
     {
-        $data = ListBuilder::make('list')
-        ->pageTitle('列表创建器')
-        ->search('admin/demo/store')
-        ->advancedSearch('admin/demo/store')
-        ->headerButton()
-        ->toolbarButton();
 
         // 获取参数
         $current   = intval($request->get('current',1));
@@ -208,15 +205,36 @@ class DemoController extends Controller
         // 总数量
         $pagination['total'] = $total;
 
-        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+        $controls = [
+            Button::make('发布文章')->icon('plus-circle')->type('primary')->onClick('openFormModel'),
+            Button::make('导出数据')->icon('download')->href('#/')->target('_blank'),
+        ];
 
-        // 模板数据
-        $data['categorys'] = $categoryTreeLists;
-        $data['lists'] = Helper::listsFormat($lists);
+        $actions = [
+            Button::make('禁用')->render("{row.status == '1' ? '禁用' : '启用'}")->type('link')->onClick('changeStatus'),
+            Button::make('编辑')->type('link')->onClick('openFormModel'),
+            Button::make('删除')->type('link')->onClick('destroy'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('标题','title'),
+            Column::make('操作','action')->actions($actions),
+        ];
+
+        $table = Table::make('table')->columns($columns)->dataSource($lists)->pagination($pagination);
+
+        $data = ListBuilder::make('list')
+        ->pageTitle('列表创建器')
+        ->headerButton($controls)
+        ->toolbarButton($controls)
+        ->search($controls,'url')
+        ->advancedSearch($controls,'url')
+        ->formModel($controls,'formUrl')
+        ->table($table);
+
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }

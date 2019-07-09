@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Builder\Form\Controls;
+namespace App\Builder\Forms\Controls;
 
 class InputNumber extends Control
 {
     public  $min,
             $max,
-            $step,
-            $type;
+            $step;
 
     function __construct() {
-        $this->type = 'inputNumber';
+        $this->controlType = 'inputNumber';
     }
 
     static function make($labelName,$name)
