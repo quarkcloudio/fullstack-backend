@@ -2,14 +2,15 @@
 
 namespace App\Builder\Forms\Controls;
 
-class DatePicker extends Control
+class RangePicker extends Control
 {
     public  $format,
             $showTime;
 
     function __construct() {
-        $this->controlType = 'datePicker';
+        $this->controlType = 'rangePicker';
         $this->showTime = true;
+        $this->value = [null,null];
     }
 
     static function make($labelName,$name)
@@ -18,8 +19,6 @@ class DatePicker extends Control
 
         $self->labelName = $labelName;
         $self->name = $name;
-
-        $self->placeholder = '请选择'.$labelName;
 
         // 删除空属性
         $self->unsetNullProperty();

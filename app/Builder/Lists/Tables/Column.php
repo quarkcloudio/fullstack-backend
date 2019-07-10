@@ -11,11 +11,14 @@ class Column
             $title,
             $width,
             $render,
-            $actions;
+            $actions,
+            $editAction;
 
     function __construct() {
         $this->align = 'left';
         $this->fixed = false;
+        $this->actions = false;
+        $this->editAction = false;
     }
 
     static function make($title,$dataIndex)
@@ -57,6 +60,12 @@ class Column
     public function render($render)
     {
         $this->render = $render;
+        return $this;
+    }
+
+    public function editAction($editAction)
+    {
+        $this->editAction = $editAction;
         return $this;
     }
 

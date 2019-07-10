@@ -24,7 +24,7 @@ class Button extends Control
 
     public function href($href)
     {
-        $this->href = $href;
+        $this->href = '#/'.$href;
         return $this;
     }
 
@@ -58,9 +58,11 @@ class Button extends Control
         return $this;
     }
 
-    public function onClick($onClick)
+    public function onClick($functionName,$value='',$url='')
     {
-        $this->onClick = $onClick;
+        $this->onClick['functionName'] = $functionName;
+        $this->onClick['url'] = $url;
+        $this->onClick['value'] = $value;
         return $this;
     }
 }

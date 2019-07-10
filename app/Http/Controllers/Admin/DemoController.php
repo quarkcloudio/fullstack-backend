@@ -14,6 +14,7 @@ use App\Builder\Forms\Controls\Radio;
 use App\Builder\Forms\Controls\Select;
 use App\Builder\Forms\Controls\SwitchButton;
 use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
 use App\Builder\Forms\Controls\Editor;
 use App\Builder\Forms\Controls\Image;
 use App\Builder\Forms\Controls\File;
@@ -99,6 +100,7 @@ class DemoController extends Controller
             Select::make('分类','category')->option($categorys)->value(2),
             SwitchButton::make('开关','switch')->checkedText('是')->unCheckedText('否')->value(true),
             DatePicker::make('创建时间','create_time')->format("YYYY-MM-DD HH:mm:ss")->value('2019'),
+            RangePicker::make('时间范围','range_time')->format("YYYY-MM-DD HH:mm:ss")->value(['2018','2019']),
             Editor::make('内容','content')->value('2019'),
             Image::make('多图上传','cover_id')->mode('multiple')->list($defaultList),
             Image::make('单图上传','cover'),
@@ -205,20 +207,78 @@ class DemoController extends Controller
         // 总数量
         $pagination['total'] = $total;
 
+        $lists = Helper::listsFormat($lists);
+
+        $data = $this->articlePage($lists,$pagination);
+
+        if(!empty($data)) {
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
+    }
+
+    protected function articlePage($lists,$pagination)
+    {
         $controls = [
             Button::make('发布文章')->icon('plus-circle')->type('primary')->onClick('openFormModel'),
-            Button::make('导出数据')->icon('download')->href('#/')->target('_blank'),
+            Button::make('导出数据')->icon('download')->href('')->target('_blank'),
+        ];
+
+        $headerButton = [
+            Button::make('发布文章')->icon('plus-circle')->type('primary')->onClick('openFormModel'),
+            Button::make('导出数据')->icon('download')->href('')->target('_blank'),
+        ];
+
+        $toolbarButton = [
+            Button::make('启用')->type('primary')->onClick('multiChangeStatus',1),
+            Button::make('禁用')->onClick('multiChangeStatus',2),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus',-1),
         ];
 
         $actions = [
-            Button::make('禁用')->render("{row.status == '1' ? '禁用' : '启用'}")->type('link')->onClick('changeStatus'),
-            Button::make('编辑')->type('link')->onClick('openFormModel'),
-            Button::make('删除')->type('link')->onClick('destroy'),
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/article/changeStatus'),
+            Button::make('编辑')->type('link')->href('admin/article/edit'),
+            Button::make('删除')->type('link')->onClick('changeStatus',-1),
+        ];
+
+        $categorys = [
+            [
+                'name'=>'无图',
+                'value'=>1,
+            ],
+            [
+                'name'=>'单图（小）',
+                'value'=>2,
+            ],
+            [
+                'name'=>'多图',
+                'value'=>3,
+            ],
+        ];
+
+
+        $searchs = [
+            Select::make('分类','category')->option($categorys)->value(2),
+            Select::make('状态','status')->option($categorys)->value(2),
+            Text::make('搜索内容','title'),
+            Button::make('搜索')->onClick('openFormModel'),
+        ];
+
+        $advancedSearchs = [
+            Text::make('标题','title'),
+            Text::make('作者','author'),
+            RangePicker::make('时间范围','range_time')->format("YYYY-MM-DD HH:mm:ss"),
+            Select::make('分类','category')->option($categorys)->value(2),
+            Select::make('状态','status')->option($categorys)->value(2),
+            Button::make('搜索')->type('primary')->onClick('openFormModel'),
+            Button::make('重置')->onClick('resetSearch'),
         ];
 
         $columns = [
             Column::make('ID','id'),
             Column::make('标题','title'),
+            Column::make('状态','status'),
             Column::make('操作','action')->actions($actions),
         ];
 
@@ -226,17 +286,13 @@ class DemoController extends Controller
 
         $data = ListBuilder::make('list')
         ->pageTitle('列表创建器')
-        ->headerButton($controls)
-        ->toolbarButton($controls)
-        ->search($controls,'url')
-        ->advancedSearch($controls,'url')
+        ->headerButton($headerButton)
+        ->toolbarButton($toolbarButton)
+        ->search($searchs,'url')
+        ->advancedSearch($advancedSearchs,'url')
         ->formModel($controls,'formUrl')
         ->table($table);
 
-        if(!empty($data)) {
-            return $this->success('获取成功！','',$data);
-        } else {
-            return $this->success('获取失败！');
-        }
+        return $data;
     }
 }
