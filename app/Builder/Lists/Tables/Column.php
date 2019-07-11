@@ -11,14 +11,15 @@ class Column
             $title,
             $width,
             $render,
-            $actions,
-            $editAction;
+            $tag,
+            $a,
+            $actions;
 
     function __construct() {
         $this->align = 'left';
         $this->fixed = false;
         $this->actions = false;
-        $this->editAction = false;
+        $this->tag = false;
     }
 
     static function make($title,$dataIndex)
@@ -63,9 +64,20 @@ class Column
         return $this;
     }
 
-    public function editAction($editAction)
+    public function withTag($color)
     {
-        $this->editAction = $editAction;
+        if(strpos($color,"'") == false && strpos($color,'"') == false) {
+            $color = "'".$color."'";
+        }
+        $this->tag = $color;
+        return $this;
+    }
+
+    public function withA($href,$target='_self')
+    {
+        $a['href'] = '#/'.$href;
+        $a['target'] = $target;
+        $this->a = $a;
         return $this;
     }
 

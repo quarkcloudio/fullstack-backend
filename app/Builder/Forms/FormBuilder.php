@@ -8,19 +8,12 @@ class FormBuilder
             $pageTitle,
             $controls,
             $wrapperCol,
-            $labelCol,
-            $submitName,
-            $submitType,
-            $submitLayout,
-            $action;
+            $labelCol;
 
     function __construct() {
         $this->pageTitle = 'default title';
         $this->name = 'default form';
         $this->controls = [];
-        $this->submitName = '提交';
-        $this->submitType = 'primary';
-        $this->submitLayout = ['wrapperCol'=>['span' => 12, 'offset' => 5]];
     }
 
     static function make($name)
@@ -55,20 +48,6 @@ class FormBuilder
     public function labelCol($col)
     {
         $this->labelCol = $col;
-        return $this;
-    }
-
-    public function action($url)
-    {
-        $this->action = $url;
-        return $this;
-    }
-
-    public function submit($name,$type = 'primary',$layout = ['wrapperCol'=>['span' => 12, 'offset' => 5]])
-    {
-        $this->submitName = $name;
-        $this->submitType = $type;
-        $this->submitLayout = $layout;
         return $this;
     }
 

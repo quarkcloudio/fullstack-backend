@@ -19,9 +19,11 @@ use App\Builder\Forms\Controls\Editor;
 use App\Builder\Forms\Controls\Image;
 use App\Builder\Forms\Controls\File;
 use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
 use App\Builder\Forms\FormBuilder;
 use App\Builder\Lists\Tables\Table;
 use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\Tables\Modal;
 use App\Builder\Lists\ListBuilder;
 use App\Models\Post;
 use App\Models\Category;
@@ -105,15 +107,17 @@ class DemoController extends Controller
             Image::make('多图上传','cover_id')->mode('multiple')->list($defaultList),
             Image::make('单图上传','cover'),
             File::make('附件','file_id')->list($defaultList),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','margin-left'=>200])
+            ->onClick('submit',null,'admin/article/submit'),
         ];
 
         $data = FormBuilder::make('form')
         ->pageTitle('表单创建器')
-        ->action('admin/demo/store')
         ->controls($controls)
         ->labelCol($labelCol)
-        ->wrapperCol($wrapperCol)
-        ->submit('提交表单');
+        ->wrapperCol($wrapperCol);
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data);
@@ -220,78 +224,89 @@ class DemoController extends Controller
 
     protected function articlePage($lists,$pagination)
     {
-        $controls = [
-            Button::make('发布文章')->icon('plus-circle')->type('primary')->onClick('openFormModel'),
-            Button::make('导出数据')->icon('download')->href('')->target('_blank'),
-        ];
-
         $headerButton = [
-            Button::make('发布文章')->icon('plus-circle')->type('primary')->onClick('openFormModel'),
+            Button::make('创建数据')->icon('plus-circle')->type('primary')->onClick('openModal'),
             Button::make('导出数据')->icon('download')->href('')->target('_blank'),
         ];
 
         $toolbarButton = [
-            Button::make('启用')->type('primary')->onClick('multiChangeStatus',1),
-            Button::make('禁用')->onClick('multiChangeStatus',2),
-            Button::make('删除')->type('danger')->onClick('multiChangeStatus',-1),
+            Button::make('启用')->type('primary')->onClick('multiChangeStatus',1,'admin/article/changeStatus'),
+            Button::make('禁用')->onClick('multiChangeStatus',2,'admin/article/changeStatus'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus',-1,'admin/article/changeStatus'),
         ];
 
         $actions = [
             Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/article/changeStatus'),
             Button::make('编辑')->type('link')->href('admin/article/edit'),
-            Button::make('删除')->type('link')->onClick('changeStatus',-1),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus',-1,'admin/article/changeStatus'),
         ];
 
-        $categorys = [
+        $controls = [
+            Text::make('姓名','username')->style(['width'=>200])->value('love'),
+            Text::make('密码','password')->extra('请输入6-8为字符')->value('love'),
+            TextArea::make('描述','des')->value('love'),
+            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
+            SwitchButton::make('开关','switch')->checkedText('是')->unCheckedText('否')->value(true),
+            DatePicker::make('创建时间','create_time')->format("YYYY-MM-DD HH:mm:ss")->value('2019'),
+            RangePicker::make('时间范围','range_time')->format("YYYY-MM-DD HH:mm:ss")->value(['2018','2019']),
+            Editor::make('内容','content')->value('2019'),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','margin-left'=>200])
+            ->onClick('submit',null,'admin/article/submit'),
+        ];
+
+        $status = [
             [
-                'name'=>'无图',
-                'value'=>1,
+                'name'=>'全部',
+                'value'=>'0',
             ],
             [
-                'name'=>'单图（小）',
-                'value'=>2,
+                'name'=>'正常',
+                'value'=>'1',
             ],
             [
-                'name'=>'多图',
-                'value'=>3,
+                'name'=>'禁用',
+                'value'=>'2',
             ],
         ];
 
 
         $searchs = [
-            Select::make('分类','category')->option($categorys)->value(2),
-            Select::make('状态','status')->option($categorys)->value(2),
+            Select::make('状态','status')->option($status)->value('0'),
             Text::make('搜索内容','title'),
-            Button::make('搜索')->onClick('openFormModel'),
+            Button::make('搜索')->onClick('search'),
         ];
 
         $advancedSearchs = [
             Text::make('标题','title'),
             Text::make('作者','author'),
-            RangePicker::make('时间范围','range_time')->format("YYYY-MM-DD HH:mm:ss"),
-            Select::make('分类','category')->option($categorys)->value(2),
-            Select::make('状态','status')->option($categorys)->value(2),
-            Button::make('搜索')->type('primary')->onClick('openFormModel'),
+            RangePicker::make('时间范围','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            Select::make('状态','status')->option($status)->value('0'),
+            Button::make('搜索')->type('primary')->onClick('search'),
             Button::make('重置')->onClick('resetSearch'),
         ];
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('标题','title'),
-            Column::make('状态','status'),
+            Column::make('标题','title')->withA('admin/article/edit'),
+            Column::make('作者','author'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
             Column::make('操作','action')->actions($actions),
         ];
 
         $table = Table::make('table')->columns($columns)->dataSource($lists)->pagination($pagination);
 
+        $modal = Modal::make('创建数据')->width(400)->height(600)->formUrl('admin/demo/getFormInfo');
+
         $data = ListBuilder::make('list')
         ->pageTitle('列表创建器')
         ->headerButton($headerButton)
         ->toolbarButton($toolbarButton)
-        ->search($searchs,'url')
-        ->advancedSearch($advancedSearchs,'url')
-        ->formModel($controls,'formUrl')
-        ->table($table);
+        ->search($searchs)
+        ->advancedSearch($advancedSearchs)
+        ->table($table)
+        ->modal($modal);
 
         return $data;
     }

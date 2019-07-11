@@ -38,19 +38,15 @@ class ListBuilder
         return $this;
     }
 
-    public function search($controls,$url='')
+    public function search($controls)
     {
-        $search['controls'] = $controls;
-        $search['url'] = $url;
-        $this->search = $search;
+        $this->search = $controls;
         return $this;
     }
 
-    public function advancedSearch($controls,$url='')
+    public function advancedSearch($controls)
     {
-        $advancedSearch['controls'] = $controls;
-        $advancedSearch['url'] = $url;
-        $this->advancedSearch = $advancedSearch;
+        $this->advancedSearch = $controls;
         return $this;
     }
 
@@ -72,11 +68,9 @@ class ListBuilder
         return $this;
     }
 
-    public function formModel($controls,$url)
+    public function modal($controls)
     {
-        $formModel['controls'] = $controls;
-        $formModel['url'] = $url;
-        $this->formModel = $formModel;
+        $this->modal = $controls;
         return $this;
     }
 

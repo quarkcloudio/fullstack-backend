@@ -9,6 +9,9 @@ class Button extends Control
     function __construct() {
         $this->controlType = 'button';
         $this->type = 'default';
+        $this->onClick['name'] = null;
+        $this->onClick['url'] = null;
+        $this->onClick['value'] = null;
     }
 
     static function make($name)
@@ -58,9 +61,9 @@ class Button extends Control
         return $this;
     }
 
-    public function onClick($functionName,$value='',$url='')
+    public function onClick($name,$value='',$url='')
     {
-        $this->onClick['functionName'] = $functionName;
+        $this->onClick['name'] = $name;
         $this->onClick['url'] = $url;
         $this->onClick['value'] = $value;
         return $this;
