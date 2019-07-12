@@ -23,7 +23,6 @@ use App\Builder\Forms\Controls\Popconfirm;
 use App\Builder\Forms\FormBuilder;
 use App\Builder\Lists\Tables\Table;
 use App\Builder\Lists\Tables\Column;
-use App\Builder\Lists\Tables\Modal;
 use App\Builder\Lists\ListBuilder;
 use App\Models\Post;
 use App\Models\Category;
@@ -109,7 +108,44 @@ class DemoController extends Controller
             File::make('附件','file_id')->list($defaultList),
             Button::make('提交')
             ->type('primary')
-            ->style(['width'=>100,'float'=>'left','margin-left'=>200])
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,'admin/article/submit'),
+        ];
+
+        $data = FormBuilder::make('form')
+        ->pageTitle('表单创建器')
+        ->controls($controls)
+        ->labelCol($labelCol)
+        ->wrapperCol($wrapperCol);
+
+        if(!empty($data)) {
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->error('获取失败！');
+        }
+    }
+
+    /**
+     * 创建器-表单演示
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function getModalFormInfo(Request $request)
+    {
+
+        $labelCol['sm'] = ['span'=>2];
+        $wrapperCol['sm'] = ['span'=>22];
+
+        $controls = [
+            Text::make('姓名','username')->style(['width'=>200])->value('love'),
+            Text::make('密码','password')->extra('请输入6-8为字符')->value('love'),
+            TextArea::make('描述','des')->value('love'),
+            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
+            SwitchButton::make('开关','switch')->checkedText('是')->unCheckedText('否')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['float'=>'right'])
             ->onClick('submit',null,'admin/article/submit'),
         ];
 
@@ -225,35 +261,21 @@ class DemoController extends Controller
     protected function articlePage($lists,$pagination)
     {
         $headerButton = [
-            Button::make('创建数据')->icon('plus-circle')->type('primary')->onClick('openModal'),
+            Button::make('创建数据')->icon('plus-circle')->type('primary')->onClick('openModal',['title'=>'创建数据弹窗','width'=>600],'admin/demo/getModalFormInfo'),
             Button::make('导出数据')->icon('download')->href('')->target('_blank'),
         ];
 
         $toolbarButton = [
-            Button::make('启用')->type('primary')->onClick('multiChangeStatus',1,'admin/article/changeStatus'),
-            Button::make('禁用')->onClick('multiChangeStatus',2,'admin/article/changeStatus'),
-            Button::make('删除')->type('danger')->onClick('multiChangeStatus',-1,'admin/article/changeStatus'),
+            Button::make('启用')->type('primary')->onClick('multiChangeStatus','enable','admin/article/changeStatus'),
+            Button::make('禁用')->onClick('multiChangeStatus','disable','admin/article/changeStatus'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','delete','admin/article/changeStatus'),
         ];
 
         $actions = [
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/article/changeStatus'),
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','enable|disable','admin/article/changeStatus'),
             Button::make('编辑')->type('link')->href('admin/article/edit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus',-1,'admin/article/changeStatus'),
-        ];
-
-        $controls = [
-            Text::make('姓名','username')->style(['width'=>200])->value('love'),
-            Text::make('密码','password')->extra('请输入6-8为字符')->value('love'),
-            TextArea::make('描述','des')->value('love'),
-            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
-            SwitchButton::make('开关','switch')->checkedText('是')->unCheckedText('否')->value(true),
-            DatePicker::make('创建时间','create_time')->format("YYYY-MM-DD HH:mm:ss")->value('2019'),
-            RangePicker::make('时间范围','range_time')->format("YYYY-MM-DD HH:mm:ss")->value(['2018','2019']),
-            Editor::make('内容','content')->value('2019'),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','margin-left'=>200])
-            ->onClick('submit',null,'admin/article/submit'),
+            Button::make('弹窗编辑')->type('link')->onClick('openModal',['title'=>'编辑数据弹窗','width'=>600],'admin/demo/getModalFormInfo'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/article/changeStatus'),
         ];
 
         $status = [
@@ -297,16 +319,13 @@ class DemoController extends Controller
 
         $table = Table::make('table')->columns($columns)->dataSource($lists)->pagination($pagination);
 
-        $modal = Modal::make('创建数据')->width(400)->height(600)->formUrl('admin/demo/getFormInfo');
-
         $data = ListBuilder::make('list')
         ->pageTitle('列表创建器')
         ->headerButton($headerButton)
         ->toolbarButton($toolbarButton)
         ->search($searchs)
         ->advancedSearch($advancedSearchs)
-        ->table($table)
-        ->modal($modal);
+        ->table($table);
 
         return $data;
     }
