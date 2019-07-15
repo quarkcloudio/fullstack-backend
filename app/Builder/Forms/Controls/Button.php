@@ -4,7 +4,7 @@ namespace App\Builder\Forms\Controls;
 
 class Button extends Control
 {
-    public  $href,$icon,$target,$type,$onClick,$render;
+    public  $href,$icon,$target,$type,$onClick,$render,$extendButtons;
 
     function __construct() {
         $this->controlType = 'button';
@@ -12,6 +12,7 @@ class Button extends Control
         $this->onClick['name'] = null;
         $this->onClick['url'] = null;
         $this->onClick['value'] = null;
+        $this->extendButtons = false;
     }
 
     static function make($name)
@@ -46,6 +47,12 @@ class Button extends Control
     public function target($target)
     {
         $this->target = $target;
+        return $this;
+    }
+
+    public function withExtendButtons($extendButtons)
+    {
+        $this->extendButtons = $extendButtons;
         return $this;
     }
 

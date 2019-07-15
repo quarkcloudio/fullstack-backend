@@ -137,6 +137,9 @@ class DemoController extends Controller
         $labelCol['sm'] = ['span'=>2];
         $wrapperCol['sm'] = ['span'=>22];
 
+        $labelCol1['sm'] = ['span'=>0];
+        $wrapperCol1['sm'] = ['span'=>24];
+
         $controls = [
             Text::make('姓名','username')->style(['width'=>200])->value('love'),
             Text::make('密码','password')->extra('请输入6-8为字符')->value('love'),
@@ -145,8 +148,13 @@ class DemoController extends Controller
             SwitchButton::make('开关','switch')->checkedText('是')->unCheckedText('否')->value(true),
             Button::make('提交')
             ->type('primary')
-            ->style(['float'=>'right'])
-            ->onClick('submit',null,'admin/article/submit'),
+            ->withExtendButtons(
+                ['cancel']
+            )
+            ->style(['float'=>'right','marginRight'=>10])
+            ->labelCol($labelCol1)
+            ->wrapperCol($wrapperCol1)
+            ->onClick('submit',null,'admin/demo/submit'),
         ];
 
         $data = FormBuilder::make('form')
@@ -328,5 +336,20 @@ class DemoController extends Controller
         ->table($table);
 
         return $data;
+    }
+
+    /**
+     * 保存方法
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function submit(Request $request)
+    {
+        if(1) {
+            return $this->success('操作成功！');
+        } else {
+            return $this->error('操作失败！');
+        }
     }
 }

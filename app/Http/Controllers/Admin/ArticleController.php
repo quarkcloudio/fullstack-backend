@@ -6,12 +6,34 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
-use EasyWeChat\Factory;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Models\Post;
 use App\Models\Category;
 
-class ArticleController extends Controller
+class ArticleController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '文章';
+    }
+
     /**
      * 列表页面
      *
@@ -46,20 +68,6 @@ class ArticleController extends Controller
             if(isset($search['status'])) {
                 if(!empty($search['status'])) {
                     $query->where('posts.status',$search['status']);
-                }
-            }
-
-            // 作者
-            if(isset($search['author'])) {
-                if(!empty($search['author'])) {
-                    $query->where('posts.author',$search['author']);
-                }
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('posts.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
                 }
             }
         }
@@ -100,14 +108,140 @@ class ArticleController extends Controller
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
-        // 模板数据
-        $data['categorys'] = $categoryTreeLists;
-        $data['lists'] = Helper::listsFormat($lists);
+        $getCategorys = [];
+
+        $getCategorys[0]['name'] = '所有分类';
+        $getCategorys[0]['value'] = '0';
+
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+        }
+
+        $lists = Helper::listsFormat($lists);
+
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('分类','categorys')->option($getCategorys)->value('0'),
+            Select::make('状态','status')->option($status)->value('0'),
+            Text::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('标题','title')->withA('admin/article/edit'),
+            Column::make('作者','author'),
+            Column::make('分类','category_title'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('发布时间','created_at'),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs);
+
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function articleForm($data = [])
+    {
+        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
+        $categoryTrees     = Helper::listToTree($categorys);
+        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+
+        // 模板数据
+        $getCategorys = [];
+
+        $getCategorys[0]['name'] = '请选择分类';
+        $getCategorys[0]['value'] = '0';
+
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+        }
+
+        $checkboxList = [
+            [
+                'name'=>'首页推荐',
+                'value'=>1,
+            ],
+            [
+                'name'=>'频道推荐',
+                'value'=>2,
+            ],
+            [
+                'name'=>'列表推荐',
+                'value'=>4,
+            ],
+            [
+                'name'=>'详情推荐',
+                'value'=>8,
+            ],
+        ];
+
+        $radioList = [
+            [
+                'name'=>'无图',
+                'value'=>1,
+            ],
+            [
+                'name'=>'单图（小）',
+                'value'=>2,
+            ],
+            [
+                'name'=>'多图',
+                'value'=>3,
+            ],
+            [
+                'name'=>'单图（大）',
+                'value'=>4,
+            ],
+        ];
+
+        $controls = [
+            Text::make('标题','title')->style(['width'=>200]),
+            Text::make('别名','name')->style(['width'=>200]),
+            TextArea::make('描述','description'),
+            Text::make('标签','tags')->style(['width'=>400]),
+            Text::make('作者','tags')->style(['width'=>400]),
+            Text::make('来源','tags')->style(['width'=>400]),
+            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
+            Checkbox::make('推荐位','position')->list($checkboxList),
+            Radio::make('展现形式','show_type')->list($radioList)->value(1),
+            Image::make('封面图','cover_id')->mode('multiple'),
+            Select::make('分类','category_id')->option($getCategorys)->value('0'),
+            SwitchButton::make('允许评论','status')->checkedText('是')->unCheckedText('否')->value(true),
+            Editor::make('内容','content'),
+            DatePicker::make('创建时间','create_time')->format("YYYY-MM-DD HH:mm:ss"),
+            File::make('附件','file_id'),
+        ];
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
     }
 
     /**
@@ -118,14 +252,13 @@ class ArticleController extends Controller
      */
     public function create(Request $request)
     {
-        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+        $data = $this->articleForm();
 
-        // 模板数据
-        $data['categorys'] = $categoryTreeLists;
-
-        return $this->success('获取成功！','',$data);
+        if(!empty($data)) {
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
     }
 
     /**
@@ -572,4 +705,5 @@ class ArticleController extends Controller
             return $this->success('获取失败！');
         }
     }
+
 }

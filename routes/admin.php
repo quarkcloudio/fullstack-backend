@@ -213,6 +213,7 @@ Route::group(['middleware' => ['admin']], function() {
 
     Route::get('admin/demo/getFormInfo', 'Admin\\DemoController@getFormInfo')->name('api/admin/demo/getFormInfo');
     Route::get('admin/demo/getModalFormInfo', 'Admin\\DemoController@getModalFormInfo')->name('api/admin/demo/getModalFormInfo');
+    Route::post('admin/demo/submit', 'Admin\\DemoController@submit')->name('api/admin/demo/submit');
     Route::get('admin/demo/getListInfo', 'Admin\\DemoController@getListInfo')->name('api/admin/demo/getListInfo');
 });
 

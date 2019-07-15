@@ -10,6 +10,7 @@ class DatePicker extends Control
     function __construct() {
         $this->controlType = 'datePicker';
         $this->showTime = true;
+        $this->value = date('Y-m-d H:i:s');
     }
 
     static function make($labelName,$name)
