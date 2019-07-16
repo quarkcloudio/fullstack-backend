@@ -8,7 +8,7 @@ class SwitchButton extends Control
             $unCheckedChildren;
 
     function __construct() {
-        $this->controlType = 'switch';
+        $this->componentName = 'switch';
     }
 
     static function make($labelName,$name)

@@ -8,7 +8,7 @@ class Select extends Control
             $mode;
 
     function __construct() {
-        $this->controlType = 'select';
+        $this->componentName = 'select';
     }
 
     static function make($labelName,$name)

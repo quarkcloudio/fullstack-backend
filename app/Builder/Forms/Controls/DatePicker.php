@@ -8,7 +8,7 @@ class DatePicker extends Control
             $showTime;
 
     function __construct() {
-        $this->controlType = 'datePicker';
+        $this->componentName = 'datePicker';
         $this->showTime = true;
         $this->value = date('Y-m-d H:i:s');
     }

@@ -7,7 +7,7 @@ class Button extends Control
     public  $href,$icon,$target,$type,$onClick,$render,$extendButtons;
 
     function __construct() {
-        $this->controlType = 'button';
+        $this->componentName = 'button';
         $this->type = 'default';
         $this->onClick['name'] = null;
         $this->onClick['url'] = null;

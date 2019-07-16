@@ -7,7 +7,7 @@ class Radio extends Control
     public  $list;
 
     function __construct() {
-        $this->controlType = 'radio';
+        $this->componentName = 'radio';
     }
 
     static function make($labelName,$name)

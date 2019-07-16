@@ -7,7 +7,7 @@ class Popconfirm extends Control
     public $icon,$type,$render,$placement,$title,$onConfirm,$okText,$cancelText;
 
     function __construct() {
-        $this->controlType = 'popconfirm';
+        $this->componentName = 'popconfirm';
         $this->type = 'default';
         $this->onConfirm['name'] = null;
         $this->onConfirm['url'] = null;

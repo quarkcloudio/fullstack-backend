@@ -8,7 +8,7 @@ class TextArea extends Control
             $rows;
 
     function __construct() {
-        $this->controlType = 'textArea';
+        $this->componentName = 'textArea';
     }
 
     static function make($labelName,$name)

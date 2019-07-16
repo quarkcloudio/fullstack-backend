@@ -9,7 +9,7 @@ class InputNumber extends Control
             $step;
 
     function __construct() {
-        $this->controlType = 'inputNumber';
+        $this->componentName = 'inputNumber';
     }
 
     static function make($labelName,$name)

@@ -5,7 +5,7 @@ namespace App\Builder\Forms\Controls;
 class Text extends Control
 {
     function __construct() {
-        $this->controlType = 'text';
+        $this->componentName = 'text';
     }
 
     static function make($labelName,$name)

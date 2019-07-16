@@ -58,11 +58,6 @@ class BuilderController extends Controller
             $pageTitle = '新增'.$this->pageTitle;
         }
 
-        $controls[] = Button::make('提交')
-        ->type('primary')
-        ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-        ->onClick('submit',null,'admin/'.$this->controllerName().'/store');
-
         $result = FormBuilder::make('form')
         ->pageTitle($pageTitle)
         ->controls($controls)

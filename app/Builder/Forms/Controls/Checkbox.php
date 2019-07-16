@@ -7,7 +7,7 @@ class Checkbox extends Control
     public  $list;
 
     function __construct() {
-        $this->controlType = 'checkbox';
+        $this->componentName = 'checkbox';
     }
 
     static function make($labelName,$name)

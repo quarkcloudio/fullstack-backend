@@ -14,7 +14,7 @@ class Control
             $labelCol,
             $style,
             $extra,
-            $controlType;
+            $componentName;
 
     function __construct() {
         $this->size = 'default';

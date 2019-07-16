@@ -24,6 +24,10 @@ use App\Builder\Forms\FormBuilder;
 use App\Builder\Lists\Tables\Table;
 use App\Builder\Lists\Tables\Column;
 use App\Builder\Lists\ListBuilder;
+
+use App\Builder\Tabs;
+use App\Builder\TabPane;
+
 use App\Models\Post;
 use App\Models\Category;
 
@@ -228,18 +232,36 @@ class ArticleController extends BuilderController
             Text::make('标签','tags')->style(['width'=>400]),
             Text::make('作者','tags')->style(['width'=>400]),
             Text::make('来源','tags')->style(['width'=>400]),
-            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
             Checkbox::make('推荐位','position')->list($checkboxList),
             Radio::make('展现形式','show_type')->list($radioList)->value(1),
             Image::make('封面图','cover_id')->mode('multiple'),
             Select::make('分类','category_id')->option($getCategorys)->value('0'),
-            SwitchButton::make('允许评论','status')->checkedText('是')->unCheckedText('否')->value(true),
             Editor::make('内容','content'),
             DatePicker::make('创建时间','create_time')->format("YYYY-MM-DD HH:mm:ss"),
-            File::make('附件','file_id'),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
         ];
 
-        $result = $this->formBuilder($controls,$data);
+        $controls1 = [
+            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
+            SwitchButton::make('允许评论','status')->checkedText('是')->unCheckedText('否')->value(true),
+            File::make('附件','file_id'),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
+        ];
+
+        $tabPane = [
+            TabPane::make('基本',1)->controls($controls),
+            TabPane::make('扩展',2)->controls($controls1)
+        ];
+
+        $tabs = Tabs::make('tab')->defaultActiveKey(1)->tabPanes($tabPane);
+
+        $result = $this->formBuilder($tabs,$data);
 
         return $result;
     }

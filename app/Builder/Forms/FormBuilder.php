@@ -8,9 +8,11 @@ class FormBuilder
             $pageTitle,
             $controls,
             $wrapperCol,
-            $labelCol;
+            $labelCol,
+            $componentName;
 
     function __construct() {
+        $this->componentName = 'form';
         $this->pageTitle = 'default title';
         $this->name = 'default form';
         $this->controls = [];

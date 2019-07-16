@@ -8,7 +8,7 @@ class RangePicker extends Control
             $showTime;
 
     function __construct() {
-        $this->controlType = 'rangePicker';
+        $this->componentName = 'rangePicker';
         $this->showTime = true;
         $this->value = [null,null];
     }

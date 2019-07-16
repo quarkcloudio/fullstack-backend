@@ -11,7 +11,7 @@ class File extends Control
         $this->limitSize = 2; // 默认文件大小2M
         $this->limitType = ['image/jpeg','image/png'];
         $this->limitNum = 3; // 默认上传个数
-        $this->controlType = 'file';
+        $this->componentName = 'file';
     }
 
     static function make($labelName,$name)

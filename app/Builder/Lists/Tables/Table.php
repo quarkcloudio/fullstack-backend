@@ -9,9 +9,11 @@ class Table
             $columns,
             $dataSource,
             $pagination,
-            $size;
+            $size,
+            $componentName;
 
     function __construct() {
+        $this->componentName = 'table';
         $this->bordered = false;
         $this->columns = [];
         $this->dataSource = [];

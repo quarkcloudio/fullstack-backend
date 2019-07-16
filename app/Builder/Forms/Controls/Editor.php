@@ -5,7 +5,7 @@ namespace App\Builder\Forms\Controls;
 class Editor extends Control
 {
     function __construct() {
-        $this->controlType = 'editor';
+        $this->componentName = 'editor';
         $this->style = ['height' => 400, 'boxShadow' => 'inset 0 1px 3px rgba(0,0,0,.1)'];
     }
 
