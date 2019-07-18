@@ -2,13 +2,13 @@
 
 namespace App\Builder\Forms\Controls;
 
-class Text extends Control
+class ID extends Control
 {
-    public  $type;
+    public  $display;
 
     function __construct() {
-        $this->componentName = 'text';
-        $this->type = 'text';
+        $this->componentName = 'id';
+        $this->display = 'none';
     }
 
     static function make($labelName,$name)
@@ -25,9 +25,9 @@ class Text extends Control
         return $self;
     }
 
-    public function type($type)
+    public function display($display)
     {
-        $this->type = $type;
+        $this->display = $display;
         return $this;
     }
 }

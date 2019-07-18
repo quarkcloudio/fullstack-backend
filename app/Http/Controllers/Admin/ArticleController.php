@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
+use App\Builder\Forms\Controls\ID;
 use App\Builder\Forms\Controls\Text;
 use App\Builder\Forms\Controls\TextArea;
 use App\Builder\Forms\Controls\InputNumber;
@@ -24,10 +24,8 @@ use App\Builder\Forms\FormBuilder;
 use App\Builder\Lists\Tables\Table;
 use App\Builder\Lists\Tables\Column;
 use App\Builder\Lists\ListBuilder;
-
 use App\Builder\Tabs;
 use App\Builder\TabPane;
-
 use App\Models\Post;
 use App\Models\Category;
 
@@ -170,7 +168,7 @@ class ArticleController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function articleForm($data = [])
+    public function form($data = [])
     {
         $categorys         = Category::where('type','ARTICLE')->get()->toArray();
         $categoryTrees     = Helper::listToTree($categorys);
@@ -225,38 +223,82 @@ class ArticleController extends BuilderController
             ],
         ];
 
-        $controls = [
-            Text::make('标题','title')->style(['width'=>200]),
-            Text::make('别名','name')->style(['width'=>200]),
-            TextArea::make('描述','description'),
-            Text::make('标签','tags')->style(['width'=>400]),
-            Text::make('作者','tags')->style(['width'=>400]),
-            Text::make('来源','tags')->style(['width'=>400]),
-            Checkbox::make('推荐位','position')->list($checkboxList),
-            Radio::make('展现形式','show_type')->list($radioList)->value(1),
-            Image::make('封面图','cover_id')->mode('multiple'),
-            Select::make('分类','category_id')->option($getCategorys)->value('0'),
-            Editor::make('内容','content'),
-            DatePicker::make('创建时间','create_time')->format("YYYY-MM-DD HH:mm:ss"),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
-        ];
+        if(!empty($data)) {
+            $baseControls = [
+                ID::make('ID','id')->value($data['id']),
+                Text::make('标题','title')->style(['width'=>400])->value($data['title']),
+                TextArea::make('描述','description')->style(['width'=>400])->value($data['description']),
+                Text::make('标签','tags')->style(['width'=>400])->value($data['tags']),
+                Text::make('作者','author')->style(['width'=>200])->value($data['author']),
+                Text::make('来源','source')->style(['width'=>200])->value($data['source']),
+                Checkbox::make('推荐位','position')->list($checkboxList)->value($data['position']),
+                Radio::make('展现形式','show_type')->list($radioList)->value(1)->value($data['show_type']),
+                Image::make('封面图','cover_ids')->mode('multiple')->list($data['cover_ids']),
+                Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value($data['category_id']),
+                SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value($data['comment_status']),
+                Editor::make('内容','content')->value($data['content']),
+                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss")->value($data['created_at']),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
+            ];
 
-        $controls1 = [
-            InputNumber::make('排序','level')->extra('越大越靠前')->max(100)->value(1),
-            SwitchButton::make('允许评论','status')->checkedText('是')->unCheckedText('否')->value(true),
-            File::make('附件','file_id'),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
-        ];
+            $extendControls = [
+                Text::make('别名','name')->style(['width'=>200])->value($data['name']),
+                InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value($data['level']),
+                InputNumber::make('浏览量','view')->value($data['view']),
+                InputNumber::make('评论量','comment')->value($data['comment']),
+                Text::make('访问密码','password')->style(['width'=>200])->value($data['password']),
+                File::make('附件','file_id')->list($data['file_id']),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
+            ];
+        } else {
+
+            $baseControls = [
+                Text::make('标题','title')->style(['width'=>400]),
+                TextArea::make('描述','description')->style(['width'=>400]),
+                Text::make('标签','tags')->style(['width'=>400]),
+                Text::make('作者','author')->style(['width'=>200]),
+                Text::make('来源','source')->style(['width'=>200]),
+                Checkbox::make('推荐位','position')->list($checkboxList),
+                Radio::make('展现形式','show_type')->list($radioList)->value(1),
+                Image::make('封面图','cover_ids')->mode('multiple'),
+                Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
+                SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
+                Editor::make('内容','content'),
+                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
+            ];
+
+            $extendControls = [
+                Text::make('别名','name')->style(['width'=>200]),
+                InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
+                InputNumber::make('浏览量','view')->value(0),
+                InputNumber::make('评论量','comment')->value(0),
+                Text::make('访问密码','password')->style(['width'=>200]),
+                File::make('附件','file_id'),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
+            ];
+
+        }
 
         $tabPane = [
-            TabPane::make('基本',1)->controls($controls),
-            TabPane::make('扩展',2)->controls($controls1)
+            TabPane::make('基本',1)->controls($baseControls),
+            TabPane::make('扩展',2)->controls($extendControls)
         ];
 
         $tabs = Tabs::make('tab')->defaultActiveKey(1)->tabPanes($tabPane);
@@ -274,7 +316,7 @@ class ArticleController extends BuilderController
      */
     public function create(Request $request)
     {
-        $data = $this->articleForm();
+        $data = $this->form();
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data);
@@ -300,10 +342,11 @@ class ArticleController extends BuilderController
         $createdAt      =   $request->json('created_at');
         $name           =   $request->json('name','');
         $author         =   $request->json('author','');
+        $source         =   $request->json('source','');
         $level          =   $request->json('level',0);
         $comment        =   $request->json('comment',0);
         $view           =   $request->json('view',0);
-        $password       =   $request->json('password',0);
+        $password       =   $request->json('password');
         $position       =   $request->json('position',0);
         $showType       =   $request->json('show_type');
         $coverIds       =   $request->json('cover_ids',0);
@@ -340,14 +383,15 @@ class ArticleController extends BuilderController
         $data['created_at'] = $createdAt;
         $data['name'] = $name;
         $data['author'] = $author;
+        $data['source'] = $source;
         $data['level'] = $level;
         $data['comment'] = $comment;
         $data['view'] = $view;
         $data['password'] = $password;
         $data['show_type'] = $showType;
         $data['position'] = collect($position)->sum();
-        $data['cover_ids'] = $coverIds;
-        $data['file_id'] = $fileId;
+        $data['cover_ids'] = json_encode($coverIds);
+        $data['file_id'] = json_encode($fileId);
         $data['status'] = $status;
         $data['type'] = 'ARTICLE';
 
@@ -376,22 +420,9 @@ class ArticleController extends BuilderController
 
         $data = Post::find($id)->toArray();
 
-        $coverIds = json_decode($data['cover_ids'],true);
-        if($coverIds) {
-            foreach ($coverIds as $key => $value) {
-                // 获取封面图列表
-                $data['cover_list'][$key]['uid'] = $value;
-                $data['cover_list'][$key]['name'] = Helper::getPicture($value,0,'name');
-                $data['cover_list'][$key]['url'] = Helper::getPicture($value);
-                $data['cover_list'][$key]['status'] = 'done';
-            }
-        } else {
-            $data['cover_list'] = [];
-        }
+        $data['cover_ids'] = json_decode($data['cover_ids'],true);
 
-        // 获取文件
-        $data['file_path'] = Helper::getFile($data['file_id']);
-        $data['file_name'] = Helper::getFile($data['file_id'],'name');
+        $data['file_id'] = json_decode($data['file_id'],true);
 
         $position = [];
 
@@ -413,12 +444,19 @@ class ArticleController extends BuilderController
 
         $data['position'] = $position;
 
-        $categorys = Category::where('type','ARTICLE')->get()->toArray();
-        $categoryTrees = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+        if ($data['comment_status'] == 'open') {
+            $data['comment_status'] = true;
+        } else {
+            $data['comment_status'] = false;
+        }
 
-        // 所有分类
-        $data['categorys'] = $categoryTreeLists;
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        $data = $this->form($data);
 
         if(!empty($data)) {
             return $this->success('操作成功！','',$data);
@@ -448,7 +486,7 @@ class ArticleController extends BuilderController
         $level          =   $request->json('level',0);
         $comment        =   $request->json('comment',0);
         $view           =   $request->json('view',0);
-        $password       =   $request->json('password',0);
+        $password       =   $request->json('password');
         $position       =   $request->json('position',0);
         $showType       =   $request->json('show_type');
         $coverIds       =   $request->json('cover_ids',0);
@@ -491,37 +529,14 @@ class ArticleController extends BuilderController
         $data['password'] = $password;
         $data['show_type'] = $showType;
         $data['position'] = collect($position)->sum();
-        $data['cover_ids'] = $coverIds;
-        $data['file_id'] = $fileId;
+        $data['cover_ids'] = json_encode($coverIds);
+        $data['file_id'] = json_encode($fileId);
         $data['status'] = $status;
         $data['type'] = 'ARTICLE';
 
         $result = Post::where('id',$id)->update($data);
         if ($result) {
             return $this->success('操作成功！','index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Post::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }
@@ -666,20 +681,6 @@ class ArticleController extends BuilderController
                     $query->where('posts.status',$search['status']);
                 }
             }
-
-            // 作者
-            if(isset($search['author'])) {
-                if(!empty($search['author'])) {
-                    $query->where('posts.author',$search['author']);
-                }
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('posts.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
-            }
         }
 
         // 查询数量
@@ -718,11 +719,53 @@ class ArticleController extends BuilderController
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
-        // 模板数据
-        $data['categorys'] = $categoryTreeLists;
-        $data['lists'] = Helper::listsFormat($lists);
+        $getCategorys = [];
+
+        $getCategorys[0]['name'] = '所有分类';
+        $getCategorys[0]['value'] = '0';
+
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+        }
+
+        $lists = Helper::listsFormat($lists);
+
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('分类','categorys')->option($getCategorys)->value('0'),
+            Select::make('状态','status')->option($status)->value('0'),
+            Text::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('标题','title')->withA('admin/article/edit'),
+            Column::make('作者','author'),
+            Column::make('分类','category_title'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('发布时间','created_at'),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs);
+
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }

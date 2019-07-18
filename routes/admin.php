@@ -45,7 +45,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/article/store', 'Admin\\ArticleController@store')->name('api/admin/article/store');
     Route::get('admin/article/edit', 'Admin\\ArticleController@edit')->name('api/admin/article/edit');
     Route::post('admin/article/save', 'Admin\\ArticleController@save')->name('api/admin/article/save');
-    Route::post('admin/article/destroy', 'Admin\\ArticleController@destroy')->name('api/admin/article/destroy');
     Route::post('admin/article/changeStatus', 'Admin\\ArticleController@changeStatus')->name('api/admin/article/changeStatus');
     Route::get('admin/article/myPublished', 'Admin\\ArticleController@myPublished')->name('api/admin/article/myPublished');
     
@@ -54,7 +53,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/page/store', 'Admin\\PageController@store')->name('api/admin/page/store');
     Route::get('admin/page/edit', 'Admin\\PageController@edit')->name('api/admin/page/edit');
     Route::post('admin/page/save', 'Admin\\PageController@save')->name('api/admin/page/save');
-    Route::post('admin/page/destroy', 'Admin\\PageController@destroy')->name('api/admin/page/destroy');
     Route::post('admin/page/changeStatus', 'Admin\\PageController@changeStatus')->name('api/admin/page/changeStatus');
     
     Route::get('admin/groupbuyShop/index', 'Admin\\GroupbuyShopController@index')->name('api/admin/groupbuyShop/index');

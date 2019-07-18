@@ -8,14 +8,38 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 use App\Services\Helper;
 use EasyWeChat\Factory;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\User;
 use App\Models\Category;
 use App\Models\AccountLog;
 use Validator;
 use DB;
 
-class UserController extends Controller
+class UserController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '用户';
+    }
+
     /**
      * 列表页面
      *
@@ -37,7 +61,7 @@ class UserController extends Controller
 
             // 用户名
             if(isset($search['username'])) {
-                $query->where('name','like','%'.$search['username'].'%');
+                $query->where('username','like','%'.$search['username'].'%');
             }
 
             // 昵称
@@ -80,8 +104,25 @@ class UserController extends Controller
         ->toArray();
 
         foreach ($lists as $key => $value) {
-            $lists[$key]['cover_path'] = Helper::getPicture($value['cover_id']);
+            $lists[$key]['cover_path'] = Helper::getPicture($value['avatar']);
         }
+
+        $lists = Helper::listsFormat($lists);
+
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
 
         // 默认页码
         $pagination['defaultCurrent'] = 1;
@@ -94,11 +135,97 @@ class UserController extends Controller
 
         // 模板数据
         $data['lists'] = Helper::listsFormat($lists);
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Text::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('头像','cover_path')->isImage()->withA('admin/user/edit'),
+            Column::make('用户名','username')->withA('admin/user/edit'),
+            Column::make('昵称','nickname'),
+            Column::make('手机号','phone'),
+            Column::make('邮箱','email'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('注册时间','created_at'),
+        ];
+
+        $actions = [
+            Button::make('充值')->type('link')->onClick('openModal',['title'=>'用户充值','width'=>600],'admin/'.$this->controllerName().'/recharge'),
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->href('admin/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,null,null,null,$actions);
+
         if(!empty($data)) {
             return $this->success('获取成功！','',$data,$pagination,$search);
         } else {
             return $this->success('获取失败！');
         }
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        $radioList = [
+            [
+                'name'=>'男',
+                'value'=>1,
+            ],
+            [
+                'name'=>'女',
+                'value'=>2,
+            ],
+        ];
+
+        if(!empty($data)) {
+            $controls = [
+                ID::make('ID','id')->value($data['id']),
+                Image::make('头像','avatar')->list($data['avatar']),
+                Text::make('用户名','username')->style(['width'=>200])->value($data['username']),
+                Text::make('昵称','nickname')->style(['width'=>200])->value($data['nickname']),
+                Text::make('邮箱','email')->style(['width'=>200])->value($data['email']),
+                Radio::make('性别','sex')->list($radioList)->value($data['sex']),
+                Text::make('密码','password')->style(['width'=>200])->type('password'),
+                Text::make('手机号','phone')->style(['width'=>200])->value($data['phone']),
+                DatePicker::make('注册时间','created_at')->format("YYYY-MM-DD HH:mm:ss")->value($data['created_at']),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
+            ];
+        } else {
+            $controls = [
+                Image::make('头像','avatar'),
+                Text::make('用户名','username')->style(['width'=>200]),
+                Text::make('昵称','nickname')->style(['width'=>200]),
+                Text::make('邮箱','email')->style(['width'=>200]),
+                Radio::make('性别','sex')->list($radioList)->value(1),
+                Text::make('密码','password')->style(['width'=>200])->type('password'),
+                Text::make('手机号','phone')->style(['width'=>200]),
+                DatePicker::make('注册时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
+            ];
+        }
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
     }
 
     /**
@@ -109,7 +236,8 @@ class UserController extends Controller
      */
     public function create(Request $request)
     {
-        return $this->success('获取成功！');
+        $data = $this->form();
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -123,8 +251,14 @@ class UserController extends Controller
         $requestJson    =   $request->getContent();
         $requestData    =   json_decode($requestJson,true);
 
-        // 删除modelName
-        unset($requestData['modelName']);
+        // 删除url
+        unset($requestData['url']);
+
+        $avatar = $requestData['avatar'];
+        if($avatar) {
+            unset($requestData['avatar']);
+            $requestData['avatar'] = $avatar[0]['id'];
+        }
 
         // 表单验证错误提示信息
         $messages = [
@@ -137,7 +271,7 @@ class UserController extends Controller
 
         // 表单验证规则
         $rules = [
-            'name' => ['required','max:255',Rule::unique('users')],
+            'username' => ['required','max:255',Rule::unique('users')],
             'password' => ['required','max:255','min:6'],
             'nickname' => ['required','max:255',Rule::unique('users')],
             'email' =>  ['required','email','max:255',Rule::unique('users')],
@@ -151,7 +285,7 @@ class UserController extends Controller
             $errors = $validator->errors()->getMessages();
 
             foreach($errors as $key => $value) {
-                if($key === 'name') {
+                if($key === 'username') {
                     $errorMsg = '用户名'.$value[0];
                 }
 
@@ -210,7 +344,14 @@ class UserController extends Controller
 
         $data = User::find($id)->toArray();
 
-        $data['cover_path'] = Helper::getPicture($data['cover_id']);
+        $avatar = $data['avatar'];
+
+        unset($data['avatar']);
+
+        $data['avatar'][0]['id'] =$avatar;
+        $data['avatar'][0]['uid'] =$avatar;
+        $data['avatar'][0]['name'] = Helper::getPicture($avatar,'name');
+        $data['avatar'][0]['url'] = Helper::getPicture($avatar);
 
         if(empty($data['last_login_ip'])) {
             $data['last_login_ip'] = '暂无';
@@ -219,6 +360,14 @@ class UserController extends Controller
         if(empty($data['last_login_time'])) {
             $data['last_login_time'] = '暂无';
         }
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        $data = $this->form($data);
 
         if(!empty($data)) {
             return $this->success('操作成功！','',$data);
@@ -238,8 +387,14 @@ class UserController extends Controller
         $requestJson    =   $request->getContent();
         $requestData    =   json_decode($requestJson,true);
 
-        // 删除modelName
-        unset($requestData['modelName']);
+        // 删除url
+        unset($requestData['url']);
+
+        $avatar = $requestData['avatar'];
+        if($avatar) {
+            unset($requestData['avatar']);
+            $requestData['avatar'] = $avatar[0]['id'];
+        }
 
         // 表单验证错误提示信息
         $messages = [
@@ -251,7 +406,7 @@ class UserController extends Controller
 
         // 表单验证规则
         $rules = [
-            'name' => ['required','max:255',Rule::unique('users')->ignore($requestData['id'])],
+            'username' => ['required','max:255',Rule::unique('users')->ignore($requestData['id'])],
             'nickname' => ['required','max:255',Rule::unique('users')->ignore($requestData['id'])],
             'email' =>  ['required','email','max:255',Rule::unique('users')->ignore($requestData['id'])],
             'phone' =>  ['required','max:11',Rule::unique('users')->ignore($requestData['id'])],
@@ -264,7 +419,7 @@ class UserController extends Controller
             $errors = $validator->errors()->getMessages();
 
             foreach($errors as $key => $value) {
-                if($key === 'name') {
+                if($key === 'username') {
                     $errorMsg = '用户名'.$value[0];
                 }
 
@@ -298,29 +453,6 @@ class UserController extends Controller
 
         if ($result) {
             return $this->success('操作成功！','/user/index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = User::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }

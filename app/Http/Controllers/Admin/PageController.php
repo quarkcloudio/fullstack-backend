@@ -4,14 +4,38 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
-use EasyWeChat\Factory;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
+use App\Builder\Tabs;
+use App\Builder\TabPane;
 use App\Models\Post;
 use App\Models\Category;
 
-class PageController extends Controller
+class PageController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '单页';
+    }
+
     /**
      * 列表页面
      *
@@ -65,8 +89,6 @@ class PageController extends Controller
 
         // 查询列表
         $lists = $query
-        //->skip(($current-1)*$pageSize)
-        //->take($pageSize)
         ->where('status', '>', 0)
         ->orderBy('id', 'desc')
         ->select('posts.*')
@@ -102,11 +124,107 @@ class PageController extends Controller
         // 模板数据
         $data['lists'] = $lists;
 
+
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Text::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('标题','title')->withA('admin/page/edit'),
+            Column::make('作者','author'),
+            Column::make('分类','category_title'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('发布时间','created_at'),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs);
+
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        $categorys         = Post::where('type','PAGE')->where('status','>',0)->get()->toArray();
+        $categoryTrees     = Helper::listToTree($categorys);
+        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+
+        // 模板数据
+        $getCategorys = [];
+
+        $getCategorys[0]['name'] = '父节点';
+        $getCategorys[0]['value'] = '0';
+
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+        }
+
+        if(!empty($data)) {
+            $controls = [
+                ID::make('ID','id')->value($data['id']),
+                Text::make('标题','title')->style(['width'=>400])->value($data['title']),
+                Text::make('别名','name')->style(['width'=>200])->value($data['name']),
+                TextArea::make('描述','description')->style(['width'=>400])->value($data['description']),
+                Text::make('标签','tags')->style(['width'=>400])->value($data['tags']),
+                Image::make('封面图','cover_ids')->mode('multiple')->list($data['cover_ids']),
+                Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys)->value($data['pid']),
+                Editor::make('内容','content')->value($data['content']),
+                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss")->value($data['created_at']),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
+            ];
+        } else {
+            $controls = [
+                Text::make('标题','title')->style(['width'=>400]),
+                Text::make('别名','name')->style(['width'=>200]),
+                TextArea::make('描述','description')->style(['width'=>400]),
+                Text::make('标签','tags')->style(['width'=>400]),
+                Image::make('封面图','cover_ids')->mode('multiple'),
+                Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys),
+                Editor::make('内容','content'),
+                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
+            ];
+        }
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
     }
 
     /**
@@ -117,13 +235,7 @@ class PageController extends Controller
      */
     public function create(Request $request)
     {
-        $categorys         = Post::where('type','PAGE')->where('status','>',0)->get()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
-
-        // 模板数据
-        $data['categorys'] = $categoryTreeLists;
-
+        $data = $this->form();
         return $this->success('获取成功！','',$data);
     }
 
@@ -151,7 +263,7 @@ class PageController extends Controller
         $view           =   $request->json('view',0);
         $password       =   $request->json('password',0);
         $position       =   $request->json('position',0);
-        $showType       =   $request->json('show_type');
+        $showType       =   $request->json('show_type',0);
         $coverIds       =   $request->json('cover_ids',0);
         $fileId         =   $request->json('file_id',0);
         $status         =   $request->json('status');
@@ -190,8 +302,8 @@ class PageController extends Controller
         $data['password'] = $password;
         $data['show_type'] = $showType;
         $data['position'] = collect($position)->sum();
-        $data['cover_ids'] = $coverIds;
-        $data['file_id'] = $fileId;
+        $data['cover_ids'] = json_encode($coverIds);
+        $data['file_id'] = json_encode($fileId);
         $data['status'] = $status;
         $data['type'] = 'PAGE';
 
@@ -220,49 +332,15 @@ class PageController extends Controller
 
         $data = Post::find($id)->toArray();
 
-        $coverIds = json_decode($data['cover_ids'],true);
-        if($coverIds) {
-            foreach ($coverIds as $key => $value) {
-                // 获取封面图列表
-                $data['cover_list'][$key]['uid'] = $value;
-                $data['cover_list'][$key]['name'] = Helper::getPicture($value,0,'name');
-                $data['cover_list'][$key]['url'] = Helper::getPicture($value);
-                $data['cover_list'][$key]['status'] = 'done';
-            }
+        $data['cover_ids'] = json_decode($data['cover_ids'],true);
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
         } else {
-            $data['cover_list'] = [];
+            $data['status'] = false;
         }
 
-        // 获取文件
-        $data['file_path'] = Helper::getFile($data['file_id']);
-        $data['file_name'] = Helper::getFile($data['file_id'],'name');
-
-        $position = [];
-
-        if(in_array($data['position'], [1,3,5,7,9,15])) {
-            $position[] = 1;
-        }
-
-        if(in_array($data['position'], [2,3,6,7,9,10,14,15])) {
-            $position[] = 2;
-        }
-
-        if(in_array($data['position'], [4,5,6,7,12,13,14,15])) {
-            $position[] = 4;
-        }
-
-        if(in_array($data['position'], [8,9,10,11,12,13,14,15])) {
-            $position[] = 8;
-        }
-
-        $data['position'] = $position;
-
-        $categorys = Post::where('type','PAGE')->where('status','>',0)->get()->toArray();
-        $categoryTrees = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
-
-        // 所有分类
-        $data['categorys'] = $categoryTreeLists;
+        $data = $this->form($data);
 
         if(!empty($data)) {
             return $this->success('操作成功！','',$data);
@@ -296,7 +374,7 @@ class PageController extends Controller
         $view           =   $request->json('view',0);
         $password       =   $request->json('password',0);
         $position       =   $request->json('position',0);
-        $showType       =   $request->json('show_type');
+        $showType       =   $request->json('show_type',0);
         $coverIds       =   $request->json('cover_ids',0);
         $fileId         =   $request->json('file_id',0);
         $status         =   $request->json('status');
@@ -335,37 +413,14 @@ class PageController extends Controller
         $data['password'] = $password;
         $data['show_type'] = $showType;
         $data['position'] = collect($position)->sum();
-        $data['cover_ids'] = $coverIds;
-        $data['file_id'] = $fileId;
+        $data['cover_ids'] = json_encode($coverIds);
+        $data['file_id'] = json_encode($fileId);
         $data['status'] = $status;
         $data['type'] = 'PAGE';
 
         $result = Post::where('id',$id)->update($data);
         if ($result) {
             return $this->success('操作成功！','index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Post::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }
