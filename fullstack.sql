@@ -10,10 +10,50 @@ Target Server Type    : MYSQL
 Target Server Version : 50724
 File Encoding         : 65001
 
-Date: 2019-07-04 23:33:02
+Date: 2019-07-19 14:33:46
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for account_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `account_logs`;
+CREATE TABLE `account_logs` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `adminid` int(11) DEFAULT NULL,
+  `uid` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `money` decimal(10,2) DEFAULT NULL,
+  `score` int(11) DEFAULT NULL,
+  `type` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remark` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of account_logs
+-- ----------------------------
+INSERT INTO `account_logs` VALUES ('1', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:00:51', '2019-03-12 06:00:51');
+INSERT INTO `account_logs` VALUES ('2', null, 'administratorLOGIN_ERROR', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:16:19', '2019-03-12 06:16:19');
+INSERT INTO `account_logs` VALUES ('3', null, 'administratorLOGIN_ERROR', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:17:34', '2019-03-12 06:17:34');
+INSERT INTO `account_logs` VALUES ('4', null, 'administratorLOGIN_ERROR', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:17:52', '2019-03-12 06:17:52');
+INSERT INTO `account_logs` VALUES ('5', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:18:01', '2019-03-12 06:18:01');
+INSERT INTO `account_logs` VALUES ('6', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:24:06', '2019-03-12 06:24:06');
+INSERT INTO `account_logs` VALUES ('7', null, 'administratorLOGIN_ERROR', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:37:21', '2019-03-12 06:37:21');
+INSERT INTO `account_logs` VALUES ('8', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 06:51:15', '2019-03-12 06:51:15');
+INSERT INTO `account_logs` VALUES ('9', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 07:00:29', '2019-03-12 07:00:29');
+INSERT INTO `account_logs` VALUES ('10', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 07:06:40', '2019-03-12 07:06:40');
+INSERT INTO `account_logs` VALUES ('11', null, 'administratorLOGIN_ERROR', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 07:06:50', '2019-03-12 07:06:50');
+INSERT INTO `account_logs` VALUES ('12', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 07:06:59', '2019-03-12 07:06:59');
+INSERT INTO `account_logs` VALUES ('13', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 07:07:31', '2019-03-12 07:07:31');
+INSERT INTO `account_logs` VALUES ('14', null, 'administratorLOGIN_ERROR', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 07:07:42', '2019-03-12 07:07:42');
+INSERT INTO `account_logs` VALUES ('15', null, 'administratorLOGIN_ERROR', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-03-12 07:09:01', '2019-03-12 07:09:01');
+INSERT INTO `account_logs` VALUES ('16', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-05-20 17:56:05', '2019-05-20 17:56:05');
+INSERT INTO `account_logs` VALUES ('17', null, '管理员登录', '0.00', '0', '127.0.0.1', 'ADMIN', '1', '2019-05-20 17:58:01', '2019-05-20 17:58:01');
+INSERT INTO `account_logs` VALUES ('20', '1', '2', '0.00', '10', '3', '测', '1', '2019-07-19 14:32:55', '2019-07-19 14:32:55');
 
 -- ----------------------------
 -- Table structure for action_logs
@@ -113,10 +153,31 @@ CREATE TABLE `admins` (
 -- ----------------------------
 -- Records of admins
 -- ----------------------------
-INSERT INTO `admins` VALUES ('1', 'administrator', '超级管理员', 'admin@yourweb.com', '10086', '1', '$2y$10$3oTf1wNz/LMicAnHc0WRPujqs94E4q2Yo4L0dPNeS21Wm1xI7DwNS', '', '', '', '', '', '127.0.0.1', '2019-07-04 20:43:32', '1', 'FnMwEPMfeG', '2019-03-08 08:25:58', '2019-07-04 20:43:32', null);
+INSERT INTO `admins` VALUES ('1', 'administrator', '超级管理员', 'admin@yourweb.com', '10086', '1', '$2y$10$3oTf1wNz/LMicAnHc0WRPujqs94E4q2Yo4L0dPNeS21Wm1xI7DwNS', '', '', '', '', '', '127.0.0.1', '2019-07-19 14:30:05', '1', 'FnMwEPMfeG', '2019-03-08 08:25:58', '2019-07-19 14:30:05', null);
 INSERT INTO `admins` VALUES ('2', '郭云飞', '杨过', 'dai_hang_love@126.com', '', '1', '$2y$10$QQGux06mhnoGxDMzF7/M9O82dkMZL/TJLT4zPjvR2cGXZBLXgFujW', '', '', '', '', '', '', null, '1', null, '2019-05-09 17:29:51', '2019-05-09 17:47:51', '2019-05-09 17:47:51');
 INSERT INTO `admins` VALUES ('4', '狮子鱼', '萌叔叔丶', 'dai_hang_love@136.com', '15076569622', '1', '$2y$10$2KbQstMpjTr3EakWVvIRUu.ZoGqRB8km4JvZ2cMreQlH9r4cFzoQW', '', '', '', '', '', '', null, '1', null, '2019-05-09 17:59:52', '2019-05-09 18:09:57', '2019-05-09 18:09:57');
 INSERT INTO `admins` VALUES ('5', 'tangtanglove', 'tangtanglove', 'dai_hang_love@10.com', '15076569631', '1', '$2y$10$fDuJSwqjFjLDv60xFxtMu.2dfuahUuFGbanhZTmFDo4XCwRniLMaq', '', '', '', '', '', '127.0.0.1', '2019-05-20 18:21:32', '1', null, '2019-05-09 18:10:20', '2019-05-20 18:21:32', null);
+
+-- ----------------------------
+-- Table structure for banner_categories
+-- ----------------------------
+DROP TABLE IF EXISTS `banner_categories`;
+CREATE TABLE `banner_categories` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `width` int(11) DEFAULT '0',
+  `height` int(11) DEFAULT '0',
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of banner_categories
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for banners
@@ -139,27 +200,6 @@ CREATE TABLE `banners` (
 
 -- ----------------------------
 -- Records of banners
--- ----------------------------
-
--- ----------------------------
--- Table structure for banner_categories
--- ----------------------------
-DROP TABLE IF EXISTS `banner_categories`;
-CREATE TABLE `banner_categories` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `width` int(11) DEFAULT '0',
-  `height` int(11) DEFAULT '0',
-  `status` tinyint(4) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of banner_categories
 -- ----------------------------
 
 -- ----------------------------
@@ -344,15 +384,17 @@ CREATE TABLE `files` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of files
 -- ----------------------------
-INSERT INTO `files` VALUES ('1', null, '0', 'groupRecruitHeader.png', '20202', 'public/uploads/files/TBnMmcDTzZALtoU0aZuCYRcVeBxAPlOjUNI05zmd.png', 'cd4b1c0e6a95492c1d82f34751af4d5d', '1', '2019-05-10 15:18:19', '2019-05-10 15:18:19');
-INSERT INTO `files` VALUES ('2', null, '0', 'login.png', '14710', 'public/uploads/files/1lpsWW5imDypJ3l4oZPgvwAwoMGhoOvEUhDItBad.png', 'e321e6b70a980f77105a9a7530ac6cef', '1', '2019-05-10 15:18:23', '2019-05-10 15:18:23');
-INSERT INTO `files` VALUES ('3', null, '0', 'topbg.png', '13432', 'public/uploads/files/jRn1waL4hk1bqDBZjgs6FHTuYapdV1KOHaYfSCRC.png', 'ce49fea5dc3fd2eba84dae70c0a7aacb', '1', '2019-05-10 17:20:13', '2019-05-10 17:20:13');
-INSERT INTO `files` VALUES ('4', null, '0', 'expired.png', '10783', 'public/uploads/files/XjpPfPQ8G5TYocOAX9ULpyTttL1S1QkArCRaYavM.png', '3c1a1a2f64ae2bc39677d69f796e0a26', '1', '2019-05-10 17:26:24', '2019-05-10 17:26:24');
+INSERT INTO `files` VALUES ('1', null, '0', 'groupRecruitHeader.png', '20202', 'public/uploads/files/TBnMmcDTzZALtoU0aZuCYRcVeBxAPlOjUNI05zmd.png', 'cd4b1c0e6a95492c1d82f34751af4d5d', '1', '2019-05-10 15:18:19', '2019-07-15 16:00:10');
+INSERT INTO `files` VALUES ('2', null, '0', 'login.png', '14710', 'public/uploads/files/1lpsWW5imDypJ3l4oZPgvwAwoMGhoOvEUhDItBad.png', 'e321e6b70a980f77105a9a7530ac6cef', '1', '2019-05-10 15:18:23', '2019-07-15 16:00:10');
+INSERT INTO `files` VALUES ('3', null, '0', 'topbg.png', '13432', 'public/uploads/files/jRn1waL4hk1bqDBZjgs6FHTuYapdV1KOHaYfSCRC.png', 'ce49fea5dc3fd2eba84dae70c0a7aacb', '1', '2019-05-10 17:20:13', '2019-07-15 16:00:10');
+INSERT INTO `files` VALUES ('4', null, '0', 'expired.png', '10783', 'public/uploads/files/XjpPfPQ8G5TYocOAX9ULpyTttL1S1QkArCRaYavM.png', '3c1a1a2f64ae2bc39677d69f796e0a26', '1', '2019-05-10 17:26:24', '2019-07-15 16:00:10');
+INSERT INTO `files` VALUES ('5', null, '0', 'EITlid1Kla (1).txt', '32', 'public/uploads/files/EIbQ4sh3tnCIcQJEMqqm8vIv7Nmw4ZWfkz2OqRYg.txt', '0a68e84bf07be471337bcf7d7de5287a', '1', '2019-07-05 15:20:44', '2019-07-15 16:00:10');
+INSERT INTO `files` VALUES ('6', null, '0', 'channel.txt', '32843', 'public/uploads/files/hQMFXfbztbeYZDucL9AOGnKUOdyPJtNXWlHNeDHp.txt', '5c088c5668cebe007af46d93a3a9fbea', '1', '2019-07-05 15:20:52', '2019-07-15 16:00:10');
 
 -- ----------------------------
 -- Table structure for goods
@@ -416,27 +458,6 @@ CREATE TABLE `goods` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for goods_attributes
--- ----------------------------
-DROP TABLE IF EXISTS `goods_attributes`;
-CREATE TABLE `goods_attributes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `shop_id` int(11) unsigned DEFAULT NULL COMMENT '商家id，可选',
-  `goods_type_id` int(11) DEFAULT NULL COMMENT '商品类型',
-  `name` varchar(255) DEFAULT NULL COMMENT '属性或规格名称',
-  `description` varchar(255) DEFAULT NULL COMMENT '属性或规格描述',
-  `style` tinyint(4) DEFAULT NULL COMMENT '显示样式：1多选，2单选，3文本，多选：以复选框的形式让商家勾选属性值；',
-  `sort` int(11) DEFAULT NULL COMMENT '排序',
-  `status` tinyint(4) DEFAULT NULL,
-  `type` tinyint(4) DEFAULT NULL COMMENT '1:spu商品属性,2:sku商品规格用于销售',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- ----------------------------
--- Records of goods_attributes
--- ----------------------------
-
--- ----------------------------
 -- Table structure for goods_attribute_alias
 -- ----------------------------
 DROP TABLE IF EXISTS `goods_attribute_alias`;
@@ -466,6 +487,27 @@ CREATE TABLE `goods_attribute_values` (
 
 -- ----------------------------
 -- Records of goods_attribute_values
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for goods_attributes
+-- ----------------------------
+DROP TABLE IF EXISTS `goods_attributes`;
+CREATE TABLE `goods_attributes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `shop_id` int(11) unsigned DEFAULT NULL COMMENT '商家id，可选',
+  `goods_type_id` int(11) DEFAULT NULL COMMENT '商品类型',
+  `name` varchar(255) DEFAULT NULL COMMENT '属性或规格名称',
+  `description` varchar(255) DEFAULT NULL COMMENT '属性或规格描述',
+  `style` tinyint(4) DEFAULT NULL COMMENT '显示样式：1多选，2单选，3文本，多选：以复选框的形式让商家勾选属性值；',
+  `sort` int(11) DEFAULT NULL COMMENT '排序',
+  `status` tinyint(4) DEFAULT NULL,
+  `type` tinyint(4) DEFAULT NULL COMMENT '1:spu商品属性,2:sku商品规格用于销售',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of goods_attributes
 -- ----------------------------
 
 -- ----------------------------
@@ -536,6 +578,32 @@ CREATE TABLE `goods_info_attribute_values` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for goods_order_details
+-- ----------------------------
+DROP TABLE IF EXISTS `goods_order_details`;
+CREATE TABLE `goods_order_details` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(11) unsigned NOT NULL DEFAULT '0',
+  `goods_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `goods_sku_id` int(11) NOT NULL,
+  `mall_order_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `num` int(11) NOT NULL COMMENT '购买数量',
+  `goods_price` decimal(10,2) NOT NULL COMMENT '现价',
+  `market_price` decimal(10,2) NOT NULL COMMENT '原价',
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cover_ids` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:等待付款，1:已付款，2：已退款',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+-- ----------------------------
+-- Records of goods_order_details
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for goods_orders
 -- ----------------------------
 DROP TABLE IF EXISTS `goods_orders`;
@@ -564,32 +632,6 @@ CREATE TABLE `goods_orders` (
 
 -- ----------------------------
 -- Records of goods_orders
--- ----------------------------
-
--- ----------------------------
--- Table structure for goods_order_details
--- ----------------------------
-DROP TABLE IF EXISTS `goods_order_details`;
-CREATE TABLE `goods_order_details` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `uid` int(11) unsigned NOT NULL DEFAULT '0',
-  `goods_id` int(11) unsigned NOT NULL DEFAULT '0',
-  `goods_sku_id` int(11) NOT NULL,
-  `mall_order_id` int(11) unsigned NOT NULL DEFAULT '0',
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `num` int(11) NOT NULL COMMENT '购买数量',
-  `goods_price` decimal(10,2) NOT NULL COMMENT '现价',
-  `market_price` decimal(10,2) NOT NULL COMMENT '原价',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cover_ids` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:等待付款，1:已付款，2：已退款',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
--- ----------------------------
--- Records of goods_order_details
 -- ----------------------------
 
 -- ----------------------------
@@ -734,6 +776,24 @@ INSERT INTO `menus` VALUES ('43', '创建器列表页', 'admin', '', '42', '0', 
 INSERT INTO `menus` VALUES ('44', '创建器表单页', 'admin', '', '42', '0', '/demo/builderForm', '1', '1', '2019-07-01 15:01:30', '2019-07-02 11:55:10');
 
 -- ----------------------------
+-- Table structure for message_reads
+-- ----------------------------
+DROP TABLE IF EXISTS `message_reads`;
+CREATE TABLE `message_reads` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `message_id` int(11) NOT NULL,
+  `uid` int(11) NOT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of message_reads
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for messages
 -- ----------------------------
 DROP TABLE IF EXISTS `messages`;
@@ -752,24 +812,6 @@ CREATE TABLE `messages` (
 
 -- ----------------------------
 -- Records of messages
--- ----------------------------
-
--- ----------------------------
--- Table structure for message_reads
--- ----------------------------
-DROP TABLE IF EXISTS `message_reads`;
-CREATE TABLE `message_reads` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `message_id` int(11) NOT NULL,
-  `uid` int(11) NOT NULL,
-  `status` tinyint(4) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of message_reads
 -- ----------------------------
 
 -- ----------------------------
@@ -904,6 +946,7 @@ INSERT INTO `oauth_access_tokens` VALUES ('00a02d59faade06c937d30969ca3e6f0c70ec
 INSERT INTO `oauth_access_tokens` VALUES ('018db70af3d7bc545da9160a77d7c23578383ec9e19cf58554c87caa27b06eb229878ec2a97fb40e', '1', '1', 'FullStack', '[]', '0', '2019-06-12 15:13:37', '2019-06-12 15:13:37', '2020-06-12 15:13:37');
 INSERT INTO `oauth_access_tokens` VALUES ('02447d5eae69ea14b5828e2f374a635e348202c4c879a6ef74b0bfa87e123e2ed46bc0b985358718', '1', '1', 'FullStack', '[]', '0', '2019-04-05 09:35:45', '2019-04-05 09:35:45', '2020-04-05 09:35:45');
 INSERT INTO `oauth_access_tokens` VALUES ('025d414053cb945b5a6f2a25336a633ec5258236ba99b36bfa5b2a28f5b7955eaa077e6f61202995', '1', '1', 'FullStack', '[]', '0', '2019-05-31 15:32:53', '2019-05-31 15:32:53', '2020-05-31 15:32:53');
+INSERT INTO `oauth_access_tokens` VALUES ('02950a366883c480b6f6e0a076c916eacf9b54a55ff8ac895fb87aed315ecd1bca3b59a5d759a4c2', '1', '1', 'FullStack', '[]', '0', '2019-07-19 14:30:05', '2019-07-19 14:30:05', '2020-07-19 14:30:05');
 INSERT INTO `oauth_access_tokens` VALUES ('0415855644d8a21b6af81a6f9bd9b689446da814dd1a0c955eb0a016c9c63a2f721b03980342aaf1', '1', '1', 'FullStack', '[]', '0', '2019-04-03 14:59:39', '2019-04-03 14:59:39', '2020-04-03 14:59:39');
 INSERT INTO `oauth_access_tokens` VALUES ('04b217ffd15cb103c55bf21f02e89ed097b49b2ee250034d6af91ef5deea7a924724281739ca4fb6', '1', '1', 'FullStack', '[]', '0', '2019-06-28 18:02:24', '2019-06-28 18:02:24', '2020-06-28 18:02:24');
 INSERT INTO `oauth_access_tokens` VALUES ('06ef55b157942c9b682128f7342f0d9b1ce6e6da10c2382622a143b84de4f3f08d953f8fc298520d', '1', '1', 'FullStack', '[]', '0', '2019-06-13 14:36:07', '2019-06-13 14:36:07', '2020-06-13 14:36:07');
@@ -913,8 +956,13 @@ INSERT INTO `oauth_access_tokens` VALUES ('0a824e877ff06c2bdc5b30aaf54a1e21d824c
 INSERT INTO `oauth_access_tokens` VALUES ('0acdaaf904260ea8836b2c56e70b933168530a1ea363918372ffe2df69a84401b3bf96b250456055', '1', '1', 'FullStack', '[]', '0', '2019-07-01 18:08:52', '2019-07-01 18:08:52', '2020-07-01 18:08:52');
 INSERT INTO `oauth_access_tokens` VALUES ('0c3ffaf1fbb97ee5aaf11abff97c851d30cb0040e8961f34430d75aea56555a181e3a84be20ff63e', '1', '1', 'FullStack', '[]', '0', '2019-05-09 14:56:10', '2019-05-09 14:56:10', '2020-05-09 14:56:10');
 INSERT INTO `oauth_access_tokens` VALUES ('0ce5dc50d095b4250347b4867768273d2254825aaa8456532bb3d9eab4dd563873722865377d96eb', '1', '1', 'FullStack', '[]', '0', '2019-05-08 09:37:18', '2019-05-08 09:37:18', '2020-05-08 09:37:18');
+INSERT INTO `oauth_access_tokens` VALUES ('0e34f85761179fdfaf490f2bd10302f1fd9b3f039b2ce7230c45aeda581a9b0cfa653894e3d51e8c', '1', '1', 'FullStack', '[]', '0', '2019-07-09 08:32:29', '2019-07-09 08:32:29', '2020-07-09 08:32:29');
+INSERT INTO `oauth_access_tokens` VALUES ('1366cfe76bbe34aac39a9c8eaa4df00d67fd654a3d248d23d3b4019cdae992abb3df8032638a6de4', '1', '1', 'FullStack', '[]', '0', '2019-07-12 18:01:06', '2019-07-12 18:01:06', '2020-07-12 18:01:06');
 INSERT INTO `oauth_access_tokens` VALUES ('1647d85a5e5464cd6811f45fa40e14f5e43428c7fe97b1a872ae281d2a777f8be7d1dbc9a5b8c1f8', '1', '1', 'FullStack', '[]', '0', '2019-05-08 13:59:10', '2019-05-08 13:59:10', '2020-05-08 13:59:10');
+INSERT INTO `oauth_access_tokens` VALUES ('1825a19c9e597c68d03800c6a7b42981a6f36cba2687091699fcb4a32a8e998edd22253fa5f17d60', '1', '1', 'FullStack', '[]', '0', '2019-07-11 17:39:39', '2019-07-11 17:39:39', '2020-07-11 17:39:39');
 INSERT INTO `oauth_access_tokens` VALUES ('1919e11a5e71a6e6d402e3c01c034256e89597d62de40e9f285d65065ffd0a571e2c86b44bf076ef', '1', '1', 'FullStack', '[]', '0', '2019-06-26 17:44:07', '2019-06-26 17:44:07', '2020-06-26 17:44:07');
+INSERT INTO `oauth_access_tokens` VALUES ('1a5ab49920fe0ac9a1c6535664c95fd79516f79d4c02edba98c9338cc64cc171b45b71ba1ec3d523', '1', '1', 'FullStack', '[]', '0', '2019-07-05 17:36:55', '2019-07-05 17:36:55', '2020-07-05 17:36:55');
+INSERT INTO `oauth_access_tokens` VALUES ('1a98bb9fa3b9abb7500dbcbcc43be070d51c6f6e46c554ef440c85c1a02d74b8a0ec6ab6c71c2ca8', '1', '1', 'FullStack', '[]', '0', '2019-07-15 11:42:04', '2019-07-15 11:42:04', '2020-07-15 11:42:04');
 INSERT INTO `oauth_access_tokens` VALUES ('1ad93d755c104c4d7c5ccf87d3acf0202a37a750799fb6fec89740d96e8f1d6fc8458b99b736189b', '1', '1', 'FullStack', '[]', '0', '2019-04-04 08:57:15', '2019-04-04 08:57:15', '2020-04-04 08:57:15');
 INSERT INTO `oauth_access_tokens` VALUES ('1b3cf6ac0a26c1b72258f74a860c10e7e636657723ba86226455ff3ea3ec8aeed15aeaca75ff376f', '1', '1', 'FullStack', '[]', '0', '2019-05-06 13:58:51', '2019-05-06 13:58:51', '2020-05-06 13:58:51');
 INSERT INTO `oauth_access_tokens` VALUES ('1d196a4034c5af02a7a465f8bd8ead6e1ae25f7964e68132d75a90b8821a494905393b6558892cc6', '1', '1', 'FullStack', '[]', '0', '2019-05-16 11:39:29', '2019-05-16 11:39:29', '2020-05-16 11:39:29');
@@ -924,13 +972,17 @@ INSERT INTO `oauth_access_tokens` VALUES ('208224488488cd2a964e24cb6a6eb36860fea
 INSERT INTO `oauth_access_tokens` VALUES ('25039f26a22df892dfc4333873222e868974218c887a9c33accef8d114b4a757cb650cd7af392983', '1', '1', 'FullStack', '[]', '0', '2019-05-07 11:10:55', '2019-05-07 11:10:55', '2020-05-07 11:10:55');
 INSERT INTO `oauth_access_tokens` VALUES ('260e75939165922b584813e62c2769966853a203df3c502fa104df5fad9169aa8db95bc356171c4f', '1', '1', 'FullStack', '[]', '0', '2019-04-09 14:47:36', '2019-04-09 14:47:36', '2020-04-09 14:47:36');
 INSERT INTO `oauth_access_tokens` VALUES ('26d71b7901b7832f7f2237f501058189423492af065b69bcd75ca96eaa22ddd3bd1c4be469d4d805', '5', '1', 'FullStack', '[]', '0', '2019-05-20 17:58:01', '2019-05-20 17:58:01', '2020-05-20 17:58:01');
+INSERT INTO `oauth_access_tokens` VALUES ('282afb71df9c28d885ad082ebe01c6ad5e505325df3e41a60ab4600b8cf10f8b2ab2f22b49e18a9f', '1', '1', 'FullStack', '[]', '0', '2019-07-05 14:03:24', '2019-07-05 14:03:24', '2020-07-05 14:03:24');
 INSERT INTO `oauth_access_tokens` VALUES ('2db7a654b7166e1eca3f250256f986ec48d8896df09bd91b297c0035de784f6c9b57fc7c1fc683c6', '1', '1', 'FullStack', '[]', '0', '2019-05-09 18:11:28', '2019-05-09 18:11:28', '2020-05-09 18:11:28');
+INSERT INTO `oauth_access_tokens` VALUES ('310beada5d0e4cdf058c2134bc900ee4f02ffabb26934320fc924d5a93c80db42422b199cc2aaada', '1', '1', 'FullStack', '[]', '0', '2019-07-15 11:38:00', '2019-07-15 11:38:00', '2020-07-15 11:38:00');
 INSERT INTO `oauth_access_tokens` VALUES ('325bbebc73596845532e6d4e2b8dd1a6c965f18ce09b9467e1f100604e68ef6331a032f466aaad82', '1', '1', 'FullStack', '[]', '0', '2019-07-01 15:32:05', '2019-07-01 15:32:05', '2020-07-01 15:32:05');
 INSERT INTO `oauth_access_tokens` VALUES ('391b45e3fd6c7852686a3032c9aec3ff10795b227469447af5e0b595396f064af83dff1ec2820306', '1', '1', 'FullStack', '[]', '0', '2019-05-20 18:59:46', '2019-05-20 18:59:46', '2020-05-20 18:59:46');
 INSERT INTO `oauth_access_tokens` VALUES ('3970f8ee251b0c979dc95ddc03f467210327eb197ad8f783d154b56f206ab2784ab60cbc0db220d6', '1', '1', 'FullStack', '[]', '0', '2019-05-14 08:04:52', '2019-05-14 08:04:52', '2020-05-14 08:04:52');
 INSERT INTO `oauth_access_tokens` VALUES ('3adacfac6731622ace23f37dd1de7259327a9079ff87d3d34048617a652b9928c8f303701a6c16fd', '1', '1', 'FullStack', '[]', '0', '2019-05-09 18:13:17', '2019-05-09 18:13:17', '2020-05-09 18:13:17');
 INSERT INTO `oauth_access_tokens` VALUES ('3b915e8488195a45c15cf4a0283c512f89d88f07d515afefca03ca9510952673d76eb22e052f2389', '1', '1', 'FullStack', '[]', '0', '2019-05-09 11:42:20', '2019-05-09 11:42:20', '2020-05-09 11:42:20');
 INSERT INTO `oauth_access_tokens` VALUES ('3d6c2fad2b8ff2e53996beb66843efb4abf6bf2b145f8bfae8b5d2b2827b3bcc44c4d339c6afd86a', '1', '1', 'FullStack', '[]', '0', '2019-05-21 10:49:10', '2019-05-21 10:49:10', '2020-05-21 10:49:10');
+INSERT INTO `oauth_access_tokens` VALUES ('403fc9d9538dc06eb23d1010b6f4acd7dc38ce85a7ea66a860fd84069b4c8356378f9b0eeecd6f60', '1', '1', 'FullStack', '[]', '0', '2019-07-09 14:07:41', '2019-07-09 14:07:41', '2020-07-09 14:07:41');
+INSERT INTO `oauth_access_tokens` VALUES ('46e53fcdbed2a9851ea54d6b8a1edfdf33a8894aae8ef7d1564fb1da5a915b90619d0873bf84f51c', '1', '1', 'FullStack', '[]', '0', '2019-07-08 17:30:59', '2019-07-08 17:30:59', '2020-07-08 17:30:59');
 INSERT INTO `oauth_access_tokens` VALUES ('47f84fe347b1aeb99f551c37ca3a50865c3cdebc6f102fc68a2075f041a7b027ece3628d3164c676', '1', '1', 'FullStack', '[]', '0', '2019-05-13 17:09:53', '2019-05-13 17:09:53', '2020-05-13 17:09:53');
 INSERT INTO `oauth_access_tokens` VALUES ('487b8ec47a79bc25947069ec44ca9314946bf6520ea7c97c565a71e1c84ff6e5b1cf3fe7c5a1f40d', '1', '1', 'FullStack', '[]', '0', '2019-06-23 10:21:15', '2019-06-23 10:21:15', '2020-06-23 10:21:15');
 INSERT INTO `oauth_access_tokens` VALUES ('496864c9a5422308edc44c8213842510c26be882f995ed899f3ac9cc44bd73f5c73329c074129d1a', '1', '1', 'FullStack', '[]', '0', '2019-06-12 15:13:15', '2019-06-12 15:13:15', '2020-06-12 15:13:15');
@@ -939,11 +991,14 @@ INSERT INTO `oauth_access_tokens` VALUES ('4e9147d888e56bb0ee8d6a9c54e53b59e0860
 INSERT INTO `oauth_access_tokens` VALUES ('51652ecef2c2b8116928ea51d17b83857a8745a5ff4f622a5f3dda7dd8f614773560b32634895c02', '1', '1', 'FullStack', '[]', '0', '2019-06-27 12:04:41', '2019-06-27 12:04:41', '2020-06-27 12:04:41');
 INSERT INTO `oauth_access_tokens` VALUES ('52193a64577fa6a1641395ac5499a32fc44057e75d15c29bb8f6b8b5546653b2de481d573e3c73eb', '1', '1', 'FullStack', '[]', '0', '2019-05-13 14:03:32', '2019-05-13 14:03:32', '2020-05-13 14:03:32');
 INSERT INTO `oauth_access_tokens` VALUES ('54a1e5802510d2d0e44ee13f55387d1e586116d218a6306f83e4fdf7f9d5d44bd93d801dd1ec3d09', '1', '1', 'FullStack', '[]', '0', '2019-05-07 18:49:32', '2019-05-07 18:49:32', '2020-05-07 18:49:32');
+INSERT INTO `oauth_access_tokens` VALUES ('55ac82df60c65ef93431ea6c94694f3869952820a53f96d84f67b6349489fca5523099f1266c2874', '1', '1', 'FullStack', '[]', '0', '2019-07-15 14:51:00', '2019-07-15 14:51:00', '2020-07-15 14:51:00');
 INSERT INTO `oauth_access_tokens` VALUES ('57c2b02606ff4f0e54ab6991aea68f7eee2a9e6820f735a921ab227a43b3681a238360312710b3a6', '1', '1', 'FullStack', '[]', '0', '2019-05-09 15:33:51', '2019-05-09 15:33:51', '2020-05-09 15:33:51');
 INSERT INTO `oauth_access_tokens` VALUES ('58b73948f22e6850da51aa74deabd06299cfd80ed34f9aca98088e235d04d123dc523db342b9efad', '1', '1', 'FullStack', '[]', '0', '2019-06-23 11:00:32', '2019-06-23 11:00:32', '2020-06-23 11:00:32');
 INSERT INTO `oauth_access_tokens` VALUES ('595109a3f40c00e2def122dae4b73d9a667e1188bc57cc8222ac97ee260a6126c0900294b6618ce6', '5', '1', 'FullStack', '[]', '0', '2019-05-09 18:40:43', '2019-05-09 18:40:43', '2020-05-09 18:40:43');
+INSERT INTO `oauth_access_tokens` VALUES ('5a7e5a1575a8c79e1c5223f6f971164e35445a184ed871318ce3daf40ec6b0110de57cc3a2dae32b', '1', '1', 'FullStack', '[]', '0', '2019-07-11 14:31:37', '2019-07-11 14:31:37', '2020-07-11 14:31:37');
 INSERT INTO `oauth_access_tokens` VALUES ('5c61dd221f0c7377c99bddea5b1ab29921a1be0ccddabdaeb1e29504dd924cb4b188924660e35ff3', '1', '1', 'FullStack', '[]', '0', '2019-05-27 17:27:38', '2019-05-27 17:27:38', '2020-05-27 17:27:38');
 INSERT INTO `oauth_access_tokens` VALUES ('5cda5897de80ca99a12f59d21946474b1ed1d2233644b402696ff10a1751ff189ee7b5df0cd47681', '1', '1', 'FullStack', '[]', '0', '2019-06-21 17:35:47', '2019-06-21 17:35:47', '2020-06-21 17:35:47');
+INSERT INTO `oauth_access_tokens` VALUES ('5d4007e7dd41f79887a3bb369583894bbd368cf628740d76963d81e82f8efea1ed1364ecac4b8f96', '1', '1', 'FullStack', '[]', '0', '2019-07-19 08:25:51', '2019-07-19 08:25:51', '2020-07-19 08:25:51');
 INSERT INTO `oauth_access_tokens` VALUES ('5db7602c8bfbe6bca30b8fa182c1c6aad2fc9739c299e96b46a168f88698f8af991c851e68398d23', '1', '1', 'FullStack', '[]', '0', '2019-07-03 18:23:04', '2019-07-03 18:23:04', '2020-07-03 18:23:04');
 INSERT INTO `oauth_access_tokens` VALUES ('5dbefbf901d077ba21ab4b92d63d00c1405ec56c9a3db5d2a6a09d536c03daea84c5ee401a79d62b', '1', '1', 'FullStack', '[]', '0', '2019-05-15 09:01:17', '2019-05-15 09:01:17', '2020-05-15 09:01:17');
 INSERT INTO `oauth_access_tokens` VALUES ('5e3d56de28029b824cccf48c6557c6f08e6135ecf2622e00fa2b2c8ad73943d287f0c6cc85d4d3bf', '1', '1', 'FullStack', '[]', '0', '2019-05-20 10:27:55', '2019-05-20 10:27:55', '2020-05-20 10:27:55');
@@ -963,12 +1018,16 @@ INSERT INTO `oauth_access_tokens` VALUES ('6d38b85cd166f890d89bed3c444f434ba30c7
 INSERT INTO `oauth_access_tokens` VALUES ('6de29a3d4791b00d68c6e2f6f39d88551123b3cd56775471403a6cb983b2dfdb7f14bd50bacad692', '1', '1', 'FullStack', '[]', '0', '2019-07-01 14:24:05', '2019-07-01 14:24:05', '2020-07-01 14:24:05');
 INSERT INTO `oauth_access_tokens` VALUES ('6e34bb2f4712c76c67242482838c19751e68882dfb279110cc98c900c853535d3d604bc46b7182cc', '5', '1', 'FullStack', '[]', '0', '2019-05-09 18:38:27', '2019-05-09 18:38:27', '2020-05-09 18:38:27');
 INSERT INTO `oauth_access_tokens` VALUES ('6ffaf872345d256c0a41335c998de344308d5c56983aec80f5aa6030ab26fc373f4256aeeca12187', '1', '1', 'FullStack', '[]', '0', '2019-05-07 18:51:16', '2019-05-07 18:51:16', '2020-05-07 18:51:16');
+INSERT INTO `oauth_access_tokens` VALUES ('72a4f8c453ade4b7c59393ba1786a9c4c498594ba8dce4509352c5760313b45c5db5a5efb45cacc1', '1', '1', 'FullStack', '[]', '0', '2019-07-18 09:09:21', '2019-07-18 09:09:21', '2020-07-18 09:09:21');
 INSERT INTO `oauth_access_tokens` VALUES ('75624e62bcc136a1147358aacc45ea36f6a4c00a59f59f35e09d014cc09a33c322ff176be34167db', '1', '1', 'FullStack', '[]', '0', '2019-05-14 18:06:04', '2019-05-14 18:06:04', '2020-05-14 18:06:04');
 INSERT INTO `oauth_access_tokens` VALUES ('759d274291206c6d9f3727298782fb2f7009d986957c12f4cd29ee2fc9aa47acea429ef9a6d8ccbb', '1', '1', 'FullStack', '[]', '0', '2019-05-06 17:03:52', '2019-05-06 17:03:52', '2020-05-06 17:03:52');
 INSERT INTO `oauth_access_tokens` VALUES ('76206739043460b4d009abafb94e4cb6790027f19735932451529e3469e235253ab923187e79509a', '1', '1', 'FullStack', '[]', '0', '2019-04-30 19:04:12', '2019-04-30 19:04:12', '2020-04-30 19:04:12');
 INSERT INTO `oauth_access_tokens` VALUES ('76bdd95db95613ef981d742cfc3b567563c0dc961749738546a53c8899520a1a51e3d9f8d1d1f4e3', '1', '1', 'FullStack', '[]', '0', '2019-05-10 17:06:30', '2019-05-10 17:06:30', '2020-05-10 17:06:30');
 INSERT INTO `oauth_access_tokens` VALUES ('780ad2af80c1c9de0d4443129ba40fdf94b8cdb9febd18a9900e6e530d67b39439f49caac8ad8f7c', '5', '1', 'FullStack', '[]', '0', '2019-05-09 18:10:41', '2019-05-09 18:10:41', '2020-05-09 18:10:41');
+INSERT INTO `oauth_access_tokens` VALUES ('79144a8ec9c6cd48668244d1983718db6821c8a68b8d2f3ce4f51ca06174ba387772a5a98c7bc598', '1', '1', 'FullStack', '[]', '0', '2019-07-19 11:26:43', '2019-07-19 11:26:43', '2020-07-19 11:26:43');
+INSERT INTO `oauth_access_tokens` VALUES ('79e478e308afcd402c3a10b892cc9c948a67521a7a19c5122128aea686613c84ad8a35fdff456f95', '1', '1', 'FullStack', '[]', '0', '2019-07-16 11:44:29', '2019-07-16 11:44:29', '2020-07-16 11:44:29');
 INSERT INTO `oauth_access_tokens` VALUES ('7b7f66a7944ec3165bb8ef0d4bc1776e530a2a004c6934b3ac4e0385e04b2dedaa82c0580b0b652a', '1', '1', 'FullStack', '[]', '0', '2019-06-13 10:07:33', '2019-06-13 10:07:33', '2020-06-13 10:07:33');
+INSERT INTO `oauth_access_tokens` VALUES ('7c3dca2c623b6bd192e587b4c20aa30c105e9d62ff9fa22c055d835f44ed319ad8ae108269dc8a1d', '1', '1', 'FullStack', '[]', '0', '2019-07-18 15:43:14', '2019-07-18 15:43:14', '2020-07-18 15:43:14');
 INSERT INTO `oauth_access_tokens` VALUES ('7d06d2bdcead82669ddd2f89c73a4bbbf4ef11a5488fadf7c9cd8605565fc183daecc0fbad51f83f', '1', '1', 'FullStack', '[]', '0', '2019-07-04 17:29:25', '2019-07-04 17:29:25', '2020-07-04 17:29:25');
 INSERT INTO `oauth_access_tokens` VALUES ('7d7313c3f72e846f52e7e1c366157ae8f160d63c3114fa6878d8175ba8aee3216220725810ed4e50', '1', '1', 'FullStack', '[]', '0', '2019-06-13 10:11:56', '2019-06-13 10:11:56', '2020-06-13 10:11:56');
 INSERT INTO `oauth_access_tokens` VALUES ('7e590a0ccd36594dae377dd53a0993bbec7053638e6dd9f3dfcf786121cc2e0116545537750a169f', '1', '1', 'FullStack', '[]', '0', '2019-07-02 14:32:51', '2019-07-02 14:32:51', '2020-07-02 14:32:51');
@@ -976,6 +1035,7 @@ INSERT INTO `oauth_access_tokens` VALUES ('7eac681c016a242337e3ee9d21d6c32630083
 INSERT INTO `oauth_access_tokens` VALUES ('7f5f01a873f6e9e15dd64044265d29fd98fd40d41d0f67d90c4b37cc0f88d66a4c7b8d186977aff7', '1', '1', 'FullStack', '[]', '0', '2019-05-13 17:10:04', '2019-05-13 17:10:04', '2020-05-13 17:10:04');
 INSERT INTO `oauth_access_tokens` VALUES ('80d1cb3a9ead5800718fd3fcde65f31f1d3fa258b391f14997d631f1df8a3db355f819b48a3ea178', '1', '1', 'FullStack', '[]', '0', '2019-05-29 16:29:20', '2019-05-29 16:29:20', '2020-05-29 16:29:20');
 INSERT INTO `oauth_access_tokens` VALUES ('811a7336277b322b33cbbb056baa69535803967e486c5a0669240790f8b40405d8f626fc56a3156e', '1', '1', 'FullStack', '[]', '0', '2019-06-27 08:33:10', '2019-06-27 08:33:10', '2020-06-27 08:33:10');
+INSERT INTO `oauth_access_tokens` VALUES ('8226e42979b3d7722f212f82296f93619557cf2907f4b119e05be08e77d2357f3e8da41a76413904', '1', '1', 'FullStack', '[]', '0', '2019-07-05 09:24:24', '2019-07-05 09:24:24', '2020-07-05 09:24:24');
 INSERT INTO `oauth_access_tokens` VALUES ('840590f6a0d9f25241cb81c71a1e99e5cb70e93491f45adc94d858b8d7426ed5555f1eb3f5d34016', '1', '1', 'FullStack', '[]', '0', '2019-05-27 15:31:14', '2019-05-27 15:31:14', '2020-05-27 15:31:14');
 INSERT INTO `oauth_access_tokens` VALUES ('84285fc47b93ef35c713ed1370c241d8e3d3efc74d1924a6db0019fc766b8c1a294891aa380fc1b1', '1', '1', 'FullStack', '[]', '0', '2019-06-12 18:34:56', '2019-06-12 18:34:56', '2020-06-12 18:34:56');
 INSERT INTO `oauth_access_tokens` VALUES ('8481f40518a3292312befded6831a0fb009153f568cb40c7bc2e48b88caa83c95b7bf072449463b7', '1', '1', 'FullStack', '[]', '0', '2019-04-03 15:11:06', '2019-04-03 15:11:06', '2020-04-03 15:11:06');
@@ -986,6 +1046,8 @@ INSERT INTO `oauth_access_tokens` VALUES ('8a5945afc176fdc4d3b8d5ee9d52fdec3296d
 INSERT INTO `oauth_access_tokens` VALUES ('8a853a823a6d921f39d30f846e990ef839f2a6bc6905bd14d30d258270b8ae081256821cb16521f3', '1', '1', 'FullStack', '[]', '0', '2019-06-09 18:02:27', '2019-06-09 18:02:27', '2020-06-09 18:02:27');
 INSERT INTO `oauth_access_tokens` VALUES ('8c5488e1338eae99f45a24c9cb9074abc923a48d3ce4ecebc9e3895ed30baa0e381a0c71a9c56854', '1', '1', 'FullStack', '[]', '0', '2019-06-23 11:40:39', '2019-06-23 11:40:39', '2020-06-23 11:40:39');
 INSERT INTO `oauth_access_tokens` VALUES ('8cbda48075cfb71cd421e1816af16ecc58bf2623fcb451d02ad434f548e17dd7e7ea5db278014de8', '1', '1', 'FullStack', '[]', '0', '2019-05-14 14:14:29', '2019-05-14 14:14:29', '2020-05-14 14:14:29');
+INSERT INTO `oauth_access_tokens` VALUES ('8dbb501a4ad09314b505be8c46a0125ae3f8ed5dd3dd9d44316938f4a48e58f57ed7a05c69428d93', '1', '1', 'FullStack', '[]', '0', '2019-07-15 18:59:11', '2019-07-15 18:59:11', '2020-07-15 18:59:11');
+INSERT INTO `oauth_access_tokens` VALUES ('8eab6d1f011f1ab0d399c49d2271a49c60d130d2841a88233f185528db113eee6061312b984db531', '1', '1', 'FullStack', '[]', '0', '2019-07-15 17:54:47', '2019-07-15 17:54:47', '2020-07-15 17:54:47');
 INSERT INTO `oauth_access_tokens` VALUES ('9037ce3877b0dc7d1de82b70574bf9f7b1b6edb622590b83949f2d0f966ee1c5424a1ec68931b0cf', '1', '1', 'FullStack', '[]', '0', '2019-05-09 18:35:55', '2019-05-09 18:35:55', '2020-05-09 18:35:55');
 INSERT INTO `oauth_access_tokens` VALUES ('91216600e86763a13641602423866ee0fbfce730412af1e61b6f28ba78cdb83f1b8df1746c04da6d', '1', '1', 'FullStack', '[]', '0', '2019-06-27 16:57:16', '2019-06-27 16:57:16', '2020-06-27 16:57:16');
 INSERT INTO `oauth_access_tokens` VALUES ('931ce2aed51765cf606d094834b61882f98bec29f0224ecb991a0e80e000a7bee9d8ae41bae266cc', '1', '1', 'FullStack', '[]', '0', '2019-07-02 14:25:26', '2019-07-02 14:25:26', '2020-07-02 14:25:26');
@@ -997,57 +1059,80 @@ INSERT INTO `oauth_access_tokens` VALUES ('9a9d2f7376268ccc7e0d07eb90791bb1aaac9
 INSERT INTO `oauth_access_tokens` VALUES ('9ccdd2c3759eeb0c0fb2487a9323406285fe7a9b5af96d2b5039c8bd712e7ff60a9777816d6ccbad', '1', '1', 'FullStack', '[]', '0', '2019-05-01 16:06:37', '2019-05-01 16:06:37', '2020-05-01 16:06:37');
 INSERT INTO `oauth_access_tokens` VALUES ('9f6265af12df43e43d603b164d9139bf1f21de1f831373a94a05c669d0c32d3a8d5bdbf8ffed394e', '5', '1', 'FullStack', '[]', '0', '2019-05-20 17:56:05', '2019-05-20 17:56:05', '2020-05-20 17:56:05');
 INSERT INTO `oauth_access_tokens` VALUES ('a031be7b70489d182666e9fddf45d8fc4a064f1148e28e32ac15009dfe7cff5f68f3a5472b7dcfe5', '1', '1', 'FullStack', '[]', '0', '2019-06-12 15:37:43', '2019-06-12 15:37:43', '2020-06-12 15:37:43');
+INSERT INTO `oauth_access_tokens` VALUES ('a2e9792a1de5833ace72adc223c76f00ab65b3f93b17d56f6c1f1c04123ebdc7036263901abc4e41', '1', '1', 'FullStack', '[]', '0', '2019-07-12 08:53:34', '2019-07-12 08:53:34', '2020-07-12 08:53:34');
+INSERT INTO `oauth_access_tokens` VALUES ('a56590184cb4a1682702def19c0e0da7c6c678bd1166d3d10d08c2b30cc7b152e58407fd7f1688ca', '1', '1', 'FullStack', '[]', '0', '2019-07-10 09:19:56', '2019-07-10 09:19:56', '2020-07-10 09:19:56');
+INSERT INTO `oauth_access_tokens` VALUES ('a6367b0f58a512cd546d618550a04394bc02af4a09eb54c69af3e4c8f3112ab8d3d7cf44fe4080a0', '1', '1', 'FullStack', '[]', '0', '2019-07-09 17:09:19', '2019-07-09 17:09:19', '2020-07-09 17:09:19');
 INSERT INTO `oauth_access_tokens` VALUES ('a6411bed25cca31f6f98f42abfe38f63793ab5198f9bda762ccc66c16176b6025f430f7e4027dff9', '1', '1', 'FullStack', '[]', '0', '2019-06-13 10:16:02', '2019-06-13 10:16:02', '2020-06-13 10:16:02');
 INSERT INTO `oauth_access_tokens` VALUES ('a71e84253aa7c9905609778afde06d61d4363f4660d27cc4ecc91b35b9fc0959dd5a40b4e594f054', '1', '1', 'FullStack', '[]', '0', '2019-05-13 17:05:18', '2019-05-13 17:05:18', '2020-05-13 17:05:18');
 INSERT INTO `oauth_access_tokens` VALUES ('a95364518f2a582b1f5b72913b0e30a7315621b8ea2923a0a510616b61fd29475e48cccff3bdd762', '1', '1', 'FullStack', '[]', '0', '2019-07-01 11:16:09', '2019-07-01 11:16:09', '2020-07-01 11:16:09');
 INSERT INTO `oauth_access_tokens` VALUES ('a95729c97be3274a0ee77f34b1bcd73ad90adeff906406c6d8c769148321033abd4d0ed7fce581a3', '1', '1', 'FullStack', '[]', '0', '2019-05-13 17:09:44', '2019-05-13 17:09:44', '2020-05-13 17:09:44');
+INSERT INTO `oauth_access_tokens` VALUES ('a982aa95d71c7ee9725bb21c928d5058a42557ed41b3bcd674d8e5dacd0e2c7cabdf371faa223af8', '1', '1', 'FullStack', '[]', '0', '2019-07-11 08:30:03', '2019-07-11 08:30:03', '2020-07-11 08:30:03');
 INSERT INTO `oauth_access_tokens` VALUES ('aa4a943866dc771cc4410f0472e528e94eec8ec173b540bd71f930eb993991f364e293e19f6d0369', '1', '1', 'FullStack', '[]', '0', '2019-05-10 13:50:06', '2019-05-10 13:50:06', '2020-05-10 13:50:06');
+INSERT INTO `oauth_access_tokens` VALUES ('aed1f8f149b959987bef1729ce16b52a32da0197be9fb35b85cb50739e73b9945f0848be61ccddb2', '1', '1', 'FullStack', '[]', '0', '2019-07-10 19:21:23', '2019-07-10 19:21:23', '2020-07-10 19:21:23');
 INSERT INTO `oauth_access_tokens` VALUES ('af51a98e4b7bbdd1127bb20292c36c8b103670ae591e867acb1ca9cf4af78ded2c3bbc4aa9217073', '1', '1', 'FullStack', '[]', '0', '2019-04-05 09:21:05', '2019-04-05 09:21:05', '2020-04-05 09:21:05');
 INSERT INTO `oauth_access_tokens` VALUES ('b283e5c014993b8e3db5efd94c5b64c62b8084ee9a39c91081e82311a9360b1891147937af114827', '1', '1', 'FullStack', '[]', '0', '2019-06-11 18:20:13', '2019-06-11 18:20:13', '2020-06-11 18:20:13');
+INSERT INTO `oauth_access_tokens` VALUES ('b473b772f1fc654486f956aed2e82a136ee4b94637a7332a1c961e1c2d010f0a289fb2efd6574e7f', '1', '1', 'FullStack', '[]', '0', '2019-07-16 08:43:57', '2019-07-16 08:43:57', '2020-07-16 08:43:57');
 INSERT INTO `oauth_access_tokens` VALUES ('b53e790bcf194c8ebb737586d477dd1640d6b510b2909bb2ea918e648762e51af06b2d69b07f454c', '5', '1', 'FullStack', '[]', '0', '2019-05-20 18:21:32', '2019-05-20 18:21:32', '2020-05-20 18:21:32');
 INSERT INTO `oauth_access_tokens` VALUES ('b5cbe1d1d2a3491221d9748c65366b8c3f16f4b04c90f9095802915e852ef2d8baa4b7789d859fd9', '1', '1', 'FullStack', '[]', '0', '2019-07-04 14:28:29', '2019-07-04 14:28:29', '2020-07-04 14:28:29');
+INSERT INTO `oauth_access_tokens` VALUES ('b75628d40f00ed803d1b91b72f8f5509ba7213eb4f3007c91e31fdf077b464154ea5ab6b18d4cd08', '1', '1', 'FullStack', '[]', '0', '2019-07-10 17:11:04', '2019-07-10 17:11:04', '2020-07-10 17:11:04');
 INSERT INTO `oauth_access_tokens` VALUES ('b78f428263a00e65556828ba99093a6fcb1aa25fa00f438005741a91bcad4148b0c96277877987b7', '1', '1', 'FullStack', '[]', '0', '2019-06-23 16:09:54', '2019-06-23 16:09:54', '2020-06-23 16:09:54');
 INSERT INTO `oauth_access_tokens` VALUES ('b8049871b4999d29c43abde0f7453b643de426cda326cfb0e3efe7877e71271b48b842456ce4cd3d', '1', '1', 'FullStack', '[]', '0', '2019-07-02 17:44:36', '2019-07-02 17:44:36', '2020-07-02 17:44:36');
 INSERT INTO `oauth_access_tokens` VALUES ('b80f8df4828864c1e1f33c13070b04957bef26a86f981917959d2a8df0950dcf7ea7133e6e36f0f7', '1', '1', 'FullStack', '[]', '0', '2019-07-04 20:40:21', '2019-07-04 20:40:21', '2020-07-04 20:40:21');
 INSERT INTO `oauth_access_tokens` VALUES ('b99ca2e7f7ed8bfcc32830c060bac754b69f61d7ac8d14e25fe104baadc1c91dbe26d9f5b0561ffa', '1', '1', 'FullStack', '[]', '0', '2019-07-02 14:28:05', '2019-07-02 14:28:05', '2020-07-02 14:28:05');
 INSERT INTO `oauth_access_tokens` VALUES ('b9c4c31365a96148f34b81e79f1dd0cbccaa7bcd1eb97e3da8708824d8b45da21d511272c226e7ea', '5', '1', 'FullStack', '[]', '0', '2019-05-09 18:32:22', '2019-05-09 18:32:22', '2020-05-09 18:32:22');
+INSERT INTO `oauth_access_tokens` VALUES ('baa3982aa24256d3aa2336ca9370a2699acd6655c4bd074dc735c08a12d0dfdb863a05422bf0d085', '1', '1', 'FullStack', '[]', '0', '2019-07-08 14:29:27', '2019-07-08 14:29:27', '2020-07-08 14:29:27');
+INSERT INTO `oauth_access_tokens` VALUES ('baab701523b83269dddcc2c7a2b5c323bedce87ade9009c24a51d50fd58085557a1b9e9d1c3b831f', '1', '1', 'FullStack', '[]', '0', '2019-07-10 19:22:49', '2019-07-10 19:22:49', '2020-07-10 19:22:49');
 INSERT INTO `oauth_access_tokens` VALUES ('bdbefd3260c29c068e0b7bb96a03599dc5fd40286a914cdeea90567e56c8b5d2aa66be1478b1867e', '1', '1', 'FullStack', '[]', '0', '2019-05-13 17:10:19', '2019-05-13 17:10:19', '2020-05-13 17:10:19');
 INSERT INTO `oauth_access_tokens` VALUES ('c05f432e9e3144a9b71b4516e07b8a55928a690a0cec835e6b4eec67cabecaffb2184b42f9107431', '1', '1', 'FullStack', '[]', '0', '2019-06-26 19:26:46', '2019-06-26 19:26:46', '2020-06-26 19:26:46');
 INSERT INTO `oauth_access_tokens` VALUES ('c26fb34f695e7816815839f54f50b3cbf96c6b4a37ff73456779a25b8c4eb9c48e279e2ff350c4fc', '1', '1', 'FullStack', '[]', '0', '2019-05-06 09:17:22', '2019-05-06 09:17:22', '2020-05-06 09:17:22');
+INSERT INTO `oauth_access_tokens` VALUES ('c2e9a44a9f68da3071817709ffd5ffc396b93fc194026e02e9e091b34e0e6fa1c29a1082b6d85a5e', '1', '1', 'FullStack', '[]', '0', '2019-07-18 12:42:17', '2019-07-18 12:42:17', '2020-07-18 12:42:17');
 INSERT INTO `oauth_access_tokens` VALUES ('c82162b21934eae951ca4dadc7794baafe528934ec69e6b2c4d19a348494b04ef75f6dd86a042f58', '1', '1', 'FullStack', '[]', '0', '2019-07-02 10:46:08', '2019-07-02 10:46:08', '2020-07-02 10:46:08');
 INSERT INTO `oauth_access_tokens` VALUES ('c8d896ed791814ecf0c916489262001a1db3390e9b7a2c02f1b4219cce3eb62484c5d36483c8c898', '1', '1', 'FullStack', '[]', '0', '2019-06-27 16:33:26', '2019-06-27 16:33:26', '2020-06-27 16:33:26');
 INSERT INTO `oauth_access_tokens` VALUES ('ca34792b7146e9cadefe0eb897475b660f41f82fc18657a501b155ddf48d6384d3cc64e80228a706', '1', '1', 'FullStack', '[]', '0', '2019-05-23 14:28:58', '2019-05-23 14:28:58', '2020-05-23 14:28:58');
+INSERT INTO `oauth_access_tokens` VALUES ('cc239b5fb11ff99a02727c4ac6b73a7dc56f4c23757e94a97ae4d08d91f0f439d6c0cc1805a9882d', '1', '1', 'FullStack', '[]', '0', '2019-07-19 11:27:08', '2019-07-19 11:27:08', '2020-07-19 11:27:08');
 INSERT INTO `oauth_access_tokens` VALUES ('cd89a320560a478d668d5eb1ef6d8f25da98d878b7d80a158fdff156dca89b69ccf63d0ab6b3ef20', '1', '1', 'FullStack', '[]', '0', '2019-05-10 17:08:03', '2019-05-10 17:08:03', '2020-05-10 17:08:03');
+INSERT INTO `oauth_access_tokens` VALUES ('ce0ce991d844caf51bda5b560796e8497aa5b61d9b51eac7d9bed53c45b0a1c70c4f1e93990123b1', '1', '1', 'FullStack', '[]', '0', '2019-07-10 19:38:03', '2019-07-10 19:38:03', '2020-07-10 19:38:03');
 INSERT INTO `oauth_access_tokens` VALUES ('ce2795ef60276bda6616d56d4e9eb6e2d037550f8e174fa3d337b325a24ffb14927d115fa8ba27f2', '1', '1', 'FullStack', '[]', '0', '2019-05-05 17:17:27', '2019-05-05 17:17:27', '2020-05-05 17:17:27');
 INSERT INTO `oauth_access_tokens` VALUES ('d021a650ecfbf444dabf01dd02b9b33978c6ab29581a79a1191486909dccb384f8a994e156548a47', '1', '1', 'FullStack', '[]', '0', '2019-06-23 10:26:22', '2019-06-23 10:26:22', '2020-06-23 10:26:22');
 INSERT INTO `oauth_access_tokens` VALUES ('d2c86dc7d75725be37c2921ec20d0fe2b5627ebb7fc433852b3da61b5547bc91e0fdd361b57e6c87', '1', '1', 'FullStack', '[]', '0', '2019-07-01 09:53:48', '2019-07-01 09:53:48', '2020-07-01 09:53:48');
+INSERT INTO `oauth_access_tokens` VALUES ('d30518ef4ebcc9f90d2d2ea99e2cd4bb30fec12a90fe9037548dc7838478545c62927b54c321ef10', '1', '1', 'FullStack', '[]', '0', '2019-07-05 17:07:39', '2019-07-05 17:07:39', '2020-07-05 17:07:39');
 INSERT INTO `oauth_access_tokens` VALUES ('d31a8b6db98b92449f96b4a63cbbed537c33afa58e314c539992d4bcc90d62e042970ae5113b3b98', '1', '1', 'FullStack', '[]', '0', '2019-05-13 08:29:03', '2019-05-13 08:29:03', '2020-05-13 08:29:03');
 INSERT INTO `oauth_access_tokens` VALUES ('d32996dcd73a680eb78136816cd98242c7a555b312a2a0a13e2f691c139297e8494cdcdc3b2b97a0', '1', '1', 'FullStack', '[]', '0', '2019-06-27 14:58:43', '2019-06-27 14:58:43', '2020-06-27 14:58:43');
+INSERT INTO `oauth_access_tokens` VALUES ('d4c96b686fffce5e13dba7409498a0ea63d4b7947cddef6323d74808cb2865994b0cf2f578d51477', '1', '1', 'FullStack', '[]', '0', '2019-07-09 20:10:03', '2019-07-09 20:10:03', '2020-07-09 20:10:03');
 INSERT INTO `oauth_access_tokens` VALUES ('d7867887f424da38c9386cd118599107546c17ff97c6448138199eec4cc4d92d970116af35306556', '1', '1', 'FullStack', '[]', '0', '2019-06-12 18:48:45', '2019-06-12 18:48:45', '2020-06-12 18:48:45');
 INSERT INTO `oauth_access_tokens` VALUES ('d78ff1fcbf0ef40cd0ac9b1679ab7b4f4adfa5bad2b08b3b69910f6c85b71c7b6c66aafaf0eaeb1a', '1', '1', 'FullStack', '[]', '0', '2019-05-13 10:56:00', '2019-05-13 10:56:00', '2020-05-13 10:56:00');
+INSERT INTO `oauth_access_tokens` VALUES ('d7a3cf14f2e942d193f32a8acac198b5f038a3363c7b4f409d93070b6e3f62a92fb6dcc651619280', '1', '1', 'FullStack', '[]', '0', '2019-07-15 17:51:06', '2019-07-15 17:51:06', '2020-07-15 17:51:06');
 INSERT INTO `oauth_access_tokens` VALUES ('d7a9edec3723670e93592d3e94e16858f5f8676224aee008fd8f07249ad98c21a3a73eb327d35b68', '1', '1', 'FullStack', '[]', '0', '2019-04-03 09:37:12', '2019-04-03 09:37:12', '2020-04-03 09:37:12');
+INSERT INTO `oauth_access_tokens` VALUES ('d7b3979cae4f2e1cf17c338cc404933e80c55b13ce75def3064383f02d60fc1f35e93bbe9681e4ea', '1', '1', 'FullStack', '[]', '0', '2019-07-15 08:37:18', '2019-07-15 08:37:18', '2020-07-15 08:37:18');
 INSERT INTO `oauth_access_tokens` VALUES ('d94a6cb867bd9c4277972c4bf2d2f8fc31cefacabdcf43276ed76834a50cc289103da48f9f593a35', '1', '1', 'FullStack', '[]', '0', '2019-05-17 16:51:11', '2019-05-17 16:51:11', '2020-05-17 16:51:11');
 INSERT INTO `oauth_access_tokens` VALUES ('db0a0e8e9da7c4c4be8f5996b03df559cf8b39705089c43f0540299f509b7c1c41c377b0f78dfcd9', '1', '1', 'FullStack', '[]', '0', '2019-05-29 17:51:52', '2019-05-29 17:51:52', '2020-05-29 17:51:52');
 INSERT INTO `oauth_access_tokens` VALUES ('db2e519a6d2adc0ac05ba7c55044dc31d046dc9e7ced4a199d11f48715094dbd4e362faad532924a', '1', '1', 'FullStack', '[]', '0', '2019-05-05 16:45:55', '2019-05-05 16:45:55', '2020-05-05 16:45:55');
 INSERT INTO `oauth_access_tokens` VALUES ('dc6e315f234ca4e0a504c6a88dbeb7950b383bb5a64179df4b5f96909552761eb98c678b7d8130fc', '1', '1', 'FullStack', '[]', '0', '2019-05-15 12:01:48', '2019-05-15 12:01:48', '2020-05-15 12:01:48');
+INSERT INTO `oauth_access_tokens` VALUES ('df08e9700a80fed4735078656f7811e2bfe8d6665ff9dcea23b24ed1949e42cdf38bfcf68d38c8a7', '1', '1', 'FullStack', '[]', '0', '2019-07-12 12:04:22', '2019-07-12 12:04:22', '2020-07-12 12:04:22');
+INSERT INTO `oauth_access_tokens` VALUES ('e09caeeb02cb8535e11050ee6fa2213de965c856047eb3b6c39c742eebd92ce0d32279701ad9b758', '1', '1', 'FullStack', '[]', '0', '2019-07-11 11:30:29', '2019-07-11 11:30:29', '2020-07-11 11:30:29');
 INSERT INTO `oauth_access_tokens` VALUES ('e0f09efb595fb1ecb5eaf7a822b2ccc9500b4c820b36059ecf22f946c77b920df9b4264cae60ca8f', '1', '1', 'FullStack', '[]', '0', '2019-05-09 18:37:42', '2019-05-09 18:37:42', '2020-05-09 18:37:42');
 INSERT INTO `oauth_access_tokens` VALUES ('e119a9f3567290bfcca90adc40317e9b097509789ccea828aec57217fd278cb7d7c6f70e45bbc95b', '5', '1', 'FullStack', '[]', '0', '2019-05-20 17:59:18', '2019-05-20 17:59:18', '2020-05-20 17:59:18');
 INSERT INTO `oauth_access_tokens` VALUES ('e3875ffa5ba627283eacd839af19e5455f7d8023230c5611ff99739bad859d488d82928242a2e643', '1', '1', 'FullStack', '[]', '0', '2019-06-23 10:37:12', '2019-06-23 10:37:12', '2020-06-23 10:37:12');
 INSERT INTO `oauth_access_tokens` VALUES ('e51cdff8bea932f733e82baa4c50f34273916bcca7b7fa04b52526678ac4367aaea520557d9d8aa5', '1', '1', 'FullStack', '[]', '0', '2019-06-26 18:28:58', '2019-06-26 18:28:58', '2020-06-26 18:28:58');
 INSERT INTO `oauth_access_tokens` VALUES ('e5ba98c734c552410263c7dd47f686b66e5bd7080557860dc69fb054cc30ece0f6eb0532bd919789', '1', '1', 'FullStack', '[]', '0', '2019-06-23 10:39:00', '2019-06-23 10:39:00', '2020-06-23 10:39:00');
 INSERT INTO `oauth_access_tokens` VALUES ('e836f3c63b84b738af3a0b914f3b4f3cfcad5ff2095f39475fdc174a730e7bf2a7635f936944c906', '1', '1', 'FullStack', '[]', '0', '2019-06-28 15:47:30', '2019-06-28 15:47:30', '2020-06-28 15:47:30');
+INSERT INTO `oauth_access_tokens` VALUES ('e9377bdfdd51ce2d3c89b54f7f65b6b6e42f5f7c08dbbd548aefd29b265ebf6d80c4b6e8bc320c84', '1', '1', 'FullStack', '[]', '0', '2019-07-19 11:28:13', '2019-07-19 11:28:13', '2020-07-19 11:28:13');
 INSERT INTO `oauth_access_tokens` VALUES ('ec1c39cab432a926224792ae8a0d0ada43380c8329fa58bd819e1bec0266f83062f3362f01f29835', '1', '1', 'FullStack', '[]', '0', '2019-05-13 17:11:55', '2019-05-13 17:11:55', '2020-05-13 17:11:55');
 INSERT INTO `oauth_access_tokens` VALUES ('ed05bafdb54cc0535af8fe4041275d167016a956aa993ee346d404ce66d85976344e88d284d49da8', '1', '1', 'FullStack', '[]', '0', '2019-07-02 14:27:23', '2019-07-02 14:27:23', '2020-07-02 14:27:23');
+INSERT INTO `oauth_access_tokens` VALUES ('ee4f8a49ecfb99bfd34e18f9fae7962117842bf4cc50c9cb5dfa2cd9d43e3d63db8ad9401b08e8ae', '1', '1', 'FullStack', '[]', '0', '2019-07-15 17:56:34', '2019-07-15 17:56:34', '2020-07-15 17:56:34');
 INSERT INTO `oauth_access_tokens` VALUES ('f01c7feb25cb7491c1ffed83d6096b5e5af8e9bdb8cec16cdbf29cf98f2d2cd48d69e0a86a5c852c', '1', '1', 'FullStack', '[]', '0', '2019-07-03 09:33:56', '2019-07-03 09:33:56', '2020-07-03 09:33:56');
 INSERT INTO `oauth_access_tokens` VALUES ('f12249297e45cd4a10ea71a17e5f2214e3560942387f24dfbdd2428b29b77929c388089116fff0b0', '1', '1', 'FullStack', '[]', '0', '2019-06-27 08:44:45', '2019-06-27 08:44:45', '2020-06-27 08:44:45');
 INSERT INTO `oauth_access_tokens` VALUES ('f163ef81e34c27558aa15ec4af2271e8fc44297c801bbb7c48d9ed36758ea3a208fb60f48fa40f21', '1', '1', 'FullStack', '[]', '0', '2019-05-13 17:46:18', '2019-05-13 17:46:18', '2020-05-13 17:46:18');
 INSERT INTO `oauth_access_tokens` VALUES ('f18024eacedb74b20ba50658cc2af828a44690e34f8896713257a6213d19145c30f08230c311a93d', '1', '1', 'FullStack', '[]', '0', '2019-06-23 11:19:33', '2019-06-23 11:19:33', '2020-06-23 11:19:33');
 INSERT INTO `oauth_access_tokens` VALUES ('f4f3e9e4e9e3e0e926df5fc233941a8c047b9e49911e19c8259005888d0ee323bb637fad032b8b3f', '1', '1', 'FullStack', '[]', '0', '2019-06-23 10:22:30', '2019-06-23 10:22:30', '2020-06-23 10:22:30');
+INSERT INTO `oauth_access_tokens` VALUES ('f5687df78756f35162114fee3f105e06a137404a2477c25ed262a774839cf0c0578dcad451f3a14b', '1', '1', 'FullStack', '[]', '0', '2019-07-15 17:59:54', '2019-07-15 17:59:54', '2020-07-15 17:59:54');
 INSERT INTO `oauth_access_tokens` VALUES ('f5c3ec75a820c8550a497df198e7af3731e34ea3ad991cf70cb73fde436e7332451dc22e358cc737', '1', '1', 'FullStack', '[]', '0', '2019-06-26 11:14:00', '2019-06-26 11:14:00', '2020-06-26 11:14:00');
 INSERT INTO `oauth_access_tokens` VALUES ('f5c75ec3d20e08504f1cb7dd9e0a3abe3dd75d955615a11476954d7cf3b4d47eb17aa94d5944ea52', '1', '1', 'FullStack', '[]', '0', '2019-07-04 10:51:31', '2019-07-04 10:51:31', '2020-07-04 10:51:31');
 INSERT INTO `oauth_access_tokens` VALUES ('f763b870d44e1666767f732e11cc61e89c8a39471ab4c84cb3e6889c1bacad8ee55dbd5541444409', '1', '1', 'FullStack', '[]', '0', '2019-06-23 10:08:40', '2019-06-23 10:08:40', '2020-06-23 10:08:40');
 INSERT INTO `oauth_access_tokens` VALUES ('f90d34caf1f1e81352fcdcf250fc048f59b6db3bd8896c72d48755da67fec007c3b26c5aa826561c', '1', '1', 'FullStack', '[]', '0', '2019-05-10 08:20:38', '2019-05-10 08:20:38', '2020-05-10 08:20:38');
 INSERT INTO `oauth_access_tokens` VALUES ('f91992e283b025a74236e456892777a674544bce4505fa70e2db9203905d887eef90830e5e17c2d6', '1', '1', 'FullStack', '[]', '0', '2019-06-26 19:09:29', '2019-06-26 19:09:29', '2020-06-26 19:09:29');
+INSERT INTO `oauth_access_tokens` VALUES ('f9c726669f701c76fe7e8131f14cdd46bbbe9844736bcfbe0b1c56ee0178dce7463da99e3775f537', '1', '1', 'FullStack', '[]', '0', '2019-07-18 18:43:28', '2019-07-18 18:43:28', '2020-07-18 18:43:28');
+INSERT INTO `oauth_access_tokens` VALUES ('fc91ce8f34e6639bf5eafd2349d965e7534717bd5550b8d4c1e0ea1741b96a26c223785456c5fcd7', '1', '1', 'FullStack', '[]', '0', '2019-07-10 13:55:13', '2019-07-10 13:55:13', '2020-07-10 13:55:13');
 INSERT INTO `oauth_access_tokens` VALUES ('fd2deaf7f576e4565b47024b53e933fd495e0b4d780ae64ccb6b0d2baacb8bf687cf8abe459253dd', '1', '1', 'FullStack', '[]', '0', '2019-05-08 14:02:04', '2019-05-08 14:02:04', '2020-05-08 14:02:04');
 INSERT INTO `oauth_access_tokens` VALUES ('ff0f528eb94cfd17d10e10305bf3593c24d6d0b68b098f2972ea9b0a7fc89896136b50952858f03c', '1', '1', 'FullStack', '[]', '0', '2019-04-04 11:14:13', '2019-04-04 11:14:13', '2020-04-04 11:14:13');
 
@@ -1917,7 +2002,7 @@ CREATE TABLE `pictures` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of pictures
@@ -1939,6 +2024,27 @@ INSERT INTO `pictures` VALUES ('14', '0', '0', 'qrcode_for_gh_179005a6bfd0_258.j
 INSERT INTO `pictures` VALUES ('15', '0', '0', 'icon-index-empty.png', '5669', 'public/uploads/pictures/i6yuleMb8l5qGYCANz9950DGA2sbd0epRY6GyzxE.png', '2f31b4c3865f48d91d586aca595cfcc0', '1', '2019-07-04 22:11:08', '2019-07-04 22:11:08');
 INSERT INTO `pictures` VALUES ('16', '0', '0', 'gh_0fdf8f846d03_258 (1).jpg', '32038', 'public/uploads/pictures/qUKEWLJCTUAtKq6ZdsWPEoiq274mfJpDQ5tr4qKN.jpeg', '26e7a2b93cec40a8bdd975545ae1fbd6', '1', '2019-07-04 22:57:27', '2019-07-04 22:57:27');
 INSERT INTO `pictures` VALUES ('17', '0', '0', 'gh_0fdf8f846d03_258 (2).jpg', '51208', 'public/uploads/pictures/rw9GLk7tlRL0S6K5ZeDLlAhwaq9iFKAX75ICsgH4.jpeg', 'cd928d5c951b82b0d79d20bc71fef604', '1', '2019-07-04 23:18:49', '2019-07-04 23:18:49');
+INSERT INTO `pictures` VALUES ('18', '0', '0', 'bg.png', '841', 'public/uploads/pictures/6gCQkjco3X6K1Xw4qln88u9ICbIQV7IvfhtrWsy3.png', 'd7a3460a242db2f7a1de24d15f06cd51', '1', '2019-07-05 16:31:54', '2019-07-05 16:31:54');
+INSERT INTO `pictures` VALUES ('19', '0', '0', 'attachment_1.png', '661', 'public/uploads/pictures/ujF362rZM53hun2u271mKmJgHlPEua7AfmVYV9C7.png', '8b5c17f416eebada9c6d2e0398aa6ef6', '1', '2019-07-05 16:31:54', '2019-07-05 16:31:54');
+INSERT INTO `pictures` VALUES ('20', '0', '0', 'bg_icon.png', '5718', 'public/uploads/pictures/xvgki6MTzgZgckmnvobKObnxHsKQXs8Wq4ZHTMll.png', 'd0c7daf3330ba6633420da04f32ae1a4', '1', '2019-07-05 16:31:54', '2019-07-05 16:31:54');
+INSERT INTO `pictures` VALUES ('21', '0', '0', 'count_icon.png', '5648', 'public/uploads/pictures/CXcEwhhIPMHhnD2HZsteO2ZM0NhUGDhJK4zxFFcb.png', '0b871ce8f375eeaefb7bd374d4f52d62', '1', '2019-07-05 16:31:54', '2019-07-05 16:31:54');
+INSERT INTO `pictures` VALUES ('22', '0', '0', 'icon24_login.png', '1887', 'public/uploads/pictures/tRVjzaGvJONjJylWuk7FJPq0onkwuZzPEUkhtTdD.png', '7e545d6b8560bf4d1e93ee6f0b2bef6e', '1', '2019-07-05 16:31:54', '2019-07-05 16:31:54');
+INSERT INTO `pictures` VALUES ('23', '0', '0', 'login_logo.png', '1770', 'public/uploads/pictures/LRySVCMAR04x4VqYCSB1Th8MKyy1eD9EcFqImmf0.png', 'efb1f73549ac48bfdb718b7381f7eb4d', '1', '2019-07-05 16:31:54', '2019-07-05 16:31:54');
+INSERT INTO `pictures` VALUES ('24', '0', '0', 'subnav_current.png', '1023', 'public/uploads/pictures/9GF9Cs99SEWtYHAebk30AocndrFTWHcsj1gNaaiC.png', 'fbb97ce9e3511b664d3f092a856dc2dd', '1', '2019-07-05 16:36:47', '2019-07-05 16:36:47');
+INSERT INTO `pictures` VALUES ('25', '0', '0', 'tab_sign.png', '1337', 'public/uploads/pictures/z1WV6MfBh8ytxB0J1NVkNDHuKTjHQvdwqDU7nrFi.png', '91cd82431f77e5850f7e02562f43c9db', '1', '2019-07-05 16:36:47', '2019-07-05 16:36:47');
+INSERT INTO `pictures` VALUES ('26', '0', '0', '微信图片_20190319150608.png', '10075', 'public/uploads/pictures/wfnIJ99nPCmMMIVbi0laxFQIFXiCc3j10oM0HIZ3.png', 'ae6d67d2069a7bfc97d79943089be03b', '1', '2019-07-18 11:07:23', '2019-07-18 11:07:23');
+INSERT INTO `pictures` VALUES ('27', '0', '0', '迁团-logo-01.png', '8852', 'public/uploads/pictures/rRSGUhzgltjejyroRkXCgTJOnfYjERJX6Hz8NxN3.png', 'b6f6a69aba61febf9aa1f025851ba2f7', '1', '2019-07-18 14:18:47', '2019-07-18 14:18:47');
+INSERT INTO `pictures` VALUES ('28', '0', '0', '26-提交结果-成功.png', '41679', 'public/uploads/pictures/JObrc9pT5AREBLV3uq82hwNIRg08L26cqj3bIS4w.png', '152d401b5beaf98b5ac80d7126af7be4', '1', '2019-07-18 14:21:00', '2019-07-18 14:21:00');
+INSERT INTO `pictures` VALUES ('29', '0', '0', '27-提交结果-失败.png', '41604', 'public/uploads/pictures/iDREiRpdk03ZhjwA3z7w0vPXZVzrMieERqoyOVP9.png', '6b68ce25ce91033db81791f8e0825d69', '1', '2019-07-18 14:21:00', '2019-07-18 14:21:00');
+INSERT INTO `pictures` VALUES ('30', '0', '0', '01-选择团长.png', '84818', 'public/uploads/pictures/anYFrBWpsNx8uaHMJzbZgRWobmxb0UtHNiZExIq6.png', 'f49ebbb1444eb7ba8f12e79017b22652', '1', '2019-07-18 14:23:14', '2019-07-18 14:23:14');
+INSERT INTO `pictures` VALUES ('31', '0', '0', '02-团长列表.png', '141473', 'public/uploads/pictures/Wiw1s1GNct2wexso0iOJMHHM5XepfvGYKGICsKDE.png', '9f34eba32fe0836f1e11cdf4f4c60cf0', '1', '2019-07-18 14:23:14', '2019-07-18 14:23:14');
+INSERT INTO `pictures` VALUES ('32', '0', '0', '03-选择地址-1.png', '39698', 'public/uploads/pictures/qcnpnYWc0sQQgKoicXgmsEREfgwGzwTA9dfBm0na.png', 'de6e7f9b91afc8f14a54db0e162eb3d6', '1', '2019-07-18 14:23:35', '2019-07-18 14:23:35');
+INSERT INTO `pictures` VALUES ('33', '0', '0', '03-选择地址-2.png', '66185', 'public/uploads/pictures/KdxN9Q8bgxr9CgKCkFKyPB5dPLod3KZB2S5fi2xq.png', '3874306f04074b993b7c6995396fb254', '1', '2019-07-18 14:28:28', '2019-07-18 14:28:28');
+INSERT INTO `pictures` VALUES ('34', '0', '0', '07-购物车.png', '284306', 'public/uploads/pictures/FNnX84CqqLNfCevlzAvG6LRnPRyEg7y8Nh4XkaiE.png', '2406fdd16aaa25d26f87ae5544e056de', '1', '2019-07-18 14:44:21', '2019-07-18 14:44:21');
+INSERT INTO `pictures` VALUES ('35', '0', '0', '08-订单确认.png', '218991', 'public/uploads/pictures/Fg2SBzAZN5nHkZl9ldcwCyht2mkjKPsr8TYyEfdJ.png', 'c1f9e5b5b3d2a5973eda84a6acbb79d4', '1', '2019-07-18 14:44:21', '2019-07-18 14:44:21');
+INSERT INTO `pictures` VALUES ('36', '0', '0', '09-支付方式选择.png', '134567', 'public/uploads/pictures/fhqkNL04A5cFysMM1sXiyL8i8WltBChLC78UHelZ.png', '218472bc521ab724cb50ce282d197377', '1', '2019-07-18 14:44:21', '2019-07-18 14:44:21');
+INSERT INTO `pictures` VALUES ('37', '0', '0', '06-评价列表.png', '111124', 'public/uploads/pictures/37vp31DKNH8PeIfTntD7PumhMf44OgFlF1g2btAR.png', 'f273132b98cc2e074c3efb06bed9df09', '1', '2019-07-18 15:44:58', '2019-07-18 15:44:58');
+INSERT INTO `pictures` VALUES ('38', '0', '0', '11-搜索.png', '23522', 'public/uploads/pictures/yhr2KmVXkBPHERdgm0630sgdDdQFLBhPstpFlAVS.png', 'aa3704a4f4b005df00b25d9e1990b050', '1', '2019-07-18 16:00:40', '2019-07-18 16:00:40');
 
 -- ----------------------------
 -- Table structure for posts
@@ -1956,7 +2062,7 @@ CREATE TABLE `posts` (
   `source` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '文章来源',
   `description` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT '',
   `password` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `cover_ids` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `cover_ids` varchar(10000) COLLATE utf8mb4_unicode_ci DEFAULT '',
   `pid` int(11) DEFAULT '0',
   `level` int(11) DEFAULT '0',
   `type` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ARTICLE' COMMENT '文章类型（ARTICLE/PAGE/LINK等）',
@@ -1974,17 +2080,32 @@ CREATE TABLE `posts` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of posts
 -- ----------------------------
-INSERT INTO `posts` VALUES ('1', '1', '0', '1', '默认文章,你好世界！', '你好，世界！', 'hello', 'tangtanglove', '1', 'Hello, world”程序是指在计算机屏幕上输出“Hello,world”这行字符串的计算机程序，“hello, world”的中文意思是“你好，世界。”。这个例程在Brian Kernighan 和Dennis M. Ritchie合著的《The C Programme Language》使用而广泛流行。', '', '', '0', '0', 'ARTICLE', '1', '1', '', '“Hello, world”程序是指在计算机屏幕上输出“Hello,world”这行字符串的计算机程序，“hello, world”的中文意思是“你好，世界。”。这个例程在Brian Kernighan 和Dennis M. Ritchie合著的《The C Programme Language》使用而广泛流行。因为它的简洁，实用，并包含了一个该版本的C程序首次出现在1974年Brian Kernighan所撰写的《Programming in C: A Tutorial》', '0', '0', '', 'open', '1', '0', '2019-03-08 08:25:59', '2019-03-08 08:25:59', null);
-INSERT INTO `posts` VALUES ('2', '1', '0', '1', '使用说明,配置手册', '使用说明', 'doc', 'tangtanglove', '本站', '说明书多种多样，说明书的写作格式也不拘一格，不可一概而论。本文将举出一些常见的说明书的具体例子，以期使读者对此有一明确的认识。', '', '', '0', '0', 'ARTICLE', '1', '0', '', 'https://www.kancloud.cn/tangtanglove/easyadmin/435582', '0', '0', '', 'open', '1', '0', '2019-03-08 08:25:59', '2019-03-08 08:25:59', null);
-INSERT INTO `posts` VALUES ('3', '1', '0', '1', '开发文档,帮助文件', '开发文档', 'help', 'tangtanglove', '本站', '软件开发文档是软件开发使用和维护过程中的必备资料。它能提高软件开发的效率，保证软件的质量，而且在软件的使用过程中有指导，帮助，解惑的作用，尤其在维护工作中，文档是不可或缺的资料。', null, '[15,8]', '0', '0', 'ARTICLE', '1', '0', '', '<p>https://www.kancloud.cn/tangtanglove/easyadmin/435582</p>', '0', '0', '', 'open', '1', '0', '2019-03-08 08:25:59', '2019-07-04 22:11:20', null);
+INSERT INTO `posts` VALUES ('1', '1', '0', '1', '默认文章,你好世界！', '你好，世界！', 'hello', 'tangtanglove', '1', 'Hello, world”程序是指在计算机屏幕上输出“Hello,world”这行字符串的计算机程序，“hello, world”的中文意思是“你好，世界。”。这个例程在Brian Kernighan 和Dennis M. Ritchie合著的《The C Programme Language》使用而广泛流行。', '', '', '0', '0', 'ARTICLE', '1', '1', '', '“Hello, world”程序是指在计算机屏幕上输出“Hello,world”这行字符串的计算机程序，“hello, world”的中文意思是“你好，世界。”。这个例程在Brian Kernighan 和Dennis M. Ritchie合著的《The C Programme Language》使用而广泛流行。因为它的简洁，实用，并包含了一个该版本的C程序首次出现在1974年Brian Kernighan所撰写的《Programming in C: A Tutorial》', '0', '0', '', 'open', '1', '0', '2019-03-08 08:25:59', '2019-07-11 14:40:31', null);
+INSERT INTO `posts` VALUES ('2', '1', '0', '1', '使用说明,配置手册', '使用说明', 'doc', 'tangtanglove', '本站', '说明书多种多样，说明书的写作格式也不拘一格，不可一概而论。本文将举出一些常见的说明书的具体例子，以期使读者对此有一明确的认识。', '', '', '0', '0', 'ARTICLE', '1', '0', '', 'https://www.kancloud.cn/tangtanglove/easyadmin/435582', '0', '0', '', 'open', '1', '0', '2019-03-08 08:25:59', '2019-07-12 18:45:19', null);
+INSERT INTO `posts` VALUES ('3', '1', '0', '1', '开发文档,帮助文件', '开发文档', 'help', 'tangtanglove', '本站', '软件开发文档是软件开发使用和维护过程中的必备资料。它能提高软件开发的效率，保证软件的质量，而且在软件的使用过程中有指导，帮助，解惑的作用，尤其在维护工作中，文档是不可或缺的资料。', null, '[15,8]', '0', '0', 'ARTICLE', '1', '0', '', '<p>https://www.kancloud.cn/tangtanglove/easyadmin/435582</p>', '0', '0', '', 'open', '1', '0', '2019-03-08 08:25:59', '2019-07-12 18:45:19', null);
 INSERT INTO `posts` VALUES ('4', '1', '0', '1', '关于我们,介绍', '关于我们', 'aboutus', 'tangtanglove', '本站', '关于我们,介绍', '', '', '0', '0', 'PAGE', '1', '0', '', '这是一个关于我们的文章，您可以填一下介绍什么的。', '0', '0', 'page/index', 'open', '1', '0', '2019-03-08 08:25:59', '2019-03-08 08:25:59', null);
 INSERT INTO `posts` VALUES ('15', '1', '0', '1', '帮助中心,帮助', '帮助中心', 'help', 'tangtanglove', '本站', '帮助中心,帮助', '', '', '0', '0', 'PAGE', '1', '0', '', '这是一个帮助中心的文章，您可以填一下帮助什么的。', '0', '0', 'page/index', 'open', '1', '0', '2019-03-08 08:25:59', '2019-03-08 08:25:59', null);
 INSERT INTO `posts` VALUES ('16', '1', '0', '1', '', '点赞！熊孩子博物馆前搞破坏 市民及时制止', '', '', '', '点赞！熊孩子博物馆前搞破坏 市民及时制止', '0', '[]', '0', '0', 'ARTICLE', '1', '0', '', '<p>点赞！熊孩子博物馆前搞破坏 市民及时制止</p>', '0', '0', '', 'open', '1', '0', '2019-05-08 18:50:09', '2019-05-08 18:50:19', '2019-05-08 18:50:19');
+INSERT INTO `posts` VALUES ('17', '0', '0', '1', '默认文章,你好世界！', '默认文章,你好世界！', '', '', '', '', '', '', '0', '0', 'ARTICLE', '1', '0', '', '默认文章,你好世界！', '0', '0', '', 'open', '1', '0', '2019-07-11 09:06:43', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('18', '1', '0', '1', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '', '', '', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '0', '[]', '0', '0', 'ARTICLE', '1', '0', '', '<p>丰安大路毛毛虫泛滥 吓坏不少路过市民</p>', '0', '0', '', 'open', '1', '0', '2019-07-11 09:07:53', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('19', '1', '0', '1', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '', '', '', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '0', '[]', '0', '0', 'ARTICLE', '1', '0', '', '<p>丰安大路毛毛虫泛滥 吓坏不少路过市民</p>', '0', '0', '', 'open', '1', '0', '2019-07-11 09:08:05', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('20', '1', '0', '1', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '', '', '', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '0', '[]', '0', '0', 'ARTICLE', '1', '0', '', '<p>丰安大路毛毛虫泛滥 吓坏不少路过市民</p>', '0', '0', '', 'open', '-1', '0', '2019-07-11 09:08:21', '2019-07-11 11:57:51', null);
+INSERT INTO `posts` VALUES ('21', '1', '0', '1', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '', '', '', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '0', '[]', '0', '0', 'ARTICLE', '1', '0', '', '<p>丰安大路毛毛虫泛滥 吓坏不少路过市民</p>', '0', '0', '', 'open', '1', '0', '2019-07-11 09:08:39', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('22', '1', '0', '1', 'v', '丰安大路毛毛虫泛滥 吓坏不少路过市民', null, null, '', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '0', '[{\"uid\":30,\"name\":\"01-\\u9009\\u62e9\\u56e2\\u957f.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/anYFrBWpsNx8uaHMJzbZgRWobmxb0UtHNiZExIq6.png\",\"status\":\"done\"},{\"uid\":31,\"name\":\"02-\\u56e2\\u957f\\u5217\\u8868.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/Wiw1s1GNct2wexso0iOJMHHM5XepfvGYKGICsKDE.png\",\"status\":\"done\"},{\"uid\":32,\"name\":\"03-\\u9009\\u62e9\\u5730\\u5740-1.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/qcnpnYWc0sQQgKoicXgmsEREfgwGzwTA9dfBm0na.png\",\"status\":\"done\"}]', '0', '0', 'ARTICLE', '1', '0', '', '<p>丰安大路毛毛虫泛滥 吓坏不少路过市民</p>', '0', '0', '', 'open', '1', '0', '2019-07-11 09:08:51', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('23', '1', '0', '1', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '', '', '', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '0', '[]', '0', '0', 'ARTICLE', '1', '0', '', '<p>丰安大路毛毛虫泛滥 吓坏不少路过市民</p>', '0', '0', '', 'open', '-1', '0', '2019-07-11 09:09:02', '2019-07-11 15:07:33', null);
+INSERT INTO `posts` VALUES ('24', '1', '0', '1', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '', '', '', '丰安大路毛毛虫泛滥 吓坏不少路过市民', '0', '[]', '0', '0', 'ARTICLE', '1', '0', '', '<p>丰安大路毛毛虫泛滥 吓坏不少路过市民</p>', '0', '0', '', 'open', '1', '0', '2019-07-11 09:09:23', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('25', '1', '0', '1', 'pageLoading:true', 'FullstackCMS', null, null, '', 'pageLoading:true', '0', '[{\"uid\":30,\"name\":\"01-\\u9009\\u62e9\\u56e2\\u957f.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/anYFrBWpsNx8uaHMJzbZgRWobmxb0UtHNiZExIq6.png\",\"status\":\"done\"},{\"uid\":31,\"name\":\"02-\\u56e2\\u957f\\u5217\\u8868.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/Wiw1s1GNct2wexso0iOJMHHM5XepfvGYKGICsKDE.png\",\"status\":\"done\"},{\"uid\":32,\"name\":\"03-\\u9009\\u62e9\\u5730\\u5740-1.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/qcnpnYWc0sQQgKoicXgmsEREfgwGzwTA9dfBm0na.png\",\"status\":\"done\"}]', '0', '0', 'ARTICLE', '1', '0', '', '<p>pageLoading:true</p>', '0', '0', '', 'open', '1', '0', '2019-07-15 15:40:53', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('26', '1', '0', '1', '测试内容', '测试内容', null, null, '', '测试内容', '0', '[{\"id\":30,\"name\":\"01-\\u9009\\u62e9\\u56e2\\u957f.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/anYFrBWpsNx8uaHMJzbZgRWobmxb0UtHNiZExIq6.png\",\"size\":\"84818\",\"uid\":30},{\"id\":31,\"name\":\"02-\\u56e2\\u957f\\u5217\\u8868.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/Wiw1s1GNct2wexso0iOJMHHM5XepfvGYKGICsKDE.png\",\"size\":\"141473\",\"uid\":31},{\"id\":32,\"name\":\"03-\\u9009\\u62e9\\u5730\\u5740-1.png\",\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/qcnpnYWc0sQQgKoicXgmsEREfgwGzwTA9dfBm0na.png\",\"size\":\"39698\",\"uid\":32}]', '0', '0', 'ARTICLE', '1', '0', '', '<p>测试内容</p>', '0', '0', '', 'open', '1', '0', '2019-07-15 15:41:15', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('31', '1', '0', '1', '点赞！熊孩子博物馆前搞破坏 市民及时制止', '你好，世界杯！', null, '蔡永刚', '迁安信息港', '点赞！熊孩子博物馆前搞破坏 市民及时制止', '0', '[{\"id\":32,\"uid\":32,\"name\":\"03-\\u9009\\u62e9\\u5730\\u5740-1.png\",\"size\":39698,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/qcnpnYWc0sQQgKoicXgmsEREfgwGzwTA9dfBm0na.png\"},{\"id\":33,\"uid\":33,\"name\":\"03-\\u9009\\u62e9\\u5730\\u5740-2.png\",\"size\":66185,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/KdxN9Q8bgxr9CgKCkFKyPB5dPLod3KZB2S5fi2xq.png\"},{\"id\":37,\"uid\":37,\"name\":\"06-\\u8bc4\\u4ef7\\u5217\\u8868.png\",\"size\":111124,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/37vp31DKNH8PeIfTntD7PumhMf44OgFlF1g2btAR.png\"}]', '0', '1', 'ARTICLE', '1', '0', '', '<p>点赞！熊孩子博物馆前搞破坏 市民及时制止</p>', '0', '0', '', 'open', '1', '0', '2019-07-18 15:09:20', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('32', '1', '0', '1', '阳光谷物', '阳光谷物', null, '李娜', '本站', '阳光谷物', '0', '[{\"id\":30,\"uid\":30,\"name\":\"01-\\u9009\\u62e9\\u56e2\\u957f.png\",\"size\":84818,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/anYFrBWpsNx8uaHMJzbZgRWobmxb0UtHNiZExIq6.png\"},{\"id\":31,\"uid\":31,\"name\":\"02-\\u56e2\\u957f\\u5217\\u8868.png\",\"size\":141473,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/Wiw1s1GNct2wexso0iOJMHHM5XepfvGYKGICsKDE.png\"},{\"id\":32,\"uid\":32,\"name\":\"03-\\u9009\\u62e9\\u5730\\u5740-1.png\",\"size\":39698,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/qcnpnYWc0sQQgKoicXgmsEREfgwGzwTA9dfBm0na.png\"}]', '0', '1', 'ARTICLE', '1', '12', '', '<p>阳光谷物</p>', '0', '0', '', 'open', '1', '0', '2019-07-18 16:00:46', '2019-07-18 16:13:24', null);
+INSERT INTO `posts` VALUES ('33', '1', '0', '0', '关于生活', '关于生活', 'about', '', '', '关于生活', '0', '[{\"uid\":30,\"name\":\"01-\\u9009\\u62e9\\u56e2\\u957f.png\",\"size\":84818,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/anYFrBWpsNx8uaHMJzbZgRWobmxb0UtHNiZExIq6.png\"}]', '0', '0', 'PAGE', '0', '0', '', '<p>关于生活</p>', '0', '0', '', 'close', '1', '0', '2019-07-18 18:58:37', '2019-07-18 19:04:10', null);
+INSERT INTO `posts` VALUES ('34', '1', '0', '1', '点赞！熊孩子博物馆前搞破坏 市民及时制止', '点赞！熊孩子博物馆前搞破坏 市民及时制止', '', '蔡永刚', '迁安信息港', '点赞！熊孩子博物馆前搞破坏 市民及时制止', null, '[{\"id\":27,\"uid\":27,\"name\":\"\\u8fc1\\u56e2-logo-01.png\",\"size\":8852,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/rRSGUhzgltjejyroRkXCgTJOnfYjERJX6Hz8NxN3.png\"}]', '0', '1', 'ARTICLE', '1', '6', '', '<p>点赞！熊孩子博物馆前搞破坏 市民及时制止</p>', '0', '0', '', 'open', '1', '0', '2019-07-19 10:23:22', '2019-07-19 10:23:22', null);
+INSERT INTO `posts` VALUES ('35', '1', '0', '0', '关于生活', '关于生活', 'about', '', '', '关于生活', '0', '[{\"uid\":30,\"name\":\"01-\\u9009\\u62e9\\u56e2\\u957f.png\",\"size\":84818,\"url\":\"http:\\/\\/www.project.com\\/storage\\/uploads\\/pictures\\/anYFrBWpsNx8uaHMJzbZgRWobmxb0UtHNiZExIq6.png\"}]', '4', '0', 'PAGE', '0', '0', '', '<p>关于生活</p>', '0', '0', '', 'close', '1', '0', '2019-07-19 10:46:14', '2019-07-19 10:46:14', null);
 
 -- ----------------------------
 -- Table structure for printers
@@ -2007,24 +2128,6 @@ CREATE TABLE `printers` (
 -- ----------------------------
 -- Records of printers
 -- ----------------------------
-
--- ----------------------------
--- Table structure for roles
--- ----------------------------
-DROP TABLE IF EXISTS `roles`;
-CREATE TABLE `roles` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `guard_name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of roles
--- ----------------------------
-INSERT INTO `roles` VALUES ('7', '网站编辑', 'admin', '2019-05-09 15:47:07', '2019-05-13 18:30:09');
 
 -- ----------------------------
 -- Table structure for role_has_permissions
@@ -2059,6 +2162,79 @@ INSERT INTO `role_has_permissions` VALUES ('31', '7');
 INSERT INTO `role_has_permissions` VALUES ('59', '7');
 INSERT INTO `role_has_permissions` VALUES ('60', '7');
 INSERT INTO `role_has_permissions` VALUES ('168', '7');
+
+-- ----------------------------
+-- Table structure for roles
+-- ----------------------------
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE `roles` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `guard_name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of roles
+-- ----------------------------
+INSERT INTO `roles` VALUES ('7', '网站编辑', 'admin', '2019-05-09 15:47:07', '2019-05-13 18:30:09');
+
+-- ----------------------------
+-- Table structure for shop_categories
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_categories`;
+CREATE TABLE `shop_categories` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pid` int(11) DEFAULT '0',
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sort` int(11) DEFAULT '0',
+  `cover_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '0',
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类缩略名',
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '分类描述',
+  `index_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `lists_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `detail_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `page_num` int(11) NOT NULL DEFAULT '10' COMMENT '分页数量',
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+-- ----------------------------
+-- Records of shop_categories
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for shop_self_categories
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_self_categories`;
+CREATE TABLE `shop_self_categories` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pid` int(11) DEFAULT '0',
+  `shop_id` int(11) unsigned DEFAULT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sort` int(11) DEFAULT '0',
+  `cover_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '0',
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类缩略名',
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '分类描述',
+  `index_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `lists_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `detail_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `page_num` int(11) NOT NULL DEFAULT '10' COMMENT '分页数量',
+  `status` tinyint(4) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+-- ----------------------------
+-- Records of shop_self_categories
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for shopping_carts
@@ -2126,61 +2302,6 @@ CREATE TABLE `shops` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for shop_categories
--- ----------------------------
-DROP TABLE IF EXISTS `shop_categories`;
-CREATE TABLE `shop_categories` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `pid` int(11) DEFAULT '0',
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort` int(11) DEFAULT '0',
-  `cover_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '0',
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类缩略名',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '分类描述',
-  `index_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `lists_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `detail_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `page_num` int(11) NOT NULL DEFAULT '10' COMMENT '分页数量',
-  `status` tinyint(4) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
--- ----------------------------
--- Records of shop_categories
--- ----------------------------
-
--- ----------------------------
--- Table structure for shop_self_categories
--- ----------------------------
-DROP TABLE IF EXISTS `shop_self_categories`;
-CREATE TABLE `shop_self_categories` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `pid` int(11) DEFAULT '0',
-  `shop_id` int(11) unsigned DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort` int(11) DEFAULT '0',
-  `cover_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '0',
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类缩略名',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '分类描述',
-  `index_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `lists_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `detail_tpl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `page_num` int(11) NOT NULL DEFAULT '10' COMMENT '分页数量',
-  `status` tinyint(4) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
--- ----------------------------
--- Records of shop_self_categories
--- ----------------------------
-
--- ----------------------------
 -- Table structure for sms
 -- ----------------------------
 DROP TABLE IF EXISTS `sms`;
@@ -2235,11 +2356,13 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_username_unique` (`username`),
   UNIQUE KEY `users_email_unique` (`email`),
   UNIQUE KEY `users_phone_unique` (`phone`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
+INSERT INTO `users` VALUES ('1', '', 'tangtanglove', null, 'dai_hang_love@126.com', '15076566631', '1', '$2y$10$B00sb2Pjvuu4GKfxVZNGjeChYFjH5nR5q8zV6m4Ev2l9HjTpmhVuu', '', '0.00', '0', '', '', '', '', '', null, '1', null, null, '2019-07-18 19:15:27', '2019-07-18 20:32:55', null);
+INSERT INTO `users` VALUES ('2', 'administr', 'tangtanglove1', null, 'dai_hang_love@136.com', '15076569631', '1', '$2y$10$C/3HHfALuoPAxVGLbxaJX.5kD9mPAolCp6OeHXl6/E1cYyZK.biiW', '27', '100.00', '20', '', '', '', '', '', null, '1', null, null, '2019-07-18 20:09:06', '2019-07-19 14:32:55', null);
 
 -- ----------------------------
 -- Table structure for videos

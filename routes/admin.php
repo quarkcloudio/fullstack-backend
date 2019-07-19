@@ -55,42 +55,13 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/page/save', 'Admin\\PageController@save')->name('api/admin/page/save');
     Route::post('admin/page/changeStatus', 'Admin\\PageController@changeStatus')->name('api/admin/page/changeStatus');
     
-    Route::get('admin/groupbuyShop/index', 'Admin\\GroupbuyShopController@index')->name('api/admin/groupbuyShop/index');
-    Route::get('admin/groupbuyShop/create', 'Admin\\GroupbuyShopController@create')->name('api/admin/groupbuyShop/create');
-    Route::post('admin/groupbuyShop/store', 'Admin\\GroupbuyShopController@store')->name('api/admin/groupbuyShop/store');
-    Route::get('admin/groupbuyShop/edit', 'Admin\\GroupbuyShopController@edit')->name('api/admin/groupbuyShop/edit');
-    Route::post('admin/groupbuyShop/save', 'Admin\\GroupbuyShopController@save')->name('api/admin/groupbuyShop/save');
-    Route::post('admin/groupbuyShop/destroy', 'Admin\\GroupbuyShopController@destroy')->name('api/admin/groupbuyShop/destroy');
-    Route::post('admin/groupbuyShop/changeStatus', 'Admin\\GroupbuyShopController@changeStatus')->name('api/admin/groupbuyShop/changeStatus');
-    
-    Route::get('admin/groupbuyCategory/index', 'Admin\\GroupbuyCategoryController@index')->name('api/admin/groupbuyCategory/index');
-    Route::get('admin/groupbuyCategory/create', 'Admin\\GroupbuyCategoryController@create')->name('api/admin/groupbuyCategory/create');
-    Route::post('admin/groupbuyCategory/store', 'Admin\\GroupbuyCategoryController@store')->name('api/admin/groupbuyCategory/store');
-    Route::get('admin/groupbuyCategory/edit', 'Admin\\GroupbuyCategoryController@edit')->name('api/admin/groupbuyCategory/edit');
-    Route::post('admin/groupbuyCategory/save', 'Admin\\GroupbuyCategoryController@save')->name('api/admin/groupbuyCategory/save');
-    Route::post('admin/groupbuyCategory/destroy', 'Admin\\GroupbuyCategoryController@destroy')->name('api/admin/groupbuyCategory/destroy');
-    Route::post('admin/groupbuyCategory/changeStatus', 'Admin\\GroupbuyCategoryController@changeStatus')->name('api/admin/groupbuyCategory/changeStatus');
-
-    Route::get('admin/groupbuyGoods/index', 'Admin\\GroupbuyGoodsController@index')->name('api/admin/groupbuyGoods/index');
-    Route::get('admin/groupbuyGoods/edit', 'Admin\\GroupbuyGoodsController@edit')->name('api/admin/groupbuyGoods/edit');
-    Route::post('admin/groupbuyGoods/save', 'Admin\\GroupbuyGoodsController@save')->name('api/admin/groupbuyGoods/save');
-    Route::post('admin/groupbuyGoods/destroy', 'Admin\\GroupbuyGoodsController@destroy')->name('api/admin/groupbuyGoods/destroy');
-    Route::post('admin/groupbuyGoods/changeStatus', 'Admin\\GroupbuyGoodsController@changeStatus')->name('api/admin/groupbuyGoods/changeStatus');
-    
-    Route::get('admin/groupbuyOrder/index', 'Admin\\GroupbuyOrderController@index')->name('api/admin/groupbuyOrder/index');
-    Route::get('admin/groupbuyOrder/edit', 'Admin\\GroupbuyOrderController@edit')->name('api/admin/groupbuyOrder/edit');
-    Route::post('admin/groupbuyOrder/save', 'Admin\\GroupbuyOrderController@save')->name('api/admin/groupbuyOrder/save');
-    Route::post('admin/groupbuyOrder/destroy', 'Admin\\GroupbuyOrderController@destroy')->name('api/admin/groupbuyOrder/destroy');
-    Route::post('admin/groupbuyOrder/changeStatus', 'Admin\\GroupbuyOrderController@changeStatus')->name('api/admin/groupbuyOrder/changeStatus');
-
     Route::get('admin/user/index', 'Admin\\UserController@index')->name('api/admin/user/index');
     Route::get('admin/user/create', 'Admin\\UserController@create')->name('api/admin/user/create');
     Route::post('admin/user/store', 'Admin\\UserController@store')->name('api/admin/user/store');
     Route::get('admin/user/edit', 'Admin\\UserController@edit')->name('api/admin/user/edit');
     Route::post('admin/user/save', 'Admin\\UserController@save')->name('api/admin/user/save');
-    Route::post('admin/user/destroy', 'Admin\\UserController@destroy')->name('api/admin/user/destroy');
     Route::post('admin/user/changeStatus', 'Admin\\UserController@changeStatus')->name('api/admin/user/changeStatus');
-    Route::post('admin/user/recharge', 'Admin\\UserController@recharge')->name('api/admin/user/recharge');
+    Route::any('admin/user/recharge', 'Admin\\UserController@recharge')->name('api/admin/user/recharge');
 
     Route::get('admin/actionLog/index', 'Admin\\ActionLogController@index')->name('api/admin/actionLog/index');
     Route::post('admin/actionLog/destroy', 'Admin\\ActionLogController@destroy')->name('api/admin/actionLog/destroy');

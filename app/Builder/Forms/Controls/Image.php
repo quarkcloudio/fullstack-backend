@@ -33,9 +33,9 @@ class Image extends Control
         return $this;
     }
 
-    public function list($list)
+    public function value($value)
     {
-        $this->list = $list;
+        $this->value = $value;
         return $this;
     }
 

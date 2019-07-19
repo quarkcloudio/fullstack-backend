@@ -25,7 +25,7 @@ class User extends Authenticatable
         'phone',
         'cover_id',
         'money',
-        'point',
+        'score',
         'wechat_openid',
         'wechat_unionid',
         'qq_openid',

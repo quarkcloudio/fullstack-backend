@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Helper;
 use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
 use App\Builder\Forms\Controls\Text;
 use App\Builder\Forms\Controls\TextArea;
 use App\Builder\Forms\Controls\InputNumber;
@@ -140,13 +141,13 @@ class ArticleController extends BuilderController
         $searchs = [
             Select::make('分类','categorys')->option($getCategorys)->value('0'),
             Select::make('状态','status')->option($status)->value('0'),
-            Text::make('搜索内容','title'),
+            Input::make('搜索内容','title'),
             Button::make('搜索')->onClick('search'),
         ];
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('标题','title')->withA('admin/article/edit'),
+            Column::make('标题','title')->withA('admin/'.$this->controllerName().'/edit'),
             Column::make('作者','author'),
             Column::make('分类','category_title'),
             Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
@@ -223,78 +224,47 @@ class ArticleController extends BuilderController
             ],
         ];
 
-        if(!empty($data)) {
-            $baseControls = [
-                ID::make('ID','id')->value($data['id']),
-                Text::make('标题','title')->style(['width'=>400])->value($data['title']),
-                TextArea::make('描述','description')->style(['width'=>400])->value($data['description']),
-                Text::make('标签','tags')->style(['width'=>400])->value($data['tags']),
-                Text::make('作者','author')->style(['width'=>200])->value($data['author']),
-                Text::make('来源','source')->style(['width'=>200])->value($data['source']),
-                Checkbox::make('推荐位','position')->list($checkboxList)->value($data['position']),
-                Radio::make('展现形式','show_type')->list($radioList)->value(1)->value($data['show_type']),
-                Image::make('封面图','cover_ids')->mode('multiple')->list($data['cover_ids']),
-                Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value($data['category_id']),
-                SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value($data['comment_status']),
-                Editor::make('内容','content')->value($data['content']),
-                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss")->value($data['created_at']),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
-            ];
-
-            $extendControls = [
-                Text::make('别名','name')->style(['width'=>200])->value($data['name']),
-                InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value($data['level']),
-                InputNumber::make('浏览量','view')->value($data['view']),
-                InputNumber::make('评论量','comment')->value($data['comment']),
-                Text::make('访问密码','password')->style(['width'=>200])->value($data['password']),
-                File::make('附件','file_id')->list($data['file_id']),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
-            ];
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
         } else {
-
-            $baseControls = [
-                Text::make('标题','title')->style(['width'=>400]),
-                TextArea::make('描述','description')->style(['width'=>400]),
-                Text::make('标签','tags')->style(['width'=>400]),
-                Text::make('作者','author')->style(['width'=>200]),
-                Text::make('来源','source')->style(['width'=>200]),
-                Checkbox::make('推荐位','position')->list($checkboxList),
-                Radio::make('展现形式','show_type')->list($radioList)->value(1),
-                Image::make('封面图','cover_ids')->mode('multiple'),
-                Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
-                SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
-                Editor::make('内容','content'),
-                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
-            ];
-
-            $extendControls = [
-                Text::make('别名','name')->style(['width'=>200]),
-                InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
-                InputNumber::make('浏览量','view')->value(0),
-                InputNumber::make('评论量','comment')->value(0),
-                Text::make('访问密码','password')->style(['width'=>200]),
-                File::make('附件','file_id'),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
-            ];
-
+            $action = 'admin/'.$this->controllerName().'/store';
         }
+
+        $baseControls = [
+            ID::make('ID','id'),
+            Input::make('标题','title')->style(['width'=>400]),
+            Input::make('标题','title')->style(['width'=>400]),
+            TextArea::make('描述','description')->style(['width'=>400]),
+            Input::make('标签','tags')->style(['width'=>400]),
+            Input::make('作者','author')->style(['width'=>200]),
+            Input::make('来源','source')->style(['width'=>200]),
+            Checkbox::make('推荐位','position')->list($checkboxList),
+            Radio::make('展现形式','show_type')->list($radioList)->value(1),
+            Image::make('封面图','cover_ids')->mode('multiple'),
+            Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
+            SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
+            Editor::make('内容','content'),
+            DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action),
+        ];
+
+        $extendControls = [
+            Input::make('别名','name')->style(['width'=>200]),
+            InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
+            InputNumber::make('浏览量','view')->value(0),
+            InputNumber::make('评论量','comment')->value(0),
+            Input::make('访问密码','password')->style(['width'=>200]),
+            File::make('附件','file_id'),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action),
+        ];
 
         $tabPane = [
             TabPane::make('基本',1)->controls($baseControls),
@@ -749,7 +719,7 @@ class ArticleController extends BuilderController
         $searchs = [
             Select::make('分类','categorys')->option($getCategorys)->value('0'),
             Select::make('状态','status')->option($status)->value('0'),
-            Text::make('搜索内容','title'),
+            Input::make('搜索内容','title'),
             Button::make('搜索')->onClick('search'),
         ];
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Helper;
 use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
 use App\Builder\Forms\Controls\Text;
 use App\Builder\Forms\Controls\TextArea;
 use App\Builder\Forms\Controls\InputNumber;
@@ -142,7 +143,7 @@ class PageController extends BuilderController
 
         $searchs = [
             Select::make('状态','status')->option($status)->value('0'),
-            Text::make('搜索内容','title'),
+            Input::make('搜索内容','title'),
             Button::make('搜索')->onClick('search'),
         ];
 
@@ -187,40 +188,28 @@ class PageController extends BuilderController
             $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
         }
 
-        if(!empty($data)) {
-            $controls = [
-                ID::make('ID','id')->value($data['id']),
-                Text::make('标题','title')->style(['width'=>400])->value($data['title']),
-                Text::make('别名','name')->style(['width'=>200])->value($data['name']),
-                TextArea::make('描述','description')->style(['width'=>400])->value($data['description']),
-                Text::make('标签','tags')->style(['width'=>400])->value($data['tags']),
-                Image::make('封面图','cover_ids')->mode('multiple')->list($data['cover_ids']),
-                Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys)->value($data['pid']),
-                Editor::make('内容','content')->value($data['content']),
-                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss")->value($data['created_at']),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
-            ];
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
         } else {
-            $controls = [
-                Text::make('标题','title')->style(['width'=>400]),
-                Text::make('别名','name')->style(['width'=>200]),
-                TextArea::make('描述','description')->style(['width'=>400]),
-                Text::make('标签','tags')->style(['width'=>400]),
-                Image::make('封面图','cover_ids')->mode('multiple'),
-                Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys),
-                Editor::make('内容','content'),
-                DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
-            ];
+            $action = 'admin/'.$this->controllerName().'/store';
         }
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('标题','title')->style(['width'=>400]),
+            Input::make('别名','name')->style(['width'=>200]),
+            TextArea::make('描述','description')->style(['width'=>400]),
+            Input::make('标签','tags')->style(['width'=>400]),
+            Image::make('封面图','cover_ids')->mode('multiple'),
+            Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys),
+            Editor::make('内容','content'),
+            DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action),
+        ];
 
         $result = $this->formBuilder($controls,$data);
 

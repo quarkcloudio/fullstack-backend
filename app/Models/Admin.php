@@ -34,9 +34,7 @@ class Admin extends Authenticatable
         'weibo_uid',
         'last_login_ip',
         'last_login_time',
-        'status',
-        'created_at',
-        'updated_at'
+        'status'
     ];
 
     /**

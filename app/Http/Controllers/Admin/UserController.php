@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 use App\Services\Helper;
 use EasyWeChat\Factory;
 use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
 use App\Builder\Forms\Controls\Text;
 use App\Builder\Forms\Controls\TextArea;
 use App\Builder\Forms\Controls\InputNumber;
@@ -109,6 +109,15 @@ class UserController extends BuilderController
 
         $lists = Helper::listsFormat($lists);
 
+        // 默认页码
+        $pagination['defaultCurrent'] = 1;
+        // 当前页码
+        $pagination['current'] = $current;
+        // 分页数量
+        $pagination['pageSize'] = $pageSize;
+        // 总数量
+        $pagination['total'] = $total;
+
         $status = [
             [
                 'name'=>'所有状态',
@@ -124,28 +133,25 @@ class UserController extends BuilderController
             ],
         ];
 
-        // 默认页码
-        $pagination['defaultCurrent'] = 1;
-        // 当前页码
-        $pagination['current'] = $current;
-        // 分页数量
-        $pagination['pageSize'] = $pageSize;
-        // 总数量
-        $pagination['total'] = $total;
-
-        // 模板数据
-        $data['lists'] = Helper::listsFormat($lists);
-
         $searchs = [
             Select::make('状态','status')->option($status)->value('0'),
-            Text::make('搜索内容','title'),
+            Input::make('搜索内容','username'),
             Button::make('搜索')->onClick('search'),
+        ];
+
+        $advancedSearchs = [
+            Input::make('用户名','username'),
+            Input::make('手机号','phone'),
+            RangePicker::make('注册时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            Select::make('状态','status')->option($status)->value('0'),
+            Button::make('搜索')->type('primary')->onClick('search'),
+            Button::make('重置')->onClick('resetSearch'),
         ];
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('头像','cover_path')->isImage()->withA('admin/user/edit'),
-            Column::make('用户名','username')->withA('admin/user/edit'),
+            Column::make('头像','cover_path')->isImage()->withA('admin/'.$this->controllerName().'/edit'),
+            Column::make('用户名','username')->withA('admin/'.$this->controllerName().'/edit'),
             Column::make('昵称','nickname'),
             Column::make('手机号','phone'),
             Column::make('邮箱','email'),
@@ -154,16 +160,16 @@ class UserController extends BuilderController
         ];
 
         $actions = [
-            Button::make('充值')->type('link')->onClick('openModal',['title'=>'用户充值','width'=>600],'admin/'.$this->controllerName().'/recharge'),
+            Button::make('充值')->type('link')->onClick('openModal',['title'=>'用户充值','width'=>500],'admin/'.$this->controllerName().'/recharge'),
             Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
             Button::make('编辑')->type('link')->href('admin/'.$this->controllerName().'/edit'),
             Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
         ];
 
-        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,null,null,null,$actions);
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,$advancedSearchs,null,null,$actions);
 
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }
@@ -188,40 +194,42 @@ class UserController extends BuilderController
             ],
         ];
 
-        if(!empty($data)) {
-            $controls = [
-                ID::make('ID','id')->value($data['id']),
-                Image::make('头像','avatar')->list($data['avatar']),
-                Text::make('用户名','username')->style(['width'=>200])->value($data['username']),
-                Text::make('昵称','nickname')->style(['width'=>200])->value($data['nickname']),
-                Text::make('邮箱','email')->style(['width'=>200])->value($data['email']),
-                Radio::make('性别','sex')->list($radioList)->value($data['sex']),
-                Text::make('密码','password')->style(['width'=>200])->type('password'),
-                Text::make('手机号','phone')->style(['width'=>200])->value($data['phone']),
-                DatePicker::make('注册时间','created_at')->format("YYYY-MM-DD HH:mm:ss")->value($data['created_at']),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value($data['status']),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/save'),
-            ];
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
         } else {
-            $controls = [
-                Image::make('头像','avatar'),
-                Text::make('用户名','username')->style(['width'=>200]),
-                Text::make('昵称','nickname')->style(['width'=>200]),
-                Text::make('邮箱','email')->style(['width'=>200]),
-                Radio::make('性别','sex')->list($radioList)->value(1),
-                Text::make('密码','password')->style(['width'=>200])->type('password'),
-                Text::make('手机号','phone')->style(['width'=>200]),
-                DatePicker::make('注册时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
-                SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-                Button::make('提交')
-                ->type('primary')
-                ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-                ->onClick('submit',null,'admin/'.$this->controllerName().'/store'),
-            ];
+            $action = 'admin/'.$this->controllerName().'/store';
         }
+
+        $controls = [
+            ID::make('ID','id'),
+            Image::make('头像','avatar'),
+            Input::make('用户名','username')->style(['width'=>200]),
+            Input::make('昵称','nickname')->style(['width'=>200]),
+            Input::make('邮箱','email')->style(['width'=>200]),
+            Radio::make('性别','sex')->list($radioList)->value(1),
+            Input::make('密码','password')->style(['width'=>200])->type('password'),
+            Input::make('手机号','phone')->style(['width'=>200]),
+        ];
+
+        if(isset($data['id'])) {
+
+            if(empty($data['last_login_ip'])) {
+                $data['last_login_ip'] = '暂无';
+            }
+    
+            if(empty($data['last_login_time'])) {
+                $data['last_login_time'] = '暂无';
+            }
+            $controls[] = Text::make('注册时间')->style(['width'=>200])->value($data['created_at']);
+            $controls[] = Text::make('登录时间')->style(['width'=>200])->value($data['last_login_time']);
+            $controls[] = Text::make('登录IP')->style(['width'=>200])->value($data['last_login_ip']);
+        }
+
+        $controls[] = SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true);
+        $controls[] = Button::make('提交')
+        ->type('primary')
+        ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+        ->onClick('submit',null,$action);
 
         $result = $this->formBuilder($controls,$data);
 
@@ -352,14 +360,6 @@ class UserController extends BuilderController
         $data['avatar'][0]['uid'] =$avatar;
         $data['avatar'][0]['name'] = Helper::getPicture($avatar,'name');
         $data['avatar'][0]['url'] = Helper::getPicture($avatar);
-
-        if(empty($data['last_login_ip'])) {
-            $data['last_login_ip'] = '暂无';
-        }
-
-        if(empty($data['last_login_time'])) {
-            $data['last_login_time'] = '暂无';
-        }
 
         if ($data['status'] == 1) {
             $data['status'] = true;
@@ -499,114 +499,79 @@ class UserController extends BuilderController
     */
     public function recharge(Request $request)
     {
-        $id = $request->json('id');
-        $money     =   $request->json('money',0);
-        $point     =   $request->json('point',0);
-        $remark    =   $request->json('remark');
-
-        if (empty($remark)) {
-            return $this->error('理由必需填写！');
-        }
-
-        // 开启事务
-        DB::beginTransaction();
-        try {
-            $result = true;
-
-            if (!empty($money)) {
-                User::where('id',$id)->increment('money', $money);
+        if($request->isMethod('post')) {
+            $id        =   $request->json('id');
+            $money     =   $request->json('money',0);
+            $score     =   $request->json('score',0);
+            $remark    =   $request->json('remark');
+    
+            if (empty($remark)) {
+                return $this->error('理由必需填写！');
+            }
+    
+            // 开启事务
+            DB::beginTransaction();
+            try {
+                $result = true;
+    
+                if (!empty($money)) {
+                    User::where('id',$id)->increment('money', $money);
+                }
+    
+                if (!empty($score)) {
+                    User::where('id',$id)->increment('score', $score);
+                }
+    
+                $data['adminid'] = ADMINID;
+                $data['uid'] = $id;
+                $data['money'] = $money;
+                $data['score'] = $score;
+                $data['type'] = 3;
+                $data['remark'] = $remark;
+    
+                AccountLog::create($data);
+                
+                DB::commit();
+            } catch (\Exception $e) {
+                $result = false;
+                DB::rollBack();
+            }
+    
+            if ($result) {
+                return $this->success('操作成功！');
+            } else {
+                return $this->error('操作失败！');
             }
 
-            if (!empty($point)) {
-                User::where('id',$id)->increment('point', $point);
-            }
-
-            $data['adminid'] = ADMINID;
-            $data['uid'] = $id;
-            $data['money'] = $money;
-            $data['point'] = $point;
-            $data['type'] = 3;
-            $data['remark'] = $remark;
-
-            AccountLog::create($data);
-            
-            DB::commit();
-        } catch (\Exception $e) {
-            $result = false;
-            DB::rollBack();
-        }
-
-        if ($result) {
-            return $this->success('操作成功！','/user/index');
         } else {
-            return $this->error('操作失败！');
-        }
-    }
 
-    /**
-     * 导出数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function export(Request $request)
-    {
-        // 获取参数
-        $search = $request->get('search');
-            
-        // 定义对象
-        $query = User::query();
+            $id =   $request->get('id');
+            $user = User::find($id);
 
-        // 查询
-        if(!empty($search)) {
-            // 标题
-            if(isset($search['title'])) {
-                $query->where('posts.title','like','%'.$search['title'].'%');
-            }
+            $controls = [
+                ID::make('ID','id')->value($user['id']),
+                Text::make('充值用户')->style(['width'=>200])->value($user['username'].'（'.$user['nickname'].'）'),
+                Text::make('当前余额')->style(['width'=>200,'color'=>'#f81d22'])->value($user['money']),
+                Text::make('当前积分')->style(['width'=>200,'color'=>'#0b8235'])->value($user['score']),
+                Input::make('余额充值','money')->extra('正数为充值，负数为扣款')->style(['width'=>200]),
+                Input::make('积分充值','score')->extra('正数为充值，负数为扣除')->style(['width'=>200]),
+                TextArea::make('充值理由','remark')->style(['width'=>400]),
+                Button::make('提交')
+                ->type('primary')
+                ->style(['width'=>100,'float'=>'left','marginLeft'=>350])
+                ->onClick('submit',null,'admin/'.$this->controllerName().'/recharge'),
+            ];
+    
+            $labelCol['sm'] = ['span'=>4];
+            $wrapperCol['sm'] = ['span'=>20];
 
-            // 分类
-            if(isset($search['category_id'])) {
-                if(!empty($search['category_id'])) {
-                    $query->where('posts.category_id',$search['category_id']);
-                }
-            }
+            $result = $this->formBuilder($controls,null,$labelCol,$wrapperCol);
 
-            // 状态
-            if(isset($search['status'])) {
-                if(!empty($search['status'])) {
-                    $query->where('posts.status',$search['status']);
-                }
-            }
-
-            // 作者
-            if(isset($search['author'])) {
-                if(!empty($search['author'])) {
-                    $query->where('posts.author',$search['author']);
-                }
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('posts.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
+            if(!empty($result)) {
+                return $this->success('操作成功！','',$result);
+            } else {
+                return $this->error('操作失败！');
             }
         }
-
-        // 查询列表
-        $lists = $query
-        ->join('categories', 'posts.category_id', '=', 'categories.id')
-        ->where('posts.status', '>', 0)
-        ->orderBy('id', 'desc')
-        ->select('posts.*','categories.name as category_name','categories.title as category_title')
-        ->get()
-        ->toArray();
-
-        $fileName = 'data';
-
-        $title = ['ID','标题'];
-
-        Helper::export($fileName,$title,$lists);
     }
-
 }

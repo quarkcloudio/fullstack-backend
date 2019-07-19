@@ -26,9 +26,9 @@ class File extends Control
         return $self;
     }
 
-    public function list($list)
+    public function value($value)
     {
-        $this->list = $list;
+        $this->value = $value;
         return $this;
     }
 

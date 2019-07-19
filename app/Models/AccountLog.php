@@ -13,7 +13,7 @@ class AccountLog extends Model
      * @var array
      */
     protected $fillable = [
-        'adminid','uid', 'money','point', 'type','remark','status'
+        'adminid','uid', 'money','score', 'type','remark','status'
     ];
 
 }

@@ -58,6 +58,30 @@ class BuilderController extends Controller
             $pageTitle = '新增'.$this->pageTitle;
         }
 
+        if(!empty($data)) {
+            if(isset($controls->componentName)) {
+                foreach ($controls->tabPanes as $key => $tabPane) {
+                    foreach ($tabPane->controls as $key1 => $tabPaneControl) {
+                        if(isset($tabPaneControl->name)) {
+                            if(isset($data[$tabPaneControl->name])) {
+                                $tabPaneControl->value = $data[$tabPaneControl->name];
+                                $controls->tabPanes[$key]->controls[$key1] = $tabPaneControl;
+                            }
+                        }
+                    }
+                }
+            } else {
+                foreach ($controls as $key => $control) {
+                    if(isset($control->name)) {
+                        if(isset($data[$control->name])) {
+                            $control->value = $data[$control->name];
+                            $controls[$key] = $control;
+                        }
+                    }
+                }
+            }
+        }
+
         $result = FormBuilder::make('form')
         ->pageTitle($pageTitle)
         ->controls($controls)
@@ -67,7 +91,7 @@ class BuilderController extends Controller
         return $result;
     }
 
-    protected function listBuilder($columns,$lists,$pagination,$searchs = [],$advancedSearchs = false,$headerButtons=[],$toolbarButtons = [],$actions = [])
+    protected function listBuilder($columns,$lists,$pagination,$searchs = [],$advancedSearchs = [],$headerButtons=[],$toolbarButtons = [],$actions = [])
     {
 
         if(empty($headerButtons)) {
