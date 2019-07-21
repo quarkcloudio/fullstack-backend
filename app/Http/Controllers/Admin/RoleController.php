@@ -4,10 +4,28 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use Illuminate\Validation\Rule;
 use App\Services\Helper;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -16,8 +34,13 @@ use Validator;
 use DB;
 use Cache;
 
-class RoleController extends Controller
+class RoleController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '角色';
+    }
+
     /**
      * 列表页面
      *
@@ -41,13 +64,6 @@ class RoleController extends Controller
             // 名称
             if(isset($search['query'])) {
                 $query->where('name','like','%'.$search['query'].'%');
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
             }
         }
 
@@ -79,14 +95,104 @@ class RoleController extends Controller
         // 总数量
         $pagination['total'] = $total;
 
-        // 模板数据
-        $data['lists'] = $lists;
+        $searchs = [
+            Input::make('搜索内容','name'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('名称','name')->withA('admin/admin/'.$this->controllerName().'/edit'),
+            Column::make('guard名称','guard_name'),
+            Column::make('创建时间','created_at'),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/admin/'.$this->controllerName().'/create'),
+        ];
+
+        $toolbarButtons = [
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $actions = [
+            Button::make('编辑')->type('link')->href('admin/admin/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,$toolbarButtons,$actions);
         
         if(!empty($data)) {
             return $this->success('获取成功！','',$data,$pagination,$search);
         } else {
             return $this->success('获取失败！');
         }
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/store';
+        }
+
+        // 查询列表
+        $menus = Menu::where('status',1)->where('guard_name','admin')->select('name as title','id as key','pid')->get()->toArray();
+
+        $data['menus'] = Helper::listToTree($menus,'key','pid','children',0);
+
+        $checkboxList = [];
+        foreach ($roles as $key => $role) {
+            $checkboxList[] = [
+                'name'=>$role['name'],
+                'value'=>$role['id'],
+            ];
+        }
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('用户名','username')->style(['width'=>200]),
+            Checkbox::make('角色','roleIds')->list($checkboxList),
+            Input::make('昵称','nickname')->style(['width'=>200]),
+            Input::make('邮箱','email')->style(['width'=>200]),
+            Input::make('密码','password')->style(['width'=>200])->type('password'),
+            Input::make('手机号','phone')->style(['width'=>200]),
+        ];
+
+        if(isset($data['id'])) {
+
+            if(empty($data['last_login_ip'])) {
+                $data['last_login_ip'] = '暂无';
+            }
+    
+            if(empty($data['last_login_time'])) {
+                $data['last_login_time'] = '暂无';
+            }
+
+            if(empty($data['created_at'])) {
+                $data['created_at'] = '暂无';
+            }
+            $controls[] = Text::make('注册时间')->style(['width'=>200])->value($data['created_at']);
+            $controls[] = Text::make('登录时间')->style(['width'=>200])->value($data['last_login_time']);
+            $controls[] = Text::make('登录IP')->style(['width'=>200])->value($data['last_login_ip']);
+        }
+
+        $controls[] = SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true);
+        $controls[] = Button::make('提交')
+        ->type('primary')
+        ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+        ->onClick('submit',null,$action);
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
     }
 
     /**
@@ -97,10 +203,7 @@ class RoleController extends Controller
      */
     public function create(Request $request)
     {
-        $lists = Menu::where('status',1)->where('guard_name','admin')->select('name as title','id as key','pid')->get()->toArray();
-
-        $data['menus'] = Helper::listToTree($lists,'key','pid','children',0);
-        
+        $data = $this->form();
         return $this->success('获取成功！','',$data);
     }
 
@@ -245,72 +348,6 @@ class RoleController extends Controller
         } else {
             return $this->error('操作失败！');
         }
-    }
-
-    /**
-     * 导出数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function export(Request $request)
-    {
-        // 获取参数
-        $search = $request->get('search');
-            
-        // 定义对象
-        $query = Role::query();
-
-        // 查询
-        if(!empty($search)) {
-            // 标题
-            if(isset($search['title'])) {
-                $query->where('posts.title','like','%'.$search['title'].'%');
-            }
-
-            // 分类
-            if(isset($search['category_id'])) {
-                if(!empty($search['category_id'])) {
-                    $query->where('posts.category_id',$search['category_id']);
-                }
-            }
-
-            // 状态
-            if(isset($search['status'])) {
-                if(!empty($search['status'])) {
-                    $query->where('posts.status',$search['status']);
-                }
-            }
-
-            // 作者
-            if(isset($search['author'])) {
-                if(!empty($search['author'])) {
-                    $query->where('posts.author',$search['author']);
-                }
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('posts.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
-            }
-        }
-
-        // 查询列表
-        $lists = $query
-        ->join('categories', 'posts.category_id', '=', 'categories.id')
-        ->where('posts.status', '>', 0)
-        ->orderBy('id', 'desc')
-        ->select('posts.*','categories.name as category_name','categories.title as category_title')
-        ->get()
-        ->toArray();
-
-        $fileName = 'data';
-
-        $title = ['ID','标题'];
-
-        Helper::export($fileName,$title,$lists);
     }
 
 }

@@ -63,6 +63,28 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/user/changeStatus', 'Admin\\UserController@changeStatus')->name('api/admin/user/changeStatus');
     Route::any('admin/user/recharge', 'Admin\\UserController@recharge')->name('api/admin/user/recharge');
 
+    Route::get('admin/admin/index', 'Admin\\AdminController@index')->name('api/admin/admin/index');
+    Route::get('admin/admin/create', 'Admin\\AdminController@create')->name('api/admin/admin/create');
+    Route::post('admin/admin/store', 'Admin\\AdminController@store')->name('api/admin/admin/store');
+    Route::get('admin/admin/edit', 'Admin\\AdminController@edit')->name('api/admin/admin/edit');
+    Route::post('admin/admin/save', 'Admin\\AdminController@save')->name('api/admin/admin/save');
+    Route::post('admin/admin/changeStatus', 'Admin\\AdminController@changeStatus')->name('api/admin/admin/changeStatus');
+
+    Route::get('admin/permission/index', 'Admin\\PermissionController@index')->name('api/admin/permission/index');
+    Route::get('admin/permission/create', 'Admin\\PermissionController@create')->name('api/admin/permission/create');
+    Route::post('admin/permission/store', 'Admin\\PermissionController@store')->name('api/admin/permission/store');
+    Route::get('admin/permission/edit', 'Admin\\PermissionController@edit')->name('api/admin/permission/edit');
+    Route::post('admin/permission/save', 'Admin\\PermissionController@save')->name('api/admin/permission/save');
+    Route::post('admin/permission/changeStatus', 'Admin\\PermissionController@changeStatus')->name('api/admin/permission/changeStatus');
+
+    Route::get('admin/role/index', 'Admin\\RoleController@index')->name('api/admin/role/index');
+    Route::get('admin/role/create', 'Admin\\RoleController@create')->name('api/admin/role/create');
+    Route::post('admin/role/store', 'Admin\\RoleController@store')->name('api/admin/role/store');
+    Route::get('admin/role/edit', 'Admin\\RoleController@edit')->name('api/admin/role/edit');
+    Route::post('admin/role/save', 'Admin\\RoleController@save')->name('api/admin/role/save');
+    Route::post('admin/role/destroy', 'Admin\\RoleController@destroy')->name('api/admin/role/destroy');
+    Route::post('admin/role/changeStatus', 'Admin\\RoleController@changeStatus')->name('api/admin/role/changeStatus');
+
     Route::get('admin/actionLog/index', 'Admin\\ActionLogController@index')->name('api/admin/actionLog/index');
     Route::post('admin/actionLog/destroy', 'Admin\\ActionLogController@destroy')->name('api/admin/actionLog/destroy');
 
@@ -148,14 +170,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/printer/destroy', 'Admin\\PrinterController@destroy')->name('api/admin/printer/destroy');
     Route::post('admin/printer/changeStatus', 'Admin\\PrinterController@changeStatus')->name('api/admin/printer/changeStatus');
 
-    Route::get('admin/admin/index', 'Admin\\AdminController@index')->name('api/admin/admin/index');
-    Route::get('admin/admin/create', 'Admin\\AdminController@create')->name('api/admin/admin/create');
-    Route::post('admin/admin/store', 'Admin\\AdminController@store')->name('api/admin/admin/store');
-    Route::get('admin/admin/edit', 'Admin\\AdminController@edit')->name('api/admin/admin/edit');
-    Route::post('admin/admin/save', 'Admin\\AdminController@save')->name('api/admin/admin/save');
-    Route::post('admin/admin/destroy', 'Admin\\AdminController@destroy')->name('api/admin/admin/destroy');
-    Route::post('admin/admin/changeStatus', 'Admin\\AdminController@changeStatus')->name('api/admin/admin/changeStatus');
-
     Route::get('admin/menu/index', 'Admin\\MenuController@index')->name('api/admin/menu/index');
     Route::get('admin/menu/create', 'Admin\\MenuController@create')->name('api/admin/menu/create');
     Route::post('admin/menu/store', 'Admin\\MenuController@store')->name('api/admin/menu/store');
@@ -163,22 +177,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/menu/save', 'Admin\\MenuController@save')->name('api/admin/menu/save');
     Route::post('admin/menu/destroy', 'Admin\\MenuController@destroy')->name('api/admin/menu/destroy');
     Route::post('admin/menu/changeStatus', 'Admin\\MenuController@changeStatus')->name('api/admin/menu/changeStatus');
-
-    Route::get('admin/permission/index', 'Admin\\PermissionController@index')->name('api/admin/permission/index');
-    Route::get('admin/permission/create', 'Admin\\PermissionController@create')->name('api/admin/permission/create');
-    Route::post('admin/permission/store', 'Admin\\PermissionController@store')->name('api/admin/permission/store');
-    Route::get('admin/permission/edit', 'Admin\\PermissionController@edit')->name('api/admin/permission/edit');
-    Route::post('admin/permission/save', 'Admin\\PermissionController@save')->name('api/admin/permission/save');
-    Route::post('admin/permission/destroy', 'Admin\\PermissionController@destroy')->name('api/admin/permission/destroy');
-    Route::post('admin/permission/changeStatus', 'Admin\\PermissionController@changeStatus')->name('api/admin/permission/changeStatus');
-
-    Route::get('admin/role/index', 'Admin\\RoleController@index')->name('api/admin/role/index');
-    Route::get('admin/role/create', 'Admin\\RoleController@create')->name('api/admin/role/create');
-    Route::post('admin/role/store', 'Admin\\RoleController@store')->name('api/admin/role/store');
-    Route::get('admin/role/edit', 'Admin\\RoleController@edit')->name('api/admin/role/edit');
-    Route::post('admin/role/save', 'Admin\\RoleController@save')->name('api/admin/role/save');
-    Route::post('admin/role/destroy', 'Admin\\RoleController@destroy')->name('api/admin/role/destroy');
-    Route::post('admin/role/changeStatus', 'Admin\\RoleController@changeStatus')->name('api/admin/role/changeStatus');
 
     Route::get('admin/demo/getFormInfo', 'Admin\\DemoController@getFormInfo')->name('api/admin/demo/getFormInfo');
     Route::get('admin/demo/getModalFormInfo', 'Admin\\DemoController@getModalFormInfo')->name('api/admin/demo/getModalFormInfo');

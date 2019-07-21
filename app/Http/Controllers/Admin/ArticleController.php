@@ -233,7 +233,6 @@ class ArticleController extends BuilderController
         $baseControls = [
             ID::make('ID','id'),
             Input::make('标题','title')->style(['width'=>400]),
-            Input::make('标题','title')->style(['width'=>400]),
             TextArea::make('描述','description')->style(['width'=>400]),
             Input::make('标签','tags')->style(['width'=>400]),
             Input::make('作者','author')->style(['width'=>200]),

@@ -250,6 +250,11 @@ class AdminController extends BuilderController
     {
         $requestJson    =   $request->getContent();
         $requestData    =   json_decode($requestJson,true);
+
+        if(!isset($requestData['roleIds'])) {
+            return $this->error('请选择角色');
+        }
+
         $roleIds        =   $requestData['roleIds'];
         // 删除modelName
         unset($requestData['url']);
@@ -379,6 +384,11 @@ class AdminController extends BuilderController
     {
         $requestJson    =   $request->getContent();
         $requestData    =   json_decode($requestJson,true);
+
+        if(!isset($requestData['roleIds'])) {
+            return $this->error('请选择角色');
+        }
+
         $roleIds        =   $requestData['roleIds'];
 
         // 删除modelName
@@ -445,29 +455,6 @@ class AdminController extends BuilderController
 
         if ($result) {
             return $this->success('操作成功！','/admin/user/index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Admin::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }
