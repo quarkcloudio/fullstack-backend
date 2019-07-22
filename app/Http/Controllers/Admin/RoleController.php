@@ -20,6 +20,7 @@ use App\Builder\Forms\Controls\Image;
 use App\Builder\Forms\Controls\File;
 use App\Builder\Forms\Controls\Button;
 use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\Controls\Tree;
 use App\Builder\Forms\FormBuilder;
 use App\Builder\Lists\Tables\Table;
 use App\Builder\Lists\Tables\Column;
@@ -146,49 +147,17 @@ class RoleController extends BuilderController
         // 查询列表
         $menus = Menu::where('status',1)->where('guard_name','admin')->select('name as title','id as key','pid')->get()->toArray();
 
-        $data['menus'] = Helper::listToTree($menus,'key','pid','children',0);
-
-        $checkboxList = [];
-        foreach ($roles as $key => $role) {
-            $checkboxList[] = [
-                'name'=>$role['name'],
-                'value'=>$role['id'],
-            ];
-        }
+        $menus = Helper::listToTree($menus,'key','pid','children',0);
 
         $controls = [
             ID::make('ID','id'),
-            Input::make('用户名','username')->style(['width'=>200]),
-            Checkbox::make('角色','roleIds')->list($checkboxList),
-            Input::make('昵称','nickname')->style(['width'=>200]),
-            Input::make('邮箱','email')->style(['width'=>200]),
-            Input::make('密码','password')->style(['width'=>200])->type('password'),
-            Input::make('手机号','phone')->style(['width'=>200]),
+            Input::make('名称','name')->style(['width'=>200]),
+            Tree::make('权限','menuIds')->list($menus),
+            $controls[] = Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action)
         ];
-
-        if(isset($data['id'])) {
-
-            if(empty($data['last_login_ip'])) {
-                $data['last_login_ip'] = '暂无';
-            }
-    
-            if(empty($data['last_login_time'])) {
-                $data['last_login_time'] = '暂无';
-            }
-
-            if(empty($data['created_at'])) {
-                $data['created_at'] = '暂无';
-            }
-            $controls[] = Text::make('注册时间')->style(['width'=>200])->value($data['created_at']);
-            $controls[] = Text::make('登录时间')->style(['width'=>200])->value($data['last_login_time']);
-            $controls[] = Text::make('登录IP')->style(['width'=>200])->value($data['last_login_ip']);
-        }
-
-        $controls[] = SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true);
-        $controls[] = Button::make('提交')
-        ->type('primary')
-        ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-        ->onClick('submit',null,$action);
 
         $result = $this->formBuilder($controls,$data);
 
@@ -258,7 +227,7 @@ class RoleController extends BuilderController
         // 所有菜单
         $menus = Menu::where('status',1)->where('guard_name','admin')->select('name as title','id as key','pid')->get()->toArray();
 
-        $role = Role::find($id);
+        $data = Role::find($id);
 
         $checkedMenus = [];
 
@@ -267,7 +236,7 @@ class RoleController extends BuilderController
 
             $roleHasPermission = DB::table('role_has_permissions')
             ->whereIn('permission_id',$permissionIds)
-            ->where('role_id',$role['id'])
+            ->where('role_id',$data['id'])
             ->first();
 
             if($roleHasPermission) {
@@ -277,9 +246,9 @@ class RoleController extends BuilderController
             $menus[$key]['key'] = strval($menu['key']);
         }
 
-        $data['menus'] = Helper::listToTree($menus,'key','pid','children',0);
-        $data['role'] = $role;
-        $data['checkedMenus'] = $checkedMenus;
+        $data['menuIds'] = $checkedMenus;
+
+        $data = $this->form($data);
 
         if(!empty($data)) {
             return $this->success('操作成功！','',$data);
@@ -333,7 +302,7 @@ class RoleController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function destroy(Request $request)
+    public function changeStatus(Request $request)
     {
         $id = $request->json('id');
 
