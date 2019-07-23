@@ -150,7 +150,7 @@ class BuilderController extends Controller
         list($class, $method) = explode('@', request()->route()->getActionName());
 
         # 控制器名称
-        $controller = strtolower(str_replace(
+        $controller = lcfirst(str_replace(
             'Controller',
             '',
             substr(strrchr($class, '\\'), 1)

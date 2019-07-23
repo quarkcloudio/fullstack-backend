@@ -4,7 +4,26 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Services\Helper;
 use EasyWeChat\Factory;
 use App\Models\Post;
@@ -12,8 +31,13 @@ use App\Models\Category;
 use App\Models\Comment;
 use DB;
 
-class CommentController extends Controller
+class CommentController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '评论';
+    }
+
     /**
      * 评论列表页
      * @param  Request  $request
@@ -79,21 +103,38 @@ class CommentController extends Controller
         $pagination['total'] = $total;
 
         //获取类型
-        $types=DB::table('comments')->select('type')->distinct()->get()->toArray();
+        $commentTypes = DB::table('comments')->select('type')->distinct()->get()->toArray();
 
-        foreach ($types as $key => $value) {
+        $types[] = [
+            'name'=>'所有类型',
+            'value'=>'0',
+        ];
+
+        foreach ($commentTypes as $key => $value) {
             switch ($value->type) {
                 case 'ARTICLE':
-                    $types[$key]->typeT = '文章评论';
+                    $types[] = [
+                        'name'=>'文章评论',
+                        'value'=>'ARTICLE',
+                    ];
                     break;
                 case 'PAGE':
-                    $types[$key]->typeT = '单页评论';
+                    $types[] = [
+                        'name'=>'单页评论',
+                        'value'=>'PAGE',
+                    ];
                     break;
                 case 'GROUPBUY':
-                    $types[$key]->typeT = '订单评论';
+                    $types[] = [
+                        'name'=>'团购评论',
+                        'value'=>'GROUPBUY',
+                    ];
                     break;
                 default:
-                    $types[$key]->typeT = '未知';
+                    $types[] = [
+                        'name'=>'未知',
+                        'value'=>'WEIZHI',
+                    ];
                     break;
             } 
         }
@@ -104,9 +145,60 @@ class CommentController extends Controller
             }
         }
 
-        // 模板数据
-        $data['types']=$types;
-        $data['lists'] = $this->commentListsFormat($lists);
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('评论类型','types')->option($types)->value('0'),
+            Select::make('状态','status')->option($status)->value('0'),
+            Input::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $advancedSearchs = [
+            Select::make('评论类型','types')->option($types)->value('0'),
+            RangePicker::make('评论时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            Select::make('状态','status')->option($status)->value('0'),
+            Button::make('搜索')->type('primary')->onClick('search'),
+            Button::make('重置')->onClick('resetSearch'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('评论对象','object_title')->withA('admin/plugin/'.$this->controllerName().'/edit'),
+            Column::make('类型','type'),
+            Column::make('用户','uid'),
+            Column::make('评论标题','title'),
+            Column::make('内容','content'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('评论时间','created_at'),
+        ];
+
+        $headerButtons = [
+            Button::make('刷新')->icon('reload')->type('default')->href('admin/plugin/'.$this->controllerName().'/index'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->href('admin/plugin/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $lists = $this->commentListsFormat($lists);
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,$advancedSearchs,$headerButtons,null,$actions);
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data,$pagination,$search);
@@ -185,6 +277,42 @@ class CommentController extends Controller
     }
     
     /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/store';
+        }
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('标题','title')->style(['width'=>200]),
+            Image::make('晒图','cover_ids')->mode('multiple'),
+            Input::make('类型','type')->style(['width'=>200]),
+            Input::make('内容','content')->style(['width'=>200]),
+            InputNumber::make('顶','ding')->style(['width'=>200]),
+            Input::make('举报','report')->style(['width'=>200]),
+            Input::make('评分','rate')->style(['width'=>200]),
+            DatePicker::make('评论时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action),
+        ];
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
+    }
+
+    /**
      * 编辑页面
      *
      * @param  Request  $request
@@ -197,19 +325,7 @@ class CommentController extends Controller
         $comment = Comment::find($id);
 
         //获取图片
-        $coverIds = json_decode($comment['cover_ids'],true);
-        if($coverIds) {
-            foreach ($coverIds as $key => $value) {
-                // 获取封面图列表
-                $data['cover_list'][$key]['uid'] = $value;
-                $data['cover_list'][$key]['name'] = Helper::getPicture($value,0,'name');
-                $data['cover_list'][$key]['url'] = Helper::getPicture($value);
-                $data['cover_list'][$key]['status'] = 'done';
-            }
-        } else {
-            $data['cover_list'] = [];
-            $comment['cover_path'] = Helper::getPicture($coverIds);
-        }
+        $comment['cover_ids'] = json_decode($comment['cover_ids'],true);
 
         switch ($comment['type']) {
             case 'ARTICLE':
@@ -244,7 +360,7 @@ class CommentController extends Controller
                 break;
         }
         
-        $data['comment'] = $comment;
+        $data = $this->form($comment);
         
         return $this->success('获取成功！','',$data);
     }
@@ -276,29 +392,6 @@ class CommentController extends Controller
 
         if ($result) {
             return $this->success('操作成功！','index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Comment::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }

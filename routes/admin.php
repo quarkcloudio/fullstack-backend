@@ -82,7 +82,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/role/store', 'Admin\\RoleController@store')->name('api/admin/role/store');
     Route::get('admin/role/edit', 'Admin\\RoleController@edit')->name('api/admin/role/edit');
     Route::post('admin/role/save', 'Admin\\RoleController@save')->name('api/admin/role/save');
-    Route::post('admin/role/destroy', 'Admin\\RoleController@destroy')->name('api/admin/role/destroy');
     Route::post('admin/role/changeStatus', 'Admin\\RoleController@changeStatus')->name('api/admin/role/changeStatus');
 
     Route::get('admin/actionLog/index', 'Admin\\ActionLogController@index')->name('api/admin/actionLog/index');
@@ -123,7 +122,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/banner/store', 'Admin\\BannerController@store')->name('api/admin/banner/store');
     Route::get('admin/banner/edit', 'Admin\\BannerController@edit')->name('api/admin/banner/edit');
     Route::post('admin/banner/save', 'Admin\\BannerController@save')->name('api/admin/banner/save');
-    Route::post('admin/banner/destroy', 'Admin\\BannerController@destroy')->name('api/admin/banner/destroy');
     Route::post('admin/banner/changeStatus', 'Admin\\BannerController@changeStatus')->name('api/admin/banner/changeStatus');
 
     Route::get('admin/bannerCategory/index', 'Admin\\BannerCategoryController@index')->name('api/admin/bannerCategory/index');
@@ -131,7 +129,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/bannerCategory/store', 'Admin\\BannerCategoryController@store')->name('api/admin/bannerCategory/store');
     Route::get('admin/bannerCategory/edit', 'Admin\\BannerCategoryController@edit')->name('api/admin/bannerCategory/edit');
     Route::post('admin/bannerCategory/save', 'Admin\\BannerCategoryController@save')->name('api/admin/bannerCategory/save');
-    Route::post('admin/bannerCategory/destroy', 'Admin\\BannerCategoryController@destroy')->name('api/admin/bannerCategory/destroy');
     Route::post('admin/bannerCategory/changeStatus', 'Admin\\BannerCategoryController@changeStatus')->name('api/admin/bannerCategory/changeStatus');
     
     Route::any('admin/file/index', 'Admin\\FileController@index')->name('api/admin/file/index');
@@ -151,7 +148,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::get('admin/comment/index', 'Admin\\CommentController@index')->name('api/admin/comment/index');
     Route::get('admin/comment/edit', 'Admin\\CommentController@edit')->name('api/admin/comment/edit');
     Route::post('admin/comment/save', 'Admin\\CommentController@save')->name('api/admin/comment/save');
-    Route::post('admin/comment/destroy', 'Admin\\CommentController@destroy')->name('api/admin/comment/destroy');
     Route::post('admin/comment/changeStatus', 'Admin\\CommentController@changeStatus')->name('api/admin/comment/changeStatus');
     
     Route::get('admin/link/index', 'Admin\\LinkController@index')->name('api/admin/link/index');

@@ -4,22 +4,42 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 use App\Services\Helper;
-use EasyWeChat\Factory;
-use App\Models\Post;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Models\BannerCategory;
 use App\Models\Banner;
-use App\Models\Admin;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Validator;
 use Hash;
 use DB;
 
-class BannerController extends Controller
+class BannerController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '广告';
+    }
+
     /**
      * 列表页
      * @param  Request  $request
@@ -104,14 +124,100 @@ class BannerController extends Controller
         // 总数量
         $pagination['total'] = $total;
 
-        // 模板数据
-        $data['lists'] = Helper::listsFormat($lists);
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Input::make('搜索内容','username'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('标题','title')->withA('admin/'.$this->controllerName().'/banner/edit'),
+            Column::make('排序','sort'),
+            Column::make('位置','category_title'),
+            Column::make('图片','cover_path')->isImage(),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/'.$this->controllerName().'/banner/create'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->href('admin/'.$this->controllerName().'/banner/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $lists = Helper::listsFormat($lists);
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
 
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }   
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/store';
+        }
+
+        // 查询列表
+        $categorys = BannerCategory::all();
+
+        $list = [];
+        foreach ($categorys as $key => $category) {
+            $list[] = [
+                'name'=>$category['title'],
+                'value'=>$category['id'],
+            ];
+        }
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('标题','title')->style(['width'=>200]),
+            Select::make('分类','category_id')->option($list),
+            Input::make('链接','url')->style(['width'=>200]),
+            Image::make('封面图','cover_id'),
+            InputNumber::make('排序','sort')->style(['width'=>200])->value(0),
+            DatePicker::make('截止时间','deadline')->format("YYYY-MM-DD HH:mm:ss")->value(null),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action)
+        ];
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
     }
 
     /**
@@ -122,7 +228,7 @@ class BannerController extends Controller
      */
     public function create(Request $request)
     {
-        $data['categorys'] = BannerCategory::all();
+        $data = $this->form();
         return $this->success('获取成功！','',$data);
     }
 
@@ -134,15 +240,18 @@ class BannerController extends Controller
      */
     public function store(Request $request)
     {
-        $id             =   $request->json('id');
         $title          =   $request->json('title');
-        $categoryId     =   $request->json('categoryId','');
+        $categoryId     =   $request->json('category_id','');
         $url            =   $request->json('url','');
-        $coverId        =   $request->json('cover_id',0);
+        $coverId        =   $request->json('cover_id');
         $sort           =   $request->json('sort','');
         $deadline       =   $request->json('deadline');
         $status         =   $request->json('status');
         
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
+        }
+
         // 表单验证错误提示信息
         $messages = [
             'required' => '必填',
@@ -153,8 +262,8 @@ class BannerController extends Controller
 
         // 表单验证规则
         $rules = [
-            'title' => ['required','max:255',Rule::unique('admins')->ignore(ADMINID)],
-            'url' =>  ['required','url','max:255',Rule::unique('admins')->ignore(ADMINID)],
+            'title' => ['required','max:255'],
+            'url' =>  ['required','url','max:255'],
         ];
 
         // 进行验证
@@ -210,17 +319,28 @@ class BannerController extends Controller
     {
         $id = $request->input('id');
 
-        $data = Banner::find($id);
-
-        $data['cover_path'] = Helper::getPicture($data['cover_id']);
+        $data = Banner::find($id)->toArray();
 
         if(empty($data['deadline'])) {
             $data['deadline'] = date('Y-m-d H:i:s',strtotime($data['deadline']));;
         }
         
-        $categorys = BannerCategory::all();
+        $cover_id = $data['cover_id'];
 
-        $data['categorys'] = $categorys;
+        unset($data['cover_id']);
+
+        $data['cover_id'][0]['id'] =$cover_id;
+        $data['cover_id'][0]['uid'] =$cover_id;
+        $data['cover_id'][0]['name'] = Helper::getPicture($cover_id,'name');
+        $data['cover_id'][0]['url'] = Helper::getPicture($cover_id);
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        $data = $this->form($data);
         
         return $this->success('获取成功！','',$data);
     }
@@ -235,7 +355,7 @@ class BannerController extends Controller
     {
         $id             =   $request->json('id');
         $title          =   $request->json('title');
-        $categoryId     =   $request->json('categoryId','');
+        $categoryId     =   $request->json('category_id','');
         $url            =   $request->json('url','');
         $coverId        =   $request->json('cover_id',0);
         $sort           =   $request->json('sort','');
@@ -248,6 +368,10 @@ class BannerController extends Controller
 
         if (empty($categoryId)) {
             return $this->error('请选择位置！');
+        }
+
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
         }
 
         if ($status == true) {
@@ -267,29 +391,6 @@ class BannerController extends Controller
         $result = Banner::where('id',$id)->update($data);
         if ($result) {
             return $this->success('操作成功！','index');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Banner::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }
