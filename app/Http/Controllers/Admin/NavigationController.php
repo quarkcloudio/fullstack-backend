@@ -4,16 +4,39 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
-use Illuminate\Support\Facades\Auth;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Models\Admin;
 use App\Models\Navigation;
 use Validator;
 use DB;
 
-class NavigationController extends Controller
+class NavigationController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '导航';
+    }
+
     /**
      * 列表页面
      *
@@ -37,7 +60,6 @@ class NavigationController extends Controller
             if(isset($search['query'])) {
                 $query->where('title','like','%'.$search['query'].'%');
             }
-
         }
 
         // 查询数量
@@ -71,13 +93,37 @@ class NavigationController extends Controller
             if($status == 2) {
                 $lists[$key]['status'] = '已禁用';
             }
+
+            $lists[$key]['cover_path'] = Helper::getPicture($list['cover_id']);
         }
 
-        $NavigationTrees     = Helper::listToTree($lists,'id','pid','children',0);
-        $TreeLists = Helper::treeToOrderList($NavigationTrees,0,'title','children');
-        // 模板数据
-        $data['lists'] = $NavigationTrees;
-        $data['TreeLists'] = $TreeLists;
+        $navigationTrees = Helper::listToTree($lists,'id','pid','children',0);
+        $treeLists = Helper::treeToOrderList($navigationTrees,0,'title','children');
+
+        $searchs = [
+            Input::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('标题','title'),
+            Column::make('排序','sort'),
+            Column::make('图标','cover_path')->isImage(),
+            Column::make('url','url'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->onClick('openModal',['title'=>'新增'.$this->pageTitle,'width'=>500],'admin/'.$this->controllerName().'/create'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->onClick('openModal',['title'=>'编辑'.$this->pageTitle,'width'=>500],'admin/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$treeLists,$pagination,$searchs,[],$headerButtons,null,$actions);
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data,$pagination,$search);

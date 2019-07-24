@@ -116,7 +116,7 @@ class PermissionController extends BuilderController
         ];
 
         $actions = [
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
         ];
 
         $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,$toolbarButtons,$actions);

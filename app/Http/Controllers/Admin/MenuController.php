@@ -4,18 +4,42 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\Rule;
 use App\Services\Helper;
-use Illuminate\Support\Facades\Auth;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\Controls\Icon;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Models\Admin;
 use App\Models\Menu;
 use Spatie\Permission\Models\Permission;
 use Validator;
 use DB;
 
-class MenuController extends Controller
+class MenuController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '菜单';
+    }
+
     /**
      * 列表页面
      *
@@ -55,6 +79,7 @@ class MenuController extends Controller
 
         // 查询列表
         $lists = $query
+        ->where('status', '>', 0)
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
         ->orderBy('sort', 'asc')
@@ -73,12 +98,23 @@ class MenuController extends Controller
 
         foreach ($lists as $key => $list) {
             $status = $list['status'];
-            if($status == 1) {
-                $lists[$key]['status'] = '正常';
-            }
 
-            if($status == 2) {
-                $lists[$key]['status'] = '已禁用';
+            switch ($status) {
+                case -1:
+                    $lists[$key]['status'] = '已删除';
+                    break;
+                case 1:
+                    $lists[$key]['status'] = '正常';
+                    break;
+                case 2:
+                    $lists[$key]['status'] = '已禁用';
+                    break;
+                case 3:
+                    $lists[$key]['status'] = '待审核';
+                    break;
+                default:
+                    $lists[$key]['status'] = '未知';
+                    break;
             }
 
             if($list['show']) {
@@ -99,22 +135,119 @@ class MenuController extends Controller
             }
         }
 
-        $menuTrees     = Helper::listToTree($lists,'id','pid','children',0);
-        $menuTreeLists = Helper::treeToOrderList($menuTrees,0,'name','children');
-        // 模板数据
-        $data['lists'] = $menuTrees;
-        $data['menuTreeLists'] = $menuTreeLists;
-        
-        // 所有权限
-        $data['permissions'] = Permission::all();
+        $menuTrees = Helper::listToTree($lists,'id','pid','children',0);
 
-        $data['icons'] = ['lock','unlock','bars','book','calendar','cloud','cloud-download','code','copy','credit-card','delete','desktop','download','ellipsis','more','file','file-text','file-unknown','file-pdf','file-word','file-excel','file-jpg','file-ppt','file-markdown','file-add','folder','folder-open','folder-add','hdd','frown','meh','smile','inbox','laptop','appstore','link','mail','mobile','notification','paper-clip','picture','poweroff','reload','search','setting','share-alt','shopping-cart','tablet','tag','tags','to-top','upload','user','video-camera','home','loading','loading-3-quarters','cloud-upload','star','heart','environment','eye','eye-invisible','camera','save','team','solution','phone','filter','exception','import','export','customer-service','qrcode','scan','like','dislike','message','pay-circle','calculator','pushpin','bulb','select','switcher','rocket','bell','disconnect','database','compass','barcode','hourglass','key','flag','layout','printer','sound','usb','skin','tool','sync','wifi','car','schedule','user-add','user-delete','usergroup-add','usergroup-delete','man','woman','shop','gift','idcard','medicine-box','red-envelope','coffee','copyright','trademark','safety','wallet','bank','trophy','contacts','global','shake','api','fork','dashboard','table','profile','alert','audit','branches','build','border','crown','experiment','fire','money-collect','property-safety','read','reconciliation','rest','security-scan','insurance','interation','safety-certificate','project','thunderbolt','block','cluster','deployment-unit','dollar','euro','pound','file-done','file-exclamation','file-protect','file-search','file-sync','gateway','gold','robot','shopping'];
+        $searchs = [
+            Input::make('搜索内容','name'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('名称','name'),
+            Column::make('排序','sort'),
+            Column::make('图标','icon')->isIcon(),
+            Column::make('路由','path'),
+            //Column::make('权限url','permission_name'),
+            Column::make('显示','show'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->onClick('openModal',['title'=>'新增'.$this->pageTitle,'width'=>500],'admin/'.$this->controllerName().'/create'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->onClick('openModal',['title'=>'编辑'.$this->pageTitle,'width'=>500],'admin/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$menuTrees,$pagination,$searchs,[],$headerButtons,null,$actions);
 
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/store';
+        }
+
+        // 查询列表
+        $menus = Menu::query()->where('guard_name','admin')
+        ->orderBy('sort', 'asc')
+        ->orderBy('id', 'asc')
+        ->get()
+        ->toArray();
+
+        $menuTrees = Helper::listToTree($menus,'id','pid','children',0);
+
+        $menuTreeLists = Helper::treeToOrderList($menuTrees,0,'name','children');
+
+        $list = [];
+        foreach ($menuTreeLists as $key => $menuTreeList) {
+            $list[] = [
+                'name'=>$menuTreeList['name'],
+                'value'=>$menuTreeList['id'],
+            ];
+        }
+
+        $permissions = Permission::all();
+
+        $getPermissions = [];
+        foreach ($permissions as $key => $permission) {
+            $getPermissions[] = [
+                'name'=>$permission['name'],
+                'value'=>$permission['id'],
+            ];
+        }
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('名称','name')->style(['width'=>200]),
+            Select::make('父节点','pid')->option($list)->style(['width'=>200]),
+            InputNumber::make('排序','sort')->style(['width'=>200])->value(0),
+            Icon::make('图标','icon')->style(['width'=>200]),
+            Input::make('路由','path')->style(['width'=>200]),
+            Select::make('绑定权限','permission_ids')->mode('tags')->option($getPermissions)->style(['width'=>350]),
+            SwitchButton::make('显示','show')->checkedText('是')->unCheckedText('否')->value(true),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>350])
+            ->onClick('submit',null,$action)
+        ];
+
+        $labelCol['sm'] = ['span'=>4];
+        $wrapperCol['sm'] = ['span'=>20];
+
+        $result = $this->formBuilder($controls,$data,$labelCol,$wrapperCol);
+
+        return $result;
+    }
+
+    /**
+    * 创建菜单
+    *
+    * @param  Request  $request
+    * @return Response
+    */
+    public function create(Request $request)
+    {
+        $data = $this->form();
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -130,7 +263,7 @@ class MenuController extends Controller
         $sort          =   $request->json('sort',0);
         $icon          =   $request->json('icon','');
         $path          =   $request->json('path');
-        $permissionIds =   $request->json('permissionIds','');
+        $permissionIds =   $request->json('permission_ids','');
         $show          =   $request->json('show');
         $status        =   $request->json('status','');
         
@@ -191,14 +324,12 @@ class MenuController extends Controller
         $permissionIds= Permission::where('menu_id',$id)->pluck('id');
 
         foreach ($permissionIds as $key => $value) {
-            $data['permissionIds'][] = strval($value);
+            $data['permission_ids'][] = strval($value);
         }
 
-        if(!empty($data)) {
-            return $this->success('操作成功！','',$data);
-        } else {
-            return $this->error('操作失败！');
-        }
+        $data = $this->form($data);
+        
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -215,7 +346,7 @@ class MenuController extends Controller
         $sort          =   $request->json('sort',0);
         $icon          =   $request->json('icon','');
         $path          =   $request->json('path');
-        $permissionIds =   $request->json('permissionIds','');
+        $permissionIds =   $request->json('permission_ids','');
         $show          =   $request->json('show');
         $status        =   $request->json('status','');
 

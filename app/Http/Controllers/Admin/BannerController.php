@@ -101,18 +101,9 @@ class BannerController extends BuilderController
         ->toArray();
 
         foreach ($lists as $key => $value) {
-
-            // 获取文件url，用于外部访问
-            if(strpos($value['path'],'http') !== false) {
-                $url = $value['path'];
-            } else {
-                $url = Storage::url($value['path']);
-            }
-
             if($value['cover_id']) {
                 $lists[$key]['cover_path'] = Helper::getPicture($value['cover_id']);
             }
-            $lists[$key]['img'] = '<a href="javascript:void(0)" onclick="pictureView(\''.$url.'\')"><img layer-src="'.$url.'" src="'.$url.'" width="100%" /></a>';
         }
 
         // 默认页码
@@ -161,7 +152,7 @@ class BannerController extends BuilderController
         $actions = [
             Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
             Button::make('编辑')->type('link')->href('admin/'.$this->controllerName().'/banner/edit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
         ];
 
         $lists = Helper::listsFormat($lists);
@@ -172,7 +163,7 @@ class BannerController extends BuilderController
             return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
-        }   
+        }
     }
 
     /**
@@ -250,6 +241,8 @@ class BannerController extends BuilderController
         
         if($coverId) {
             $coverId = $coverId[0]['id'];
+        } else {
+            return $this->error('请上传图片！');
         }
 
         // 表单验证错误提示信息

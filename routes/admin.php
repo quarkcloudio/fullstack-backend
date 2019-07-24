@@ -106,8 +106,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::get('admin/config/edit', 'Admin\\ConfigController@edit')->name('api/admin/config/edit');
     Route::post('admin/config/save', 'Admin\\ConfigController@save')->name('api/admin/config/save');
     Route::post('admin/config/changeStatus', 'Admin\\ConfigController@changeStatus')->name('api/admin/config/changeStatus');
-    Route::post('admin/config/changeMultiStatus', 'Admin\\ConfigController@changeMultiStatus')->name('api/admin/config/changeMultiStatus');
-    Route::post('admin/config/destroy', 'Admin\\ConfigController@destroy')->name('api/admin/config/destroy');
 
     Route::get('admin/navigation/index', 'Admin\\NavigationController@index')->name('api/admin/navigation/index');
     Route::get('admin/navigation/create', 'Admin\\NavigationController@create')->name('api/admin/navigation/create');
@@ -155,7 +153,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/link/store', 'Admin\\LinkController@store')->name('api/admin/link/store');
     Route::get('admin/link/edit', 'Admin\\LinkController@edit')->name('api/admin/link/edit');
     Route::post('admin/link/save', 'Admin\\LinkController@save')->name('api/admin/link/save');
-    Route::post('admin/link/destroy', 'Admin\\LinkController@destroy')->name('api/admin/link/destroy');
     Route::post('admin/link/changeStatus', 'Admin\\LinkController@changeStatus')->name('api/admin/link/changeStatus');
 
     Route::get('admin/printer/index', 'Admin\\PrinterController@index')->name('api/admin/printer/index');
@@ -163,7 +160,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/printer/store', 'Admin\\PrinterController@store')->name('api/admin/printer/store');
     Route::get('admin/printer/edit', 'Admin\\PrinterController@edit')->name('api/admin/printer/edit');
     Route::post('admin/printer/save', 'Admin\\PrinterController@save')->name('api/admin/printer/save');
-    Route::post('admin/printer/destroy', 'Admin\\PrinterController@destroy')->name('api/admin/printer/destroy');
     Route::post('admin/printer/changeStatus', 'Admin\\PrinterController@changeStatus')->name('api/admin/printer/changeStatus');
 
     Route::get('admin/menu/index', 'Admin\\MenuController@index')->name('api/admin/menu/index');

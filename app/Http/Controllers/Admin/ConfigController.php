@@ -3,14 +3,143 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
+use App\Builder\Tabs;
+use App\Builder\TabPane;
 use App\Models\Config;
 use App\Services\Helper;
 use DB;
 use Cache;
 
-class ConfigController extends Controller
+class ConfigController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '配置';
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function websiteForm($data = [])
+    {
+        $action = 'admin/'.$this->controllerName().'/saveWebsite';
+
+        $groupNames = Config::query()
+        ->where('status', 1)
+        ->orderBy('id', 'asc')
+        ->select(['group_name'])
+        ->distinct()
+        ->get();
+
+        foreach ($groupNames as $key => $value) {
+
+            // 查询列表
+            $configs = Config::query()
+            ->where('status', 1)
+            ->where('group_name', $value['group_name'])
+            ->orderBy('id', 'asc')
+            ->get()
+            ->toArray();
+
+            $controls = [];
+
+            foreach ($configs as $key1 => $config) {
+                switch ($config['type']) {
+                    case 'text':
+                        $controls[] = Input::make($config['title'],$config['name'])
+                        ->extra($config['remark'])
+                        ->style(['width'=>400])
+                        ->value($config['value']);
+                        break;
+                    case 'file':
+
+                        $file = null;
+
+                        if($config['value']) {
+                            $file_id = $config['value'];
+                            $file[0]['id'] =$file_id;
+                            $file[0]['uid'] =$file_id;
+                            $file[0]['name'] = Helper::getFile($file_id,'name');
+                            $file[0]['url'] = Helper::getFile($file_id);
+                        }
+                    
+                        $controls[] = File::make($config['title'],$config['name'])
+                        ->extra($config['remark'])
+                        ->value($file);
+                        break;
+                    case 'textarea':
+                        $controls[] = TextArea::make($config['title'],$config['name'])
+                        ->extra($config['remark'])
+                        ->style(['width'=>400])
+                        ->value($config['value']);
+                        break;
+                    case 'switch':
+                        $controls[] = SwitchButton::make($config['title'],$config['name'])
+                        ->extra($config['remark'])
+                        ->checkedText('开启')
+                        ->unCheckedText('关闭')
+                        ->value(true);
+                        break;
+                    case 'picture':
+
+                        $image= null;
+
+                        if($config['value']) {
+                            $image_id = $config['value'];
+                            $image[0]['id'] =$image_id;
+                            $image[0]['uid'] =$image_id;
+                            $image[0]['name'] = Helper::getPicture($image_id,'name');
+                            $image[0]['url'] = Helper::getPicture($image_id);
+                        }
+                    
+                        $controls[] = Image::make($config['title'],$config['name'])
+                        ->extra($config['remark'])
+                        ->value($image);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+            }
+
+            $controls[] = Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action);
+
+            $tabPane[] = TabPane::make($value['group_name'],$key+1)->controls($controls);
+        }
+
+        $tabs = Tabs::make('tab')->defaultActiveKey('1')->tabPanes($tabPane);
+
+        $result = $this->formBuilder($tabs,$data);
+
+        return $result;
+    }
+
     /**
      * 网站设置
      *
@@ -19,40 +148,7 @@ class ConfigController extends Controller
      */
      public function website(Request $request)
      {
-        // 获取参数
-        $getGroupName = $request->input('groupName','基本');
-        
-        $groupNames = Config::query()
-        ->where('status', 1)
-        ->orderBy('id', 'asc')
-        ->select(['group_name'])
-        ->distinct()
-        ->get();
-
-        // 查询列表
-        $configs = Config::query()
-        ->where('status', 1)
-        ->where('group_name', $getGroupName)
-        ->orderBy('id', 'asc')
-        ->get()
-        ->toArray();
-
-        foreach ($configs as $key => $value) {
-            if($value['type'] == 'picture') {
-                $name = $value['name'];
-                $data[$name.'_cover_path'] = Helper::getPicture($value['value']);
-                $data[$name.'_cover_id'] = $value['value'];
-            }
-            if($value['type'] == 'file') {
-                $name = $value['name'];
-                $data[$name.'_file_path'] = Helper::getFile($value['value']);
-                $data[$name.'_file_name'] = Helper::getFile($value['value'],'name');
-                $data[$name.'_file_id'] = $value['value'];
-            }
-        }
-        
-        $data['groupNames'] = $groupNames;
-        $data['configs'] = $configs;
+        $data = $this->websiteForm();
 
         return $this->success('获取成功！','',$data);
     }
@@ -64,12 +160,26 @@ class ConfigController extends Controller
     */
     public function saveWebsite(Request $request)
     {
-        $values = $request->json('values'); 
+
+        $requestJson    =   $request->getContent();
+        $requestData    =   json_decode($requestJson,true);
+
         $result = true;
         // 遍历插入数据
-        foreach ($values as $key => $value) {
+        foreach ($requestData as $key => $value) {
             // 修改时清空缓存
             Cache::pull($key);
+
+            $config = Config::where('name',$key)->first();
+
+            if(($config['type'] == 'file') || ($config['type'] == 'picture')) {
+                if($value) {
+                    $value = $value[0]['id'];
+                } else {
+                    $value = null;
+                }
+            }
+
             $getResult = Config::where('name',$key)->update(['value'=>$value]);
             if($getResult === false) {
                 $result = false;
@@ -82,6 +192,7 @@ class ConfigController extends Controller
             return $this->error('操作失败！');
         }
     }
+
     /**
      * 列表页面
      *
@@ -161,24 +272,110 @@ class ConfigController extends Controller
         // 总数量
         $pagination['total'] = $total;
 
-        foreach ($lists as $key => $list) {
-            $statue = $list['status'];
-            if($statue == 1) {
-                $lists[$key]['status'] = '正常';
-            }
-            if($statue == 2) {
-                $lists[$key]['status'] = '已禁用';
-            }
-        }
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
 
-        // 模板数据
-        $data['lists'] = $lists;
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Input::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('标题','title')->withA('admin/system/'.$this->controllerName().'/edit'),
+            Column::make('名称','name'),
+            Column::make('备注','remark'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/system/'.$this->controllerName().'/create'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->href('admin/system/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $lists = Helper::listsFormat($lists);
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data,$pagination,$search);
         } else {
             return $this->success('获取失败！');
         }   
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/store';
+        }
+
+        $list = [
+            [
+                'name'=>'输入框',
+                'value'=>'text',
+            ],
+            [
+                'name'=>'文本域',
+                'value'=>'textarea',
+            ],
+            [
+                'name'=>'图片',
+                'value'=>'picture',
+            ],
+            [
+                'name'=>'文件',
+                'value'=>'file',
+            ],
+            [
+                'name'=>'开关',
+                'value'=>'switch',
+            ],
+        ];
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('标题','title')->style(['width'=>200]),
+            Select::make('表单类型','type')->option($list),
+            Input::make('名称','name')->style(['width'=>200]),
+            Input::make('分组名称','group_name')->style(['width'=>200]),
+            TextArea::make('备注','remark')->style(['width'=>400]),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action)
+        ];
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
     }
 
     /**
@@ -189,7 +386,8 @@ class ConfigController extends Controller
      */
     public function create()
     {
-        return $this->success('获取成功！','');
+        $data = $this->form();
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -203,7 +401,7 @@ class ConfigController extends Controller
         $title          =   $request->json('title');
         $type           =   $request->json('type');
         $name           =   $request->json('name');
-        $groupName      =   $request->json('groupName');
+        $groupName      =   $request->json('group_name');
         $value          =   $request->json('value');
         $remark         =   $request->json('remark');
         $status         =   $request->json('status');
@@ -254,12 +452,16 @@ class ConfigController extends Controller
         }
 
         $data = Config::find($id)->toArray();
-        
-        if(!empty($data)) {
-            return $this->success('操作成功！','',$data);
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
         } else {
-            return $this->error('操作失败！');
+            $data['status'] = false;
         }
+
+        $data = $this->form($data);
+
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -274,7 +476,7 @@ class ConfigController extends Controller
         $title          =   $request->json('title');
         $type           =   $request->json('type');
         $name           =   $request->json('name');
-        $groupName      =   $request->json('groupName');
+        $groupName      =   $request->json('group_name');
         $value          =   $request->json('value');
         $remark         =   $request->json('remark');
         $status         =   $request->json('status');
@@ -310,28 +512,6 @@ class ConfigController extends Controller
         }
     }
 
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Config::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
     /**
      * 改变数据状态
      *

@@ -118,7 +118,7 @@ class RoleController extends BuilderController
 
         $actions = [
             Button::make('编辑')->type('link')->href('admin/admin/'.$this->controllerName().'/edit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
         ];
 
         $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,$toolbarButtons,$actions);

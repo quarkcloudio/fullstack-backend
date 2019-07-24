@@ -163,7 +163,7 @@ class UserController extends BuilderController
             Button::make('充值')->type('link')->onClick('openModal',['title'=>'用户充值','width'=>500],'admin/'.$this->controllerName().'/recharge'),
             Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
             Button::make('编辑')->type('link')->href('admin/'.$this->controllerName().'/edit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/'.$this->controllerName().'/changeStatus'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
         ];
 
         $data = $this->listBuilder($columns,$lists,$pagination,$searchs,$advancedSearchs,null,null,$actions);

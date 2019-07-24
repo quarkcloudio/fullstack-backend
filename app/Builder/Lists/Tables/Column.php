@@ -21,6 +21,7 @@ class Column
         $this->actions = false;
         $this->tag = false;
         $this->isImage = false;
+        $this->isIcon = false;
     }
 
     static function make($title,$dataIndex)
@@ -79,6 +80,12 @@ class Column
         $a['href'] = '#/'.$href;
         $a['target'] = $target;
         $this->a = $a;
+        return $this;
+    }
+
+    public function isIcon()
+    {
+        $this->isIcon = true;
         return $this;
     }
 

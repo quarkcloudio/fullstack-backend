@@ -16,7 +16,7 @@ class Navigation extends Model
      */
     public $timestamps = true;
     
-    protected $fillable=['title','pid','uid','sort','url','status'];   //允许批量赋值的字段
+    protected $fillable=['title','pid','uid','sort','cover_id','url','status'];   //允许批量赋值的字段
 
     protected $dates = ['delete_at'];
 }
