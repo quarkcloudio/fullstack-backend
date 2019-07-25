@@ -257,7 +257,7 @@ class AdminController extends BuilderController
 
         $roleIds        =   $requestData['roleIds'];
         // 删除modelName
-        unset($requestData['url']);
+        unset($requestData['actionUrl']);
         unset($requestData['roleIds']);
 
         // 表单验证错误提示信息
@@ -392,7 +392,7 @@ class AdminController extends BuilderController
         $roleIds        =   $requestData['roleIds'];
 
         // 删除modelName
-        unset($requestData['url']);
+        unset($requestData['actionUrl']);
         unset($requestData['roleIds']);
 
         // 表单验证错误提示信息

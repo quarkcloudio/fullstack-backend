@@ -137,6 +137,7 @@ class SmsController extends BuilderController
             return $this->success('获取失败！');
         }
     }
+
     /**
      * 删除单个数据
      *
@@ -157,6 +158,52 @@ class SmsController extends BuilderController
             return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 发送短信验证码
+     * @param  integer
+     * @return string
+     */
+    public function send(Request $request)
+    {
+        $phone = $request->input('phone');
+        $content = $request->input('content');
+
+        if(empty($phone)) {
+            return $this->error('手机号不能为空！');
+        }
+
+        if(!preg_match("/^1[34578]\d{9}$/", $phone)) {
+            return $this->error('手机号格式不正确！');
+        }
+
+        if(empty($content)) {
+            return $this->error('内容不能为空！');
+        }
+
+        $sendDayCount = Sms::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
+        ->where('phone',$phone)->count();
+
+        // 每天最多发送6条短信
+        if($sendDayCount >6) {
+            return $this->error('抱歉，每个手机号一天最多获取6条短信！');
+        }
+
+        $result = Helper::siooSendSms($phone,$content);
+
+        $data['phone'] = $phone;
+        $data['content'] = $content;
+
+        if($result) {
+            $data['status'] = 1;
+            Sms::create($data);
+            return $this->success('短信已发送！');
+        } else {
+            $data['status'] = 2;
+            Sms::create($data);
+            return $this->error('短信发送失败！');
         }
     }
 }

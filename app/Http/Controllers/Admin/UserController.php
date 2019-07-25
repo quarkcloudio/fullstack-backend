@@ -260,7 +260,7 @@ class UserController extends BuilderController
         $requestData    =   json_decode($requestJson,true);
 
         // 删除url
-        unset($requestData['url']);
+        unset($requestData['actionUrl']);
 
         $avatar = $requestData['avatar'];
         if($avatar) {
@@ -388,7 +388,7 @@ class UserController extends BuilderController
         $requestData    =   json_decode($requestJson,true);
 
         // 删除url
-        unset($requestData['url']);
+        unset($requestData['actionUrl']);
 
         $avatar = $requestData['avatar'];
         if($avatar) {
