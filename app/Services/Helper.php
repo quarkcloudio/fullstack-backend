@@ -1861,4 +1861,18 @@ class Helper
 
         return json_decode($result,true);
     }
+
+    // 获取用户token
+    static function token($request)
+    {
+        $authorization = $request->header('Authorization');
+
+        // 获取不到则重新登录
+        if (empty($authorization)) {
+            return response('Unauthorized.', 401);
+        }
+
+        $authorizations = explode(' ',$authorization);
+        return $authorizations[1];
+    }
 }

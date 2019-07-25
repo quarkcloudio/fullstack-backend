@@ -85,17 +85,17 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/role/changeStatus', 'Admin\\RoleController@changeStatus')->name('api/admin/role/changeStatus');
 
     Route::get('admin/actionLog/index', 'Admin\\ActionLogController@index')->name('api/admin/actionLog/index');
-    Route::post('admin/actionLog/destroy', 'Admin\\ActionLogController@destroy')->name('api/admin/actionLog/destroy');
+    Route::post('admin/actionLog/changeStatus', 'Admin\\ActionLogController@changeStatus')->name('api/admin/actionLog/changeStatus');
+    Route::get('admin/actionLog/export', 'Admin\\ActionLogController@export')->name('api/admin/actionLog/export');
 
     Route::get('admin/sms/index', 'Admin\\SmsController@index')->name('api/admin/sms/index');
-    Route::post('admin/sms/destroy', 'Admin\\SmsController@destroy')->name('api/admin/sms/destroy');
+    Route::post('admin/sms/changeStatus', 'Admin\\SmsController@destroy')->name('api/admin/sms/changeStatus');
 
     Route::get('admin/category/index', 'Admin\\CategoryController@index')->name('api/admin/category/index');
     Route::get('admin/category/create', 'Admin\\CategoryController@create')->name('api/admin/category/create');
     Route::post('admin/category/store', 'Admin\\CategoryController@store')->name('api/admin/category/store');
     Route::get('admin/category/edit', 'Admin\\CategoryController@edit')->name('api/admin/category/edit');
     Route::post('admin/category/save', 'Admin\\CategoryController@save')->name('api/admin/category/save');
-    Route::post('admin/category/destroy', 'Admin\\CategoryController@destroy')->name('api/admin/category/destroy');
     Route::post('admin/category/changeStatus', 'Admin\\CategoryController@changeStatus')->name('api/admin/category/changeStatus');
     
     Route::any('admin/config/website', 'Admin\\ConfigController@website')->name('api/admin/config/website');
@@ -112,7 +112,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/navigation/store', 'Admin\\NavigationController@store')->name('api/admin/navigation/store');
     Route::get('admin/navigation/edit', 'Admin\\NavigationController@edit')->name('api/admin/navigation/edit');
     Route::post('admin/navigation/save', 'Admin\\NavigationController@save')->name('api/admin/navigation/save');
-    Route::post('admin/navigation/destroy', 'Admin\\NavigationController@destroy')->name('api/admin/navigation/destroy');
     Route::post('admin/navigation/changeStatus', 'Admin\\NavigationController@changeStatus')->name('api/admin/navigation/changeStatus');
 
     Route::get('admin/banner/index', 'Admin\\BannerController@index')->name('api/admin/banner/index');
@@ -131,16 +130,16 @@ Route::group(['middleware' => ['admin']], function() {
     
     Route::any('admin/file/index', 'Admin\\FileController@index')->name('api/admin/file/index');
     Route::post('admin/file/upload', 'Admin\\FileController@upload')->name('api/admin/file/upload');
+    Route::get('admin/file/download', 'Admin\\FileController@download')->name('api/admin/file/download');
     Route::post('admin/file/update', 'Admin\\FileController@update')->name('api/admin/file/update');
-    Route::post('admin/file/destroy', 'Admin\\FileController@destroy')->name('api/admin/file/destroy');
     Route::post('admin/file/changeStatus', 'Admin\\FileController@changeStatus')->name('api/admin/file/changeStatus');
 
     Route::any('admin/picture/index', 'Admin\\PictureController@index')->name('api/admin/picture/index');
     Route::post('admin/picture/upload', 'Admin\\PictureController@upload')->name('api/admin/picture/upload');
+    Route::get('admin/picture/download', 'Admin\\PictureController@download')->name('api/admin/picture/download');
     Route::post('admin/picture/update', 'Admin\\PictureController@update')->name('api/admin/picture/update');
     Route::get('admin/picture/edit', 'Admin\\PictureController@edit')->name('api/admin/picture/edit');
     Route::post('admin/picture/save', 'Admin\\PictureController@save')->name('api/admin/picture/save');
-    Route::post('admin/picture/destroy', 'Admin\\PictureController@destroy')->name('api/admin/picture/destroy');
     Route::post('admin/picture/changeStatus', 'Admin\\PictureController@changeStatus')->name('api/admin/picture/changeStatus');
 
     Route::get('admin/comment/index', 'Admin\\CommentController@index')->name('api/admin/comment/index');
@@ -175,10 +174,3 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/demo/submit', 'Admin\\DemoController@submit')->name('api/admin/demo/submit');
     Route::get('admin/demo/getListInfo', 'Admin\\DemoController@getListInfo')->name('api/admin/demo/getListInfo');
 });
-
-// 文章文件导出
-Route::get('admin/article/export', 'Admin\\ArticleController@export')->name('api/admin/article/export');
-Route::get('admin/page/export', 'Admin\\PageController@export')->name('api/admin/page/export');
-
-//日志导出
-Route::get('admin/logs/export', 'Admin\\LogController@export')->name('api/admin/logs/export');

@@ -4,14 +4,36 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Log;
-use App\Models\Admin;
-use App\User;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Models\Sms;
 
-class SmsController extends Controller
+class SmsController extends BuilderController
 {
-      /**
+    public function __construct()
+    {
+        $this->pageTitle = '短信';
+    }
+
+    /**
      * 列表页面
      *
      * @param  Request  $request
@@ -79,8 +101,35 @@ class SmsController extends Controller
             }
         }
         
-        // 模板数据
-        $data['lists'] = $lists;
+        $searchs = [
+            Input::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('手机号','phone'),
+            Column::make('验证码','code'),
+            Column::make('内容','content'),
+            Column::make('状态','status')->withTag("text === '发送失败' ? 'red' : 'blue'"),
+            Column::make('发送时间','created_at'),
+        ];
+
+        $headerButtons = [
+            Button::make('发送'.$this->pageTitle)->icon('login')->type('primary')->href('admin/system/'.$this->controllerName().'/create'),
+        ];
+
+        $toolbarButtons = [
+            Button::make('重发')->type('primary')->onClick('submit',null,'admin/'.$this->controllerName().'/sendSms'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $actions = [
+            Button::make('重发')->type('link')->onClick('submit',null,'admin/'.$this->controllerName().'/sendSms'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,$toolbarButtons,$actions);
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data,$pagination,$search);
@@ -94,7 +143,7 @@ class SmsController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function destroy(Request $request)
+    public function changeStatus(Request $request)
     {
         $id = $request->json('id');
 

@@ -77,7 +77,11 @@ class Column
 
     public function withA($href,$target='_self')
     {
-        $a['href'] = '#/'.$href;
+        if(!(strpos($href,'http') !== false)) {
+            $href = '#/'.$href;
+        }
+
+        $a['href'] = $href;
         $a['target'] = $target;
         $this->a = $a;
         return $this;

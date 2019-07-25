@@ -5,11 +5,38 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\Helper;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
+use App\Builder\Tabs;
+use App\Builder\TabPane;
 use App\Models\Post;
 use App\Models\Category;
 
-class CategoryController extends Controller
+class CategoryController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '分类';
+    }
+
     /**
      * 列表页面
      *
@@ -92,15 +119,108 @@ class CategoryController extends Controller
             }
         }
         
-        // 模板数据
-        $data['lists'] = $lists;
+        $categoryTrees = Helper::listToTree($lists,'id','pid','children',0);
 
-        if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
-        } else {
-            return $this->success('获取失败！');
-        }
+        $searchs = [
+            Input::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('标题','title')->withA('admin/system/'.$this->controllerName().'/edit'),
+            Column::make('排序','sort'),
+            Column::make('名称','name'),
+            Column::make('类型','type'),
+            Column::make('分页数量','page_num'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('时间','created_at'),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/system/'.$this->controllerName().'/create'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->href('admin/system/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$categoryTrees,$pagination,$searchs,[],$headerButtons,null,$actions);
+
+        return $this->success('获取成功！','',$data);
     }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        $categorys         = Category::all()->toArray();
+        $categoryTrees     = Helper::listToTree($categorys);
+        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+
+        // 模板数据
+        $getCategorys = [];
+
+        $getCategorys[0]['name'] = '请选择分类';
+        $getCategorys[0]['value'] = '0';
+
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+        }
+
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/store';
+        }
+
+        $baseControls = [
+            ID::make('ID','id'),
+            Input::make('标题','title')->style(['width'=>400]),
+            Input::make('名称','name')->style(['width'=>200]),
+            Input::make('分类类型','type')->style(['width'=>200]),
+            Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys)->value('0'),
+            TextArea::make('描述','description')->style(['width'=>400]),
+            InputNumber::make('排序','sort')->style(['width'=>200])->value(0),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action),
+        ];
+
+        $extendControls = [
+            Image::make('封面图','cover_id'),
+            Input::make('频道模板','index_tpl')->style(['width'=>200]),
+            Input::make('列表模板','lists_tpl')->style(['width'=>200]),
+            Input::make('详情模板','detail_tpl')->style(['width'=>200]),
+            InputNumber::make('分页数量','page_num')->style(['width'=>200])->value(10),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+            ->onClick('submit',null,$action),
+        ];
+
+        $tabPane = [
+            TabPane::make('基本',1)->controls($baseControls),
+            TabPane::make('扩展',2)->controls($extendControls)
+        ];
+
+        $tabs = Tabs::make('tab')->defaultActiveKey(1)->tabPanes($tabPane);
+
+        $result = $this->formBuilder($tabs,$data);
+
+        return $result;
+    }
+
     /**
      * 添加页面
      * 
@@ -109,15 +229,15 @@ class CategoryController extends Controller
      */
     public function create(Request $request)
     {
-        $categorys         = Category::all()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+        $data = $this->form();
 
-        // 模板数据
-        $data['categorys'] = $categoryTreeLists;
-
-        return $this->success('获取成功！','',$data);
+        if(!empty($data)) {
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
     }
+
     /**
      * 保存方法
      * 
@@ -126,18 +246,17 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $id             =   $request->json('id');
         $title          =   $request->json('title','');
         $name           =   $request->json('name');
         $type           =   $request->json('type');
         $description    =   $request->json('description');
         $sort           =   $request->json('sort');
         $pid            =   $request->json('pid');
-        $coverIds       =   $request->json('cover_ids',0);
-        $indexTpl       =   $request->json('indexTpl');
-        $listsTpl       =   $request->json('listsTpl');
-        $detailTpl      =   $request->json('detailTpl');
-        $pageNum        =   $request->json('pageNum');
+        $coverId        =   $request->json('cover_id');
+        $indexTpl       =   $request->json('index_tpl');
+        $listsTpl       =   $request->json('lists_tpl');
+        $detailTpl      =   $request->json('detail_tpl');
+        $pageNum        =   $request->json('page_num');
         $status         =   $request->json('status');
         
         if (empty($title)) {
@@ -158,6 +277,12 @@ class CategoryController extends Controller
         } else {
             $status = 2; //禁用
         }
+        
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
+        } else {
+            $coverId = 0;
+        }
 
         $data['title']          = $title;
         $data['name']           = $name;
@@ -165,7 +290,7 @@ class CategoryController extends Controller
         $data['description']    = $description;
         $data['sort']           = $sort;
         $data['pid']            = $pid;
-        $data['cover_id']       = $coverIds;
+        $data['cover_id']       = $coverId;
         $data['index_tpl']      = $indexTpl;
         $data['lists_tpl']      = $listsTpl;
         $data['detail_tpl']     = $detailTpl;
@@ -180,6 +305,7 @@ class CategoryController extends Controller
             return $this->error('操作失败！');
         }
     }
+
     /**
      * 编辑页面
      *
@@ -196,14 +322,22 @@ class CategoryController extends Controller
 
         $data = Category::find($id)->toArray();
 
-        $data['cover_path'] = Helper::getPicture($data['cover_id']);
+        $cover_id = $data['cover_id'];
 
-        $categorys         = Category::all()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+        unset($data['cover_id']);
 
-        // 模板数据
-        $data['categorys'] = $categoryTreeLists;
+        $data['cover_id'][0]['id'] =$cover_id;
+        $data['cover_id'][0]['uid'] =$cover_id;
+        $data['cover_id'][0]['name'] = Helper::getPicture($cover_id,'name');
+        $data['cover_id'][0]['url'] = Helper::getPicture($cover_id);
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        $data = $this->form($data);
         
         if(!empty($data)) {
             return $this->success('操作成功！','',$data);
@@ -211,6 +345,7 @@ class CategoryController extends Controller
             return $this->error('操作失败！');
         }
     }
+
     /**
      * 保存编辑数据
      *
@@ -225,11 +360,11 @@ class CategoryController extends Controller
         $type           =   $request->json('type');
         $description    =   $request->json('description');
         $sort           =   $request->json('sort');
-        $coverIds       =   $request->json('cover_ids',0);
-        $indexTpl       =   $request->json('indexTpl');
-        $listsTpl       =   $request->json('listsTpl');
-        $detailTpl      =   $request->json('detailTpl');
-        $pageNum        =   $request->json('pageNum');
+        $coverId        =   $request->json('cover_id');
+        $indexTpl       =   $request->json('index_tpl');
+        $listsTpl       =   $request->json('lists_tpl');
+        $detailTpl      =   $request->json('detail_tpl');
+        $pageNum        =   $request->json('page_num');
         $status         =   $request->json('status');
         
         if (empty($title)) {
@@ -251,12 +386,18 @@ class CategoryController extends Controller
             $status = 2; //禁用
         }
 
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
+        } else {
+            $coverId = 0;
+        }
+
         $data['title']          = $title;
         $data['name']           = $name;
         $data['type']           = $type;
         $data['description']    = $description;
         $data['sort']           = $sort;
-        $data['cover_id']       = $coverIds;
+        $data['cover_id']       = $coverId;
         $data['index_tpl']      = $indexTpl;
         $data['lists_tpl']      = $listsTpl;
         $data['detail_tpl']     = $detailTpl;
@@ -270,6 +411,7 @@ class CategoryController extends Controller
             return $this->error('操作失败！');
         }
     }
+
     /**
      * 删除单个数据
      *
@@ -292,6 +434,7 @@ class CategoryController extends Controller
             return $this->error('操作失败！');
         }
     }
+
     /**
      * 改变数据状态
      *
