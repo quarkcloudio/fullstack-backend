@@ -14,6 +14,7 @@ class CreateGoodsAttributesTable extends Migration
     public function up()
     {
         Schema::create('goods_attributes', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id');
             $table->integer('shop_id')->unsigned()->nullable(); 
             $table->integer('goods_type_id')->nullable(); 

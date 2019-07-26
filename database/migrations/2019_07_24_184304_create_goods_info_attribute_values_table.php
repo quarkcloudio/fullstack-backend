@@ -14,6 +14,7 @@ class CreateGoodsInfoAttributeValuesTable extends Migration
     public function up()
     {
         Schema::create('goods_info_attribute_values', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id');
             $table->integer('goods_id')->unsigned()->nullable()->COMMENT('商品id'); 
             $table->integer('goods_sku_id')->nullable()->COMMENT('商品sku，可以为空'); 

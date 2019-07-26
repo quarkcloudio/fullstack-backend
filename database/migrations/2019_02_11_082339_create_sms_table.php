@@ -15,7 +15,7 @@ class CreateSmsTable extends Migration
     {
         Schema::create('sms', function (Blueprint $table) {
             $table->engine = 'InnoDB';
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->string('phone');
             $table->string('code')->comment('验证码');
             $table->longText('content')->comment('发送内容');

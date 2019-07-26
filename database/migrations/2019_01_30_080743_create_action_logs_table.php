@@ -14,7 +14,8 @@ class CreateActionLogsTable extends Migration
     public function up()
     {
         Schema::create('action_logs', function (Blueprint $table) {
-            $table->increments('id');
+            $table->engine='innodb';
+            $table->increments('id')->unsigned();
             $table->integer('object_id')->nullable();
             $table->string('action');
             $table->string('url');

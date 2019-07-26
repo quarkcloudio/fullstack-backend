@@ -14,6 +14,7 @@ class CreateGoodsOrdersTable extends Migration
     public function up()
     {
         Schema::create('goods_orders', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id')->unsigned();                       
             $table->integer('order_id')->unsigned()->default('0');
             $table->string('cart_ids')->nullable()->COMMENT('购物车json数据，用于购买完商品之后，清除购物车信息');

@@ -15,7 +15,7 @@ class CreateFilesTable extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->engine = 'InnoDB';
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->integer('uid')->default(0)->nullable();
             $table->integer('sort')->default(0)->nullable();
             $table->string('name')->comment('名称');

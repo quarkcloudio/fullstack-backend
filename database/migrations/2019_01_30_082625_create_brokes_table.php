@@ -14,7 +14,7 @@ class CreateBrokesTable extends Migration
     public function up()
     {
         Schema::create('brokes', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->integer('uid')->nullable();
             $table->string('name')->nullable();
             $table->string('phone')->nullable();

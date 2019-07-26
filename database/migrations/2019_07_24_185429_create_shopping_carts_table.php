@@ -14,6 +14,7 @@ class CreateShoppingCartsTable extends Migration
     public function up()
     {
         Schema::create('shopping_carts', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id')->unsigned();
             $table->integer('uid')->unsigned()->default(0);
             $table->integer('goods_id')->unsigned()->default(0);

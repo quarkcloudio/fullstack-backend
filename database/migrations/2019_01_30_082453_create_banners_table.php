@@ -14,7 +14,7 @@ class CreateBannersTable extends Migration
     public function up()
     {
         Schema::create('banners', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->integer('category_id')->default(0)->nullable();
             $table->string('title');
             $table->string('url')->nullable()->default('');

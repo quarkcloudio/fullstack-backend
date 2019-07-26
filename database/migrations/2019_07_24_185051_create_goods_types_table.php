@@ -14,6 +14,7 @@ class CreateGoodsTypesTable extends Migration
     public function up()
     {
         Schema::create('goods_types', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id');
             $table->string('name')->nullable();             
             $table->string('description')->nullable();           

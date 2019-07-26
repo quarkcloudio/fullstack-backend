@@ -14,6 +14,7 @@ class CreateGoodsAttributeValueTable extends Migration
     public function up()
     {
         Schema::create('goods_attribute_value', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id');             
             $table->integer('goods_attribute_id')->nullable()->COMMENT('商品属性id');
             $table->string('vname')->nullable()->COMMENT('属性值名称');

@@ -13,8 +13,8 @@ class CreateAddressTable extends Migration
      */
     public function up()
     {
-        Schema::create('address', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('address', function (Blueprint $table) {            
+            $table->increments('id')->unsigned();
             $table->integer('uid');
             $table->string('consignee');
             $table->string('province');
