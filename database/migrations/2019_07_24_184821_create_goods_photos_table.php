@@ -14,6 +14,7 @@ class CreateGoodsPhotosTable extends Migration
     public function up()
     {
         Schema::create('goods_photos', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id');
             $table->integer('goods_id')->unsigned()->nullable(); 
             $table->integer('goods_sku_id')->nullable();            

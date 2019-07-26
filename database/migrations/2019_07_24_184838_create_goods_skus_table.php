@@ -14,6 +14,7 @@ class CreateGoodsSkusTable extends Migration
     public function up()
     {
         Schema::create('goods_skus', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id');            
             $table->integer('goods_id')->unsigned()->nullable();
             $table->integer('shop_id')->unsigned()->nullable();

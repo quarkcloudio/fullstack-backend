@@ -14,6 +14,7 @@ class CreateGoodsCategoriesTable extends Migration
     public function up()
     {
         Schema::create('goods_categories', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id')->unsigned();
             $table->integer('pid')->nullable()->default('0');
             $table->string('title');                       

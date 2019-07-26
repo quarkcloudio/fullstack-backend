@@ -14,6 +14,7 @@ class CreateGoodsCategoryAttributesTable extends Migration
     public function up()
     {
         Schema::create('goods_category_attributes', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id');
             $table->integer('goods_category_id')->unsigned()->nullable()->COMMENT('商品分类'); 
             $table->integer('goods_attribute_id')->nullable()->COMMENT('关联属性id或规格id');

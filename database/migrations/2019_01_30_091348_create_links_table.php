@@ -14,7 +14,7 @@ class CreateLinksTable extends Migration
     public function up()
     {
         Schema::create('links', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->integer('sort')->default(0)->nullable();
             $table->string('title')->comment('标题');
             $table->string('url')->comment('访问地址');

@@ -14,14 +14,14 @@ class CreateAdminsTable extends Migration
     public function up()
     {
         Schema::create('admins', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->string('username')->unique();
             $table->string('nickname');
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->tinyInteger('sex')->default(1);
             $table->string('password');
-            $table->string('cover_id')->nullable()->default('');
+            $table->string('avatar')->nullable();
             $table->string('wechat_openid')->nullable()->default('');
             $table->string('wechat_unionid')->nullable()->default('');
             $table->string('qq_openid')->nullable()->default('');

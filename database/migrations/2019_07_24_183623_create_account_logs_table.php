@@ -14,6 +14,7 @@ class CreateAccountLogsTable extends Migration
     public function up()
     {
         Schema::create('account_logs', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->increments('id')->unsigned();
             $table->integer('adminid')->nullable();
             $table->integer('uid');

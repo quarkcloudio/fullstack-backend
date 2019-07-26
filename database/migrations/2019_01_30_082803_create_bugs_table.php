@@ -14,7 +14,7 @@ class CreateBugsTable extends Migration
     public function up()
     {
         Schema::create('bugs', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->longText('content');
             $table->string('cover_ids')->nullable();
             $table->tinyInteger('status')->default(1);

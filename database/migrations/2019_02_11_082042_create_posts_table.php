@@ -15,7 +15,7 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->engine = 'InnoDB';
-            $table->increments('id');
+            $table->increments('id')->unsigned();
             $table->integer('adminid')->default('0')->nullable()->default(0);
             $table->integer('uid')->default('0')->nullable()->default(0);
             $table->integer('category_id');

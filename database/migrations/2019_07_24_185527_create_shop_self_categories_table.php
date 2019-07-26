@@ -14,6 +14,7 @@ class CreateShopSelfCategoriesTable extends Migration
     public function up()
     {
         Schema::create('shop_self_categories', function (Blueprint $table) {
+            $table->engine='innodb';
             $table->increments('id')->unsigned();
             $table->integer('pid')->default('0');
             $table->integer('shop_id')->unsigned()->nullable();
