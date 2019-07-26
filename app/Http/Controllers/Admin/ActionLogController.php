@@ -4,13 +4,38 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Models\ActionLog;
 use App\Services\Helper;
 use App\Models\Admin;
 use App\User;
 
-class ActionLogController extends Controller
+class ActionLogController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '日志';
+    }
+
     /**
      * 列表页面
      *
@@ -116,23 +141,65 @@ class ActionLogController extends Controller
                 $lists[$key]['username'] = '暂无';
             }
         }
+
+        $searchs = [
+            Input::make('搜索的用户名','username'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $advancedSearchs = [
+            Input::make('用户名','username'),
+            Input::make('行为','action'),
+            Input::make('IP','ip'),
+            Input::make('备注','remark'),
+            RangePicker::make('发生时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            Button::make('搜索')->type('primary')->onClick('search'),
+            Button::make('重置')->onClick('resetSearch'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('用户名','username')->withA('admin/'.$this->controllerName().'/edit'),
+            Column::make('行为','action'),
+            Column::make('操作地址','url'),
+            Column::make('备注','remark'),
+            Column::make('IP','ip'),
+            Column::make('发生时间','created_at'),
+        ];
         
-        // 模板数据
-        $data['lists'] = $lists;
+        $q['search'] = $search;
+        $q['token'] = Helper::token($request);
+
+        $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
+
+        $headerButtons = [
+            Button::make('导出'.$this->pageTitle)->icon('export')->type('default')->target('_blank')->href($exportUrl),
+        ];
+
+        $toolbarButtons = [
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $actions = [
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,$advancedSearchs,$headerButtons,$toolbarButtons,$actions);
 
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }
     }
+
     /**
      * 删除单个数据
      *
      * @param  Request  $request
      * @return Response
      */
-    public function destroy(Request $request)
+    public function changeStatus(Request $request)
     {
         $id = $request->json('id');
 
@@ -148,6 +215,7 @@ class ActionLogController extends Controller
             return $this->error('操作失败！');
         }
     }
+
     /**
      * 导出数据
      *

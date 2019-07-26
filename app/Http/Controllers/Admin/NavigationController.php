@@ -4,16 +4,39 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
-use Illuminate\Support\Facades\Auth;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\Models\Admin;
 use App\Models\Navigation;
 use Validator;
 use DB;
 
-class NavigationController extends Controller
+class NavigationController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '导航';
+    }
+
     /**
      * 列表页面
      *
@@ -37,15 +60,16 @@ class NavigationController extends Controller
             if(isset($search['query'])) {
                 $query->where('title','like','%'.$search['query'].'%');
             }
-
         }
 
         // 查询数量
         $total = $query
+        ->where('status', '>', 0)
         ->count();
 
         // 查询列表
         $lists = $query
+        ->where('status', '>', 0)
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
         ->orderBy('sort', 'asc')
@@ -71,19 +95,97 @@ class NavigationController extends Controller
             if($status == 2) {
                 $lists[$key]['status'] = '已禁用';
             }
+
+            $lists[$key]['cover_path'] = Helper::getPicture($list['cover_id']);
         }
 
-        $NavigationTrees     = Helper::listToTree($lists,'id','pid','children',0);
-        $TreeLists = Helper::treeToOrderList($NavigationTrees,0,'title','children');
-        // 模板数据
-        $data['lists'] = $NavigationTrees;
-        $data['TreeLists'] = $TreeLists;
+        $navigationTrees = Helper::listToTree($lists,'id','pid','children',0);
 
-        if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+        $searchs = [
+            Input::make('搜索内容','title'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('标题','title'),
+            Column::make('排序','sort'),
+            Column::make('图标','cover_path')->isImage(),
+            Column::make('url','url'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->onClick('openModal',['title'=>'新增'.$this->pageTitle,'width'=>500],'admin/'.$this->controllerName().'/create'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('编辑')->type('link')->onClick('openModal',['title'=>'编辑'.$this->pageTitle,'width'=>500],'admin/'.$this->controllerName().'/edit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $data = $this->listBuilder($columns,$navigationTrees,$pagination,$searchs,[],$headerButtons,null,$actions);
+
+        return $this->success('获取成功！','',$data);
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function form($data = [])
+    {
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/save';
         } else {
-            return $this->success('获取失败！');
+            $action = 'admin/'.$this->controllerName().'/store';
         }
+
+        // 查询列表
+        $navigations = Navigation::all();
+
+        $list = [];
+        foreach ($navigations as $key => $navigation) {
+            $list[] = [
+                'name'=>$navigation['title'],
+                'value'=>$navigation['id'],
+            ];
+        }
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('标题','title')->style(['width'=>200]),
+            Select::make('父节点','pid')->option($list),
+            Input::make('链接','url')->style(['width'=>200]),
+            Image::make('图标','cover_id'),
+            InputNumber::make('排序','sort')->style(['width'=>200])->value(0),
+            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
+            Button::make('提交')
+            ->type('primary')
+            ->style(['width'=>100,'float'=>'left','marginLeft'=>350])
+            ->onClick('submit',null,$action)
+        ];
+
+        $labelCol['sm'] = ['span'=>4];
+        $wrapperCol['sm'] = ['span'=>20];
+
+        $result = $this->formBuilder($controls,$data,$labelCol,$wrapperCol);
+
+        return $result;
+    }
+
+    /**
+     * 添加页面
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function create(Request $request)
+    {
+        $data = $this->form();
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -98,6 +200,7 @@ class NavigationController extends Controller
         $pid           =   $request->json('pid',0);
         $sort          =   $request->json('sort',0);
         $url           =   $request->json('url','');
+        $coverId       =   $request->json('cover_id');
         $status        =   $request->json('status','');
         
         if (empty($title)) {
@@ -110,10 +213,15 @@ class NavigationController extends Controller
             $status = 2; //禁用
         }
 
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
+        }
+
         $data['title'] = $title;
         $data['pid'] = $pid;
         $data['sort'] = $sort;
         $data['url'] = $url;
+        $data['cover_id'] = $coverId;
         $data['status'] = $status;
 
         $result = Navigation::create($data);
@@ -141,11 +249,24 @@ class NavigationController extends Controller
 
         $data = Navigation::find($id)->toArray();
 
-        if(!empty($data)) {
-            return $this->success('操作成功！','',$data);
+        $cover_id = $data['cover_id'];
+
+        unset($data['cover_id']);
+
+        $data['cover_id'][0]['id'] =$cover_id;
+        $data['cover_id'][0]['uid'] =$cover_id;
+        $data['cover_id'][0]['name'] = Helper::getPicture($cover_id,'name');
+        $data['cover_id'][0]['url'] = Helper::getPicture($cover_id);
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
         } else {
-            return $this->error('操作失败！');
+            $data['status'] = false;
         }
+
+        $data = $this->form($data);
+
+        return $this->success('获取成功！','',$data);
     }
 
     /**
@@ -193,29 +314,6 @@ class NavigationController extends Controller
     }
 
     /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Navigation::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
      * 改变数据状态
      *
      * @param  Request  $request
@@ -246,72 +344,6 @@ class NavigationController extends Controller
         } else {
             return $this->error('操作失败！');
         }
-    }
-
-    /**
-     * 导出数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function export(Request $request)
-    {
-        // 获取参数
-        $search = $request->get('search');
-            
-        // 定义对象
-        $query = Navigation::query();
-
-        // 查询
-        if(!empty($search)) {
-            // 标题
-            if(isset($search['title'])) {
-                $query->where('posts.title','like','%'.$search['title'].'%');
-            }
-
-            // 分类
-            if(isset($search['category_id'])) {
-                if(!empty($search['category_id'])) {
-                    $query->where('posts.category_id',$search['category_id']);
-                }
-            }
-
-            // 状态
-            if(isset($search['status'])) {
-                if(!empty($search['status'])) {
-                    $query->where('posts.status',$search['status']);
-                }
-            }
-
-            // 作者
-            if(isset($search['author'])) {
-                if(!empty($search['author'])) {
-                    $query->where('posts.author',$search['author']);
-                }
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('posts.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
-            }
-        }
-
-        // 查询列表
-        $lists = $query
-        ->join('categories', 'posts.category_id', '=', 'categories.id')
-        ->where('posts.status', '>', 0)
-        ->orderBy('id', 'desc')
-        ->select('posts.*','categories.name as category_name','categories.title as category_title')
-        ->get()
-        ->toArray();
-
-        $fileName = 'data';
-
-        $title = ['ID','标题'];
-
-        Helper::export($fileName,$title,$lists);
     }
 
 }

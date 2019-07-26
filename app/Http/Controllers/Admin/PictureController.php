@@ -7,6 +7,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
+use App\Builder\Forms\Controls\ID;
+use App\Builder\Forms\Controls\Input as CtrlInput;
+use App\Builder\Forms\Controls\Text;
+use App\Builder\Forms\Controls\TextArea;
+use App\Builder\Forms\Controls\InputNumber;
+use App\Builder\Forms\Controls\Checkbox;
+use App\Builder\Forms\Controls\Radio;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\SwitchButton;
+use App\Builder\Forms\Controls\DatePicker;
+use App\Builder\Forms\Controls\RangePicker;
+use App\Builder\Forms\Controls\Editor;
+use App\Builder\Forms\Controls\Image;
+use App\Builder\Forms\Controls\File as CtrlFile;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Forms\FormBuilder;
+use App\Builder\Lists\Tables\Table;
+use App\Builder\Lists\Tables\Column;
+use App\Builder\Lists\ListBuilder;
 use App\User;
 use App\Models\Picture;
 use OSS\OssClient;
@@ -14,8 +34,13 @@ use OSS\Core\OssException;
 use Session;
 use Cache;
 
-class PictureController extends Controller
+class PictureController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '图片';
+    }
+
     /**
      * 列表页面
      *
@@ -87,11 +112,51 @@ class PictureController extends Controller
         // 总数量
         $pagination['total'] = $total;
 
-        // 模板数据
-        $data['lists'] = Helper::listsFormat($lists);
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            CtrlInput::make('搜索内容','username'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('名称','name')->withA(url('api/admin/'.$this->controllerName().'/download?token='.Helper::token($request)),'_blank'),
+            Column::make('排序','sort'),
+            Column::make('图片','path')->isImage(),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('创建时间','created_at'),
+        ];
+
+        $headerButtons = [
+            Button::make('刷新')->icon('reload')->type('default')->href('admin/attachment/'.$this->controllerName().'/index'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $lists = Helper::listsFormat($lists);
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
 
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }
@@ -225,30 +290,7 @@ class PictureController extends Controller
     }
 
     /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = Picture::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
-
-    /**
-     * 改变数据状态
+     * 改变多个数据状态
      *
      * @param  Request  $request
      * @return Response
@@ -262,7 +304,6 @@ class PictureController extends Controller
             return $this->error('参数错误！');
         }
 
-        // 定义对象
         $query = Picture::query();
 
         if(is_array($id)) {
@@ -271,7 +312,40 @@ class PictureController extends Controller
             $query->where('id',$id);
         }
 
-        $result = $query->update(['status'=>$status]);
+        $pictures = $query->get();
+
+        if($status == -1) {
+            foreach ($pictures as $key => $picture) {
+
+                // 阿里云存储
+                if(strpos($picture->path,'http') !== false) {
+                    $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
+                    $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
+                    $endpoint = Helper::getConfig('OSS_ENDPOINT');
+                    $bucket = Helper::getConfig('OSS_BUCKET');
+
+                    $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+
+                    $path = explode('/',$picture->path);
+                    $count = count($path);
+                    $object = $path[$count-2].'/'.$path[$count-1];
+                    
+                    $ossClient->deleteObject($bucket, $object);
+                } else {
+                    Storage::delete(storage_path('app/').$picture->path);
+                }
+            }
+        }
+
+        $query1 = Picture::query();
+
+        if(is_array($id)) {
+            $query1->whereIn('id',$id);
+        } else {
+            $query1->where('id',$id);
+        }
+
+        $result = $query1->update(['status'=>$status]);
 
         if ($result) {
             return $this->success('操作成功！');
@@ -279,99 +353,6 @@ class PictureController extends Controller
             return $this->error('操作失败！');
         }
     }
-
-    /**
-     * 改变单个数据状态
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    // public function changeStatus(Request $request)
-    // {
-    //     $id = $request->input('id');
-    //     $status = $request->input('status');
-    //     $picture = Picture::find($id);
-
-    //     if($status == -1) {
-    //         $result = Picture::destroy($id);
-
-    //         // 阿里云存储
-    //         if(strpos($picture->path,'http') !== false) {
-    //             $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
-    //             $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
-    //             $endpoint = Helper::getConfig('OSS_ENDPOINT');
-    //             $bucket = Helper::getConfig('OSS_BUCKET');
-
-    //             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-
-    //             $path = explode('/',$picture->path);
-    //             $count = count($path);
-    //             $object = $path[$count-2].'/'.$path[$count-1];
-                
-    //             $ossClient->deleteObject($bucket, $object);
-    //         } else {
-    //             Storage::delete(storage_path('app/').$picture->path);
-    //         }
-    //     }
-
-    //     if ($result) {
-    //         return $this->success('操作成功！');
-    //     } else {
-    //         return $this->error('操作失败！');
-    //     }
-    // }
-
-    /**
-     * 改变多个数据状态
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    // public function changeMultiStatus(Request $request)
-    // {
-    //     $data = $request->input('data');
-    //     $status = $request->input('status');
-
-    //     foreach (json_decode($data,true) as $key => $value) {
-    //         if (isset($value['id'])) {
-    //             $ids[] = $value['id'];
-    //         } elseif(isset($value)) {
-    //             $ids[] = $value;
-    //         }
-    //     }
-
-    //     $pictures = Picture::whereIn('id',$ids)->get();
-
-    //     if($status == -1) {
-    //         $result = Picture::destroy($ids);
-    //         foreach ($pictures as $key => $picture) {
-
-    //             // 阿里云存储
-    //             if(strpos($picture->path,'http') !== false) {
-    //                 $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
-    //                 $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
-    //                 $endpoint = Helper::getConfig('OSS_ENDPOINT');
-    //                 $bucket = Helper::getConfig('OSS_BUCKET');
-
-    //                 $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-
-    //                 $path = explode('/',$picture->path);
-    //                 $count = count($path);
-    //                 $object = $path[$count-2].'/'.$path[$count-1];
-                    
-    //                 $ossClient->deleteObject($bucket, $object);
-    //             } else {
-    //                 Storage::delete(storage_path('app/').$picture->path);
-    //             }
-    //         }
-    //     }
-
-    //     if ($result) {
-    //         return $this->success('操作成功！');
-    //     } else {
-    //         return $this->error('操作失败！');
-    //     }
-    // }
 
     /**
      * url访问图片
@@ -777,5 +758,34 @@ class PictureController extends Controller
 
         // 返回数据
         return $this->success('上传成功！','',$result);
+    }
+
+    /**
+     * 改变多个数据状态
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function download(Request $request)
+    {
+        $id = $request->get('id');
+
+        if(empty($id)) {
+            return $this->error('参数错误！');
+        }
+
+        $picture = Picture::where('id',$id)->first();
+
+        if(empty($picture)) {
+            return $this->error('文件不存在！');
+        }
+
+        if(strpos($picture['path'],'http') !== false) {
+            $path = $picture['path'];
+        } else {
+            $path = '//'.$_SERVER['HTTP_HOST'].Storage::url($picture['path']);
+        }
+
+        return redirect($path);
     }
 }

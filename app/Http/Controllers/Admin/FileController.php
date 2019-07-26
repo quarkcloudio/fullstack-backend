@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Input;
 use App\Services\Helper;
-use App\User;
-use App\Models\Picture;
+use App\Builder\Forms\Controls\Input;
+use App\Builder\Forms\Controls\Select;
+use App\Builder\Forms\Controls\Button;
+use App\Builder\Forms\Controls\Popconfirm;
+use App\Builder\Lists\Tables\Column;
 use App\Models\File;
 use OSS\OssClient;
 use OSS\Core\OssException;
-use Session;
-use Cache;
 
-class FileController extends Controller
+class FileController extends BuilderController
 {
+    public function __construct()
+    {
+        $this->pageTitle = '文件';
+    }
+
     /**
      * 上传附件
      *
@@ -292,8 +296,48 @@ class FileController extends Controller
         // 总数量
         $pagination['total'] = $total;
 
-        // 模板数据
-        $data['lists'] = Helper::listsFormat($lists);
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Input::make('搜索内容','username'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('名称','name')->withA(url('api/admin/'.$this->controllerName().'/download?token='.Helper::token($request)),'_blank'),
+            Column::make('排序','sort'),
+            Column::make('大小','size'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+            Column::make('创建时间','created_at'),
+        ];
+
+        $headerButtons = [
+            Button::make('刷新')->icon('reload')->type('default')->href('admin/attachment/'.$this->controllerName().'/index'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+        ];
+
+        $lists = Helper::listsFormat($lists);
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data,$pagination,$search);
@@ -336,32 +380,9 @@ class FileController extends Controller
             return $this->error('上传失败！');
         }
     }
-    
-    /**
-     * 删除单个数据
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function destroy(Request $request)
-    {
-        $id = $request->json('id');
-
-        if(empty($id)) {
-            return $this->error('参数错误！');
-        }
-
-        $result = File::destroy($id);
-
-        if ($result) {
-            return $this->success('操作成功！');
-        } else {
-            return $this->error('操作失败！');
-        }
-    }
 
     /**
-     * 改变数据状态
+     * 改变多个数据状态
      *
      * @param  Request  $request
      * @return Response
@@ -375,7 +396,6 @@ class FileController extends Controller
             return $this->error('参数错误！');
         }
 
-        // 定义对象
         $query = File::query();
 
         if(is_array($id)) {
@@ -384,7 +404,39 @@ class FileController extends Controller
             $query->where('id',$id);
         }
 
-        $result = $query->update(['status'=>$status]);
+        $files = $query->get();
+
+        if($status == -1) {
+            foreach ($files as $key => $file) {
+                // 阿里云存储
+                if(strpos($file->path,'http') !== false) {
+                    $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
+                    $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
+                    $endpoint = Helper::getConfig('OSS_ENDPOINT');
+                    $bucket = Helper::getConfig('OSS_BUCKET');
+        
+                    $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+
+                    $path = explode('/',$file->path);
+                    $count = count($path);
+                    $object = $path[$count-2].'/'.$path[$count-1];
+                    
+                    $ossClient->deleteObject($bucket, $object);
+                } else {
+                    Storage::delete(storage_path('app/').$file->path);
+                }
+            }
+        }
+
+        $query1 = File::query();
+
+        if(is_array($id)) {
+            $query1->whereIn('id',$id);
+        } else {
+            $query1->where('id',$id);
+        }
+
+        $result = $query1->update(['status'=>$status]);
 
         if ($result) {
             return $this->success('操作成功！');
@@ -393,94 +445,32 @@ class FileController extends Controller
         }
     }
 
-
-    /**
-     * 改变单个数据状态
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    // public function changeStatus(Request $request)
-    // {
-    //     $id = $request->input('id');
-    //     $status = $request->input('status');
-    //     $file = File::find($id);
-
-    //     if($status == -1) {
-    //         $result = File::destroy($id);
-
-    //         // 阿里云存储
-    //         if(strpos($file->path,'http') !== false) {
-    //             $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
-    //             $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
-    //             $endpoint = Helper::getConfig('OSS_ENDPOINT');
-    //             $bucket = Helper::getConfig('OSS_BUCKET');
-
-    //             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-
-    //             $path = explode('/',$file->path);
-    //             $count = count($path);
-    //             $object = $path[$count-2].'/'.$path[$count-1];
-                
-    //             $ossClient->deleteObject($bucket, $object);
-    //         } else {
-    //             Storage::delete(storage_path('app/').$file->path);
-    //         }
-    //     }
-
-    //     if ($result) {
-    //         return $this->success('操作成功！');
-    //     } else {
-    //         return $this->error('操作失败！');
-    //     }
-    // }
-
     /**
      * 改变多个数据状态
      *
      * @param  Request  $request
      * @return Response
      */
-    // public function changeMultiStatus(Request $request)
-    // {
-    //     $data = $request->input('data');
-    //     $status = $request->input('status');
+    public function download(Request $request)
+    {
+        $id = $request->get('id');
 
-    //     foreach (json_decode($data,true) as $key => $value) {
-    //         $ids[] = $value['id'];
-    //     }
+        if(empty($id)) {
+            return $this->error('参数错误！');
+        }
 
-    //     $files = File::whereIn('id',$ids)->get();
+        $file = File::where('id',$id)->first();
 
-    //     if($status == -1) {
-    //         $result = File::destroy($ids);
-    //         foreach ($files as $key => $file) {
+        if(empty($file)) {
+            return $this->error('文件不存在！');
+        }
 
-    //             // 阿里云存储
-    //             if(strpos($file->path,'http') !== false) {
-    //                 $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
-    //                 $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
-    //                 $endpoint = Helper::getConfig('OSS_ENDPOINT');
-    //                 $bucket = Helper::getConfig('OSS_BUCKET');
-        
-    //                 $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+        if(strpos($file['path'],'http') !== false) {
+            $path = $file['path'];
+        } else {
+            $path = '//'.$_SERVER['HTTP_HOST'].Storage::url($file['path']);
+        }
 
-    //                 $path = explode('/',$file->path);
-    //                 $count = count($path);
-    //                 $object = $path[$count-2].'/'.$path[$count-1];
-                    
-    //                 $ossClient->deleteObject($bucket, $object);
-    //             } else {
-    //                 Storage::delete(storage_path('app/').$file->path);
-    //             }
-    //         }
-    //     }
-
-    //     if ($result) {
-    //         return $this->success('操作成功！');
-    //     } else {
-    //         return $this->error('操作失败！');
-    //     }
-    // }
-
+        return redirect($path);
+    }
 }

@@ -276,14 +276,14 @@ class DemoController extends Controller
         $toolbarButton = [
             Button::make('启用')->type('primary')->onClick('multiChangeStatus','enable','admin/article/changeStatus'),
             Button::make('禁用')->onClick('multiChangeStatus','disable','admin/article/changeStatus'),
-            Button::make('删除')->type('danger')->onClick('multiChangeStatus','delete','admin/article/changeStatus'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/article/changeStatus'),
         ];
 
         $actions = [
             Button::make('启用|禁用')->type('link')->onClick('changeStatus','enable|disable','admin/article/changeStatus'),
             Button::make('编辑')->type('link')->href('admin/article/edit'),
             Button::make('弹窗编辑')->type('link')->onClick('openModal',['title'=>'编辑数据弹窗','width'=>600],'admin/demo/getModalFormInfo'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','delete','admin/article/changeStatus'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/article/changeStatus'),
         ];
 
         $status = [

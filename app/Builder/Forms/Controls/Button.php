@@ -28,7 +28,11 @@ class Button extends Control
 
     public function href($href)
     {
-        $this->href = '#/'.$href;
+        if(!(strpos($href,'http') !== false)) {
+            $href = '#/'.$href;
+        }
+        
+        $this->href = $href;
         return $this;
     }
 
