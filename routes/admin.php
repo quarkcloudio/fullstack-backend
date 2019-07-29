@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 
 // 后台管理api
+Route::get('admin/captcha', 'Auth\\AdminLoginController@captcha')->name('api/admin/captcha');
 Route::post('admin/login', 'Auth\\AdminLoginController@login')->name('api/admin/login');
 Route::any('admin/logout', 'Auth\\AdminLoginController@logout')->name('api/admin/logout');
 Route::get('admin/loginErrorTimes', 'Auth\\AdminLoginController@loginErrorTimes')->name('api/admin/loginErrorTimes');
