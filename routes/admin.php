@@ -22,6 +22,11 @@ Route::get('admin/loginErrorTimes', 'Auth\\AdminLoginController@loginErrorTimes'
 Route::group(['middleware' => ['admin']], function() {
 
     Route::get('admin/console/index', 'Admin\\ConsoleController@index')->name('api/admin/console/index');
+    
+    Route::any('admin/account/info', 'Admin\\AccountController@info')->name('api/admin/account/info');
+    Route::post('admin/account/profile', 'Admin\\AccountController@profile')->name('api/admin/account/profile');
+    Route::post('admin/account/password', 'Admin\\AccountController@password')->name('api/admin/account/password');
+    Route::any('admin/account/menus', 'Admin\\AccountController@menus')->name('api/admin/account/menus');
 
     Route::get('admin/article/index', 'Admin\\ArticleController@index')->name('api/admin/article/index');
     Route::get('admin/article/create', 'Admin\\ArticleController@create')->name('api/admin/article/create');
@@ -114,7 +119,6 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/menu/store', 'Admin\\MenuController@store')->name('api/admin/menu/store');
     Route::get('admin/menu/edit', 'Admin\\MenuController@edit')->name('api/admin/menu/edit');
     Route::post('admin/menu/save', 'Admin\\MenuController@save')->name('api/admin/menu/save');
-    Route::post('admin/menu/destroy', 'Admin\\MenuController@destroy')->name('api/admin/menu/destroy');
     Route::post('admin/menu/changeStatus', 'Admin\\MenuController@changeStatus')->name('api/admin/menu/changeStatus');
 
     Route::get('admin/navigation/index', 'Admin\\NavigationController@index')->name('api/admin/navigation/index');
@@ -153,13 +157,5 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/file/update', 'Admin\\FileController@update')->name('api/admin/file/update');
     Route::post('admin/file/changeStatus', 'Admin\\FileController@changeStatus')->name('api/admin/file/changeStatus');
 
-    Route::any('admin/account/info', 'Admin\\AccountController@info')->name('api/admin/account/info');
-    Route::post('admin/account/profile', 'Admin\\AccountController@profile')->name('api/admin/account/profile');
-    Route::post('admin/account/password', 'Admin\\AccountController@password')->name('api/admin/account/password');
-    Route::any('admin/account/menus', 'Admin\\AccountController@menus')->name('api/admin/account/menus');
-
-    Route::get('admin/demo/getFormInfo', 'Admin\\DemoController@getFormInfo')->name('api/admin/demo/getFormInfo');
-    Route::get('admin/demo/getModalFormInfo', 'Admin\\DemoController@getModalFormInfo')->name('api/admin/demo/getModalFormInfo');
-    Route::post('admin/demo/submit', 'Admin\\DemoController@submit')->name('api/admin/demo/submit');
-    Route::get('admin/demo/getListInfo', 'Admin\\DemoController@getListInfo')->name('api/admin/demo/getListInfo');
+    Route::get('admin/test/index', 'Admin\\TestController@index')->name('api/admin/test/index');
 });
