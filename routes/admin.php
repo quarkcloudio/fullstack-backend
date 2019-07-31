@@ -23,6 +23,7 @@ Route::get('admin/loginErrorTimes', 'Auth\\AdminLoginController@loginErrorTimes'
 Route::group(['middleware' => ['admin']], function() {
 
     Route::get('admin/console/index', 'Admin\\ConsoleController@index')->name('api/admin/console/index');
+    Route::get('admin/console/clearCache', 'Admin\\ConsoleController@clearCache')->name('api/admin/console/clearCache');
     
     Route::any('admin/account/info', 'Admin\\AccountController@info')->name('api/admin/account/info');
     Route::post('admin/account/profile', 'Admin\\AccountController@profile')->name('api/admin/account/profile');
