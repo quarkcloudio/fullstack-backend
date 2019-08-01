@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 
 // 后台管理api
+Route::get('admin/captcha', 'Auth\\AdminLoginController@captcha')->name('api/admin/captcha');
 Route::post('admin/login', 'Auth\\AdminLoginController@login')->name('api/admin/login');
 Route::any('admin/logout', 'Auth\\AdminLoginController@logout')->name('api/admin/logout');
 Route::get('admin/loginErrorTimes', 'Auth\\AdminLoginController@loginErrorTimes')->name('api/admin/loginErrorTimes');
@@ -22,6 +23,7 @@ Route::get('admin/loginErrorTimes', 'Auth\\AdminLoginController@loginErrorTimes'
 Route::group(['middleware' => ['admin']], function() {
 
     Route::get('admin/console/index', 'Admin\\ConsoleController@index')->name('api/admin/console/index');
+    Route::get('admin/console/clearCache', 'Admin\\ConsoleController@clearCache')->name('api/admin/console/clearCache');
     
     Route::any('admin/account/info', 'Admin\\AccountController@info')->name('api/admin/account/info');
     Route::post('admin/account/profile', 'Admin\\AccountController@profile')->name('api/admin/account/profile');

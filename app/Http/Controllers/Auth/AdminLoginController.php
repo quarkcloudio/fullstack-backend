@@ -9,6 +9,8 @@ use App\Services\Helper;
 use App\Models\Admin;
 use App\Models\ActionLog;
 use Laravel\Passport\Client;
+use Gregwar\Captcha\CaptchaBuilder;
+use Gregwar\Captcha\PhraseBuilder;
 
 class AdminLoginController extends Controller
 {
@@ -114,17 +116,10 @@ class AdminLoginController extends Controller
         $password = $request->json('password');
         $captcha = $request->json('captcha');
 
-        // 一天内累计6次登录错误，则必须开启验证码
-        // $loginErrorTimes = ActionLog::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
-        // ->where('action',$username.'LOGIN_ERROR')
-        // ->count();
-        
-        // if($loginErrorTimes > 6) {
-        //     $getCaptcha = session('captcha');
-        //     if(empty($captcha) || ($captcha != $getCaptcha)) {
-        //         return $this->error('验证码错误！');
-        //     }
-        // }
+        $getCaptcha = cache('adminCaptcha');
+        if(empty($captcha) || ($captcha != $getCaptcha)) {
+            return $this->error('验证码错误！');
+        }
 
         if(empty($username)) {
             return $this->error('用户名不能为空！');
@@ -153,7 +148,7 @@ class AdminLoginController extends Controller
             $log['action'] = '管理员登录';
             $log['type'] = 'ADMIN';
             $log['remark'] = Auth::guard('admin')->user()->username.'登录后台';
-            // Helper::actionLog($log);
+            Helper::actionLog($log);
 
             $result['id'] = $user->id;
             $result['username'] = $user->username;
@@ -170,10 +165,10 @@ class AdminLoginController extends Controller
             $log['action'] = $username.'LOGIN_ERROR';
             $log['type'] = 'ADMIN';
             $log['remark'] = '管理员'.$username.'尝试登录出错！';
-            // Helper::actionLog($log);
+            Helper::actionLog($log);
 
             // 清除验证码
-            session(['captcha'=>null]);
+            cache(['adminCaptcha'=>null],60*10);
 
             return $this->error('用户名或密码错误！');
         }
@@ -249,4 +244,26 @@ class AdminLoginController extends Controller
         }
     }
 
+    /**
+     * 图形验证码
+     * @param  integer
+     * @return string
+     */
+    public function captcha()
+    {
+        $phrase = new PhraseBuilder;
+        // 设置验证码位数
+        $code = Helper::makeRand(4);
+        // 生成验证码图片的Builder对象，配置相应属性
+        $builder = new CaptchaBuilder($code, $phrase);
+        // 设置背景颜色
+        $builder->setBackgroundColor(244, 252, 255);
+        $builder->setMaxAngle(0);
+        $builder->setMaxBehindLines(0);
+        $builder->setMaxFrontLines(0);
+        // 可以设置图片宽高及字体
+        $builder->build($width = 110, $height = 38, $font = null);
+        cache(['adminCaptcha' => $builder->getPhrase()],60*10);
+        return response($builder->output())->header('Content-type','image/jpeg');
+    }
 }

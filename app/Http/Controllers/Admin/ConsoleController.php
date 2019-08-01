@@ -34,6 +34,15 @@ class ConsoleController extends Controller
         return $this->success('获取成功！','',$result);
     }
 
+    /**
+     * 清空缓存
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function clearCache(Request $request)
+    {
+        Helper::clearCache();
+    }
+
     // 获取用户统计数据
     protected function getUserData()
     {
