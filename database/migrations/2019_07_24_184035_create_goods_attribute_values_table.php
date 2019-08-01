@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateGoodsAttributeValueTable extends Migration
+class CreateGoodsAttributeValuesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateGoodsAttributeValueTable extends Migration
      */
     public function up()
     {
-        Schema::create('goods_attribute_value', function (Blueprint $table) {
+        Schema::create('goods_attribute_values', function (Blueprint $table) {
             $table->engine='innodb';
             $table->increments('id');             
             $table->integer('goods_attribute_id')->nullable()->COMMENT('商品属性id');
@@ -29,6 +29,6 @@ class CreateGoodsAttributeValueTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('goods_attribute_value');
+        Schema::dropIfExists('goods_attribute_values');
     }
 }
