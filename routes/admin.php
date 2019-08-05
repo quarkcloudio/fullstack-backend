@@ -18,6 +18,7 @@ Route::get('admin/captcha', 'Auth\\AdminLoginController@captcha')->name('api/adm
 Route::post('admin/login', 'Auth\\AdminLoginController@login')->name('api/admin/login');
 Route::any('admin/logout', 'Auth\\AdminLoginController@logout')->name('api/admin/logout');
 Route::get('admin/loginErrorTimes', 'Auth\\AdminLoginController@loginErrorTimes')->name('api/admin/loginErrorTimes');
+Route::get('admin/test/index', 'Admin\\TestController@index')->name('api/admin/test/index');
 
 // 后台登录后认证路由
 Route::group(['middleware' => ['admin']], function() {
@@ -158,6 +159,4 @@ Route::group(['middleware' => ['admin']], function() {
     Route::get('admin/file/download', 'Admin\\FileController@download')->name('api/admin/file/download');
     Route::post('admin/file/update', 'Admin\\FileController@update')->name('api/admin/file/update');
     Route::post('admin/file/changeStatus', 'Admin\\FileController@changeStatus')->name('api/admin/file/changeStatus');
-
-    Route::get('admin/test/index', 'Admin\\TestController@index')->name('api/admin/test/index');
 });

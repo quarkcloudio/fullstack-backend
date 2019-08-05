@@ -23,7 +23,9 @@
         "overtrue/wechat": "~4.0",
         "spatie/laravel-permission": "^2.6",
         "topthink/think-image": "^1.0",
-        "lokielse/omnipay-alipay": "^3.0"
+        "lokielse/omnipay-alipay": "^3.0",
+        "anam/phantommagick": "^2.0",
+        "anam/phantomjs-linux-x86-binary": "~2.1.1"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
@@ -74,7 +76,7 @@
     "repositories": {
         "packagist": {
             "type": "composer",
-            "url": "https://packagist.laravel-china.org"
+            "url": "https://mirrors.aliyun.com/composer/"
         }
     }
 }

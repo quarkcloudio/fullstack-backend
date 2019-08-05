@@ -1862,6 +1862,51 @@ class Helper
         return json_decode($result,true);
     }
 
+    // web页面生成图片，必须安装phantomjs程序(https://github.com/ariya/phantomjs),windows下需要指定$phantomjs的绝对路径
+    static function htmlToImage($source,$width = null,$height = null,$path = '',$phantomjs = '')
+    {
+        if(empty($source)) {
+            return self::error("url路径不能为空！");
+        }
+
+        $conv = new \Anam\PhantomMagick\Converter();
+
+        if(strtoupper(substr(PHP_OS,0,3)) === 'WIN') {
+
+            if(empty($phantomjs)) {
+                return self::error("windows系统下，请指定phantomjs程序的绝对路径");
+            }
+
+            if(empty($path)) {
+                $path = storage_path('app/').'public/converts/'.md5($source).'.jpg';
+            }
+
+            $conv->setBinary($phantomjs);
+
+        } else {
+            if(empty($path)) {
+                $path = storage_path('app/').'public/converts/'.md5($source).'.jpg';
+            }
+        }
+
+        if(!file_exists($path)) {
+
+            if($width) {
+                $conv->width($width);
+            }
+
+            if($height) {
+                $conv->height($height);
+            }
+
+            $conv->source($source)
+            ->toJpg()
+            ->save($path);
+        }
+
+        return $path;
+    }
+
     // 获取用户token
     static function token($request)
     {
