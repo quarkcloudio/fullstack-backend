@@ -18,6 +18,7 @@ class CreateNavigationsTable extends Migration
             $table->integer('pid');
             $table->integer('uid');
             $table->string('title');
+            $table->integer('cover_id');
             $table->string('url');
             $table->integer('sort');
             $table->tinyInteger('status')->default('1');
