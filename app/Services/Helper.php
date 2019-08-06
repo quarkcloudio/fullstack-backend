@@ -1750,11 +1750,15 @@ class Helper
     }
 
     // 腾讯云语音识别，$audioFile='http://www.website/1.mp3'，必须安装ffmpeg程序
-    static function voiceRecognition($audioFile)
+    static function voiceRecognition($audioFile,$ffmpeg = '')
     {
         //用户需要修改为自己腾讯云官网账号中的appid，secretid与secretKey
         $SecretId = self::config('TENCENTCLOUD_SECRET_ID');
         $secretKey = self::config('TENCENTCLOUD_SECRET_KEY');
+
+        if(empty($ffmpeg)) {
+            return self::error("请指定ffmpeg程序的绝对路径");
+        }
 
         // 语音数据来源 0:语音url，1:语音数据bodydata
         $SourceType = 1;
@@ -1787,7 +1791,7 @@ class Helper
             $realFilePath = storage_path('app/').$path;
 
             // '2>$1' 配置管道输出错误，方便调试
-            $command = '/usr/local/ffmpeg/bin/ffmpeg -i '.$realFilePath.' -acodec pcm_s16le -ac 1 -ar 8000 '.storage_path('app/').'public/uploads/files/'.$fileNameWithoutExt.'.wav 2>&1';
+            $command = $ffmpeg.' -i '.$realFilePath.' -acodec pcm_s16le -ac 1 -ar 8000 '.storage_path('app/').'public/uploads/files/'.$fileNameWithoutExt.'.wav 2>&1';
 
             $status = shell_exec($command);
         }
@@ -1862,7 +1866,7 @@ class Helper
         return json_decode($result,true);
     }
 
-    // web页面生成图片，必须安装phantomjs程序(https://github.com/ariya/phantomjs),windows下需要指定$phantomjs的绝对路径
+    // web页面生成图片，必须安装phantomjs程序(https://github.com/ariya/phantomjs),windows下需要指定$phantomjs的绝对路径，如果截图出现乱码请安装相应的字体
     static function htmlToImage($source,$width = null,$height = null,$path = '',$phantomjs = '')
     {
         if(empty($source)) {
@@ -1871,23 +1875,15 @@ class Helper
 
         $conv = new \Anam\PhantomMagick\Converter();
 
-        if(strtoupper(substr(PHP_OS,0,3)) === 'WIN') {
-
-            if(empty($phantomjs)) {
-                return self::error("windows系统下，请指定phantomjs程序的绝对路径");
-            }
-
-            if(empty($path)) {
-                $path = storage_path('app/').'public/converts/'.md5($source).'.jpg';
-            }
-
-            $conv->setBinary($phantomjs);
-
-        } else {
-            if(empty($path)) {
-                $path = storage_path('app/').'public/converts/'.md5($source).'.jpg';
-            }
+        if(empty($phantomjs)) {
+            return self::error("请指定phantomjs程序的绝对路径");
         }
+
+        if(empty($path)) {
+            $path = storage_path('app/').'public/converts/'.md5($source).'.jpg';
+        }
+
+        $conv->setBinary($phantomjs);
 
         if(!file_exists($path)) {
 

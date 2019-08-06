@@ -24,8 +24,7 @@
         "spatie/laravel-permission": "^2.6",
         "topthink/think-image": "^1.0",
         "lokielse/omnipay-alipay": "^3.0",
-        "anam/phantommagick": "^2.0",
-        "anam/phantomjs-linux-x86-binary": "~2.1.1"
+        "anam/phantommagick": "^2.0"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

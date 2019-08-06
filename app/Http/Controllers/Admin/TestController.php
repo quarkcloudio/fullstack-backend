@@ -20,7 +20,7 @@ class TestController extends Controller
      */
     public function index(Request $request)
     {
-        $result = Helper::htmlToImage('https://m.qarc.cn',750,null,'','D:\\Software\\phantomjs\\bin\\phantomjs');
+        $result = Helper::htmlToImage('https://www.taobao.com',750,null,'','D:\\Software\\phantomjs\\bin\\phantomjs');
         echo($result);
     }
 }
