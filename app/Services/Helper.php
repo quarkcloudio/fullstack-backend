@@ -9,19 +9,17 @@ use App\Models\Category;
 use App\Models\Config;
 use App\Models\Sms;
 use App\Models\Wechat;
-use App\Models\GroupbuyShop;
-use App\Models\Merchant;
 use App\Models\Printer;
 use App\User;
 use Flc\Alidayu\Client;
 use Flc\Alidayu\App;
 use Flc\Alidayu\Requests\AlibabaAliqinFcSmsNumSend;
-use Flc\Alidayu\Requests\IRequest;
 use Endroid\QrCode\QrCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Mail;
 use Excel;
 use Cache;
@@ -50,23 +48,6 @@ class Helper
         $result['data'] = $data;
         $result['status'] = $status;
         return $result;
-    }
-
-    /**
-    * 创建uuid,系统内唯一标识符
-    * @author tangtanglove <dai_hang_love@126.com>
-    */
-    static function createUuid()
-    {
-        mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
-        $charid = strtolower(md5(uniqid(rand(), true)));
-        $hyphen = chr(45);// "-"
-        $uuid = substr($charid, 0, 8).$hyphen
-                .substr($charid, 8, 4).$hyphen
-                .substr($charid,12, 4).$hyphen
-                .substr($charid,16, 4).$hyphen
-                .substr($charid,20,12);
-        return $uuid;
     }
 
     /**
@@ -838,41 +819,6 @@ class Helper
     }
 
     /**
-    * 解析属性条件
-    * @author tangtanglove <dai_hang_love@126.com>
-    */
-	static function parseAttrOption($name,$option,$value,$type)
-    {
-        $string = '';
-        switch ($type) {
-            case 'select':
-                $optionArr = explode("\n",$option);
-                if (!empty($optionArr)) {
-                    $stringHeader = '<select name="'.$name.'" lay-verify="required">';
-                    $stringText = '';
-                    $selected = '';
-                    foreach ($optionArr as $optionKey => $optionValue) {
-                        if ($optionValue==$value) {
-                            $selected = 'selected';
-                        } else {
-                            $selected = '';
-                        }
-                        $stringText = $stringText.'<option value="'.$optionValue.'" '.$selected.'>'.$optionValue.'</option>';
-                    }
-                    $stringFooter = '</select>';
-                }
-                $string = $stringHeader.$stringText.$stringFooter;
-                break;
-            
-            default:
-                # code...
-                break;
-        }
-
-        return $string;
-    }
-
-    /**
     * 强制清除缓存
     * @author tangtanglove <dai_hang_love@126.com>
     */
@@ -1332,108 +1278,6 @@ class Helper
         return '';
     }
 
-    static function getCpuUsage()
-    {
-        static $cpu = null;
-        if (null !== $cpu) {
-            return $cpu;
-        }
-        if (self::isWin()) {
-            $cpu = self::getWinCpuUsage();
-            return $cpu;
-        }
-        $filePath = ('/proc/stat');
-        if ( ! \is_readable($filePath)) {
-            $cpu = array();
-            return $cpu;
-        }
-        $stat1 = \file($filePath);
-        \sleep(1);
-        $stat2       = \file($filePath);
-        $info1       = \explode(' ', \preg_replace('!cpu +!', '', $stat1[0]));
-        $info2       = \explode(' ', \preg_replace('!cpu +!', '', $stat2[0]));
-        $dif         = array();
-        $dif['user'] = $info2[0] - $info1[0];
-        $dif['nice'] = $info2[1] - $info1[1];
-        $dif['sys']  = $info2[2] - $info1[2];
-        $dif['idle'] = $info2[3] - $info1[3];
-        $total       = \array_sum($dif);
-        $cpu         = array();
-        foreach ($dif as $x => $y) {
-            $cpu[$x] = \round($y / $total * 100, 1);
-        }
-        return $cpu;
-    }
-
-    static function getHumanCpuUsage()
-    {
-        $cpu = self::getCpuUsage();
-        return $cpu ?: array();
-    }
-
-
-    static function getMemoryUsage($key)
-    {
-        $key = \ucfirst($key);
-        if (self::isWin()) {
-            return 0;
-        }
-        static $memInfo = null;
-        if (null === $memInfo) {
-            $memInfoFile = '/proc/meminfo';
-            if ( ! \is_readable($memInfoFile)) {
-                $memInfo = 0;
-                return 0;
-            }
-            $memInfo = \file_get_contents($memInfoFile);
-            $memInfo = \str_replace(array(
-                ' kB',
-                '  ',
-            ), '', $memInfo);
-            $lines = array();
-            foreach (\explode("\n", $memInfo) as $line) {
-                if ( ! $line) {
-                    continue;
-                }
-                $line            = \explode(':', $line);
-                $lines[$line[0]] = (int) $line[1];
-            }
-            $memInfo = $lines;
-        }
-
-        switch ($key) {
-            case 'MemRealUsage':
-                $memAvailable = 0;
-                if (isset($memInfo['MemAvailable'])) {
-                    $memAvailable = $memInfo['MemAvailable'];
-                } elseif (isset($memInfo['MemFree'])) {
-                    $memAvailable = $memInfo['MemFree'];
-                }
-                return $memInfo['MemTotal'] - $memAvailable;
-            case 'SwapRealUsage':
-                if ( ! isset($memInfo['SwapTotal']) || ! isset($memInfo['SwapFree']) || ! isset($memInfo['SwapCached'])) {
-                    return 0;
-                }
-                return $memInfo['SwapTotal'] - $memInfo['SwapFree'] - $memInfo['SwapCached'];
-        }
-        return isset($memInfo[$key]) ? (int) $memInfo[$key] : 0;
-    }
-
-    static function formatBytes($bytes, $precision = 2)
-    {
-        if ( ! $bytes) {
-            return 0;
-        }
-        $base     = \log($bytes, 1024);
-        $suffixes = array('', ' K', ' M', ' G', ' T');
-        return \round(\pow(1024, $base - \floor($base)), $precision) . $suffixes[\floor($base)];
-    }
-
-    static function getHumamMemUsage($key)
-    {
-        return self::formatBytes(self::getMemoryUsage($key) * 1024);
-    }
-
     // 获取当前地理位置
     static function address($ip='', $latitude='', $longitude='') {
 
@@ -1513,7 +1357,7 @@ class Helper
         $requestAll = [
             'client_id' => $clientId,
             'sign' => md5($clientId.$timesTamp.$clientSecret),
-            'id' => self::createUuid(),
+            'id' => Str::uuid(),
             'grant_type' => $grantType,
             'scope' => $scope,
             'code' => $code,
@@ -1538,7 +1382,7 @@ class Helper
         $requestAll = [
             'client_id' => $clientId,
             'sign' => md5($clientId.$timesTamp.$clientSecret),
-            'id' => self::createUuid(),
+            'id' => Str::uuid(),
             'grant_type' => $grantType,
             'scope' => $scope,
             'refresh_token' => $RefreshToken,
@@ -1548,32 +1392,6 @@ class Helper
         $url = 'https://open-api.10ss.net/oauth/oauth';
         $params = http_build_query($requestAll);
         return self::curl($url, $params, $ispost = 1, $https = 0);
-    }
-
-    /**
-     * 打印接口
-     * @param $machineCode
-     * @param $accessToken
-     * @param $content
-     * @param $originId
-     * @param $timesTamp
-     * @return mixed
-     */
-    public static function printer($clientId,$clientSecret,$machineCode, $accessToken, $content, $originId, $timesTamp)
-    {
-        $url = 'https://open-api.10ss.net/print/index';
-        $requestAll = [
-            'client_id' => $clientId,
-            'sign' => md5($clientId.$timesTamp.$clientSecret),
-            'id' => self::createUuid(),
-            'machine_code' => $machineCode,
-            'access_token' => $accessToken,
-            'content' => $content,
-            'origin_id' => $originId,
-            'timestamp' => $timesTamp,
-        ];
-        $params = http_build_query($requestAll);
-        return self::curl($url, $params, $ispost = 1, $https = 0);;
     }
 
     /**
@@ -1590,7 +1408,7 @@ class Helper
         $requestAll = [
             'client_id' => $clientId,
             'sign' => md5($clientId.$timesTamp.$clientSecret),
-            'id' => self::createUuid(),
+            'id' => Str::uuid(),
             'machine_code' => $machineCode,
             'access_token' => $accessToken,
             'response_type' => $responseType,
@@ -1601,17 +1419,15 @@ class Helper
     }
 
     /**
-     * 商户打印机
-     * @param $shopId 商家id
-     * @param $originId 可以为商家订单号的id
+     * 打印机
+     * @param $printerId 打印机id
+     * @param $originId 可以为订单号的id
      * @param $content 打印内容
      * @return mixed
      */
-    public static function mchPrinter($mchId,$originId,$content)
+    public static function printer($printerId,$originId,$content)
     {
-
-        $mchInfo = Merchant::where('id',$mchId)->first();
-        $printer = Printer::where('mch_id',$mchInfo['id'])->first();
+        $printer = Printer::where('id',$printerId)->first();
 
         if(empty($printer)) {
             return self::error('无此打印机配置信息！');
@@ -1647,8 +1463,23 @@ class Helper
             $accessToken = $getYlyAccessToken['access_token'];
         }
 
-        $result = self::printer($clientId,$clientSecret,$machineCode, $accessToken, $content, $originId, $timesTamp);
-        $result = json_decode($result,true);
+        $url = 'https://open-api.10ss.net/print/index';
+        $requestAll = [
+            'client_id' => $clientId,
+            'sign' => md5($clientId.$timesTamp.$clientSecret),
+            'id' => Str::uuid(),
+            'machine_code' => $machineCode,
+            'access_token' => $accessToken,
+            'content' => $content,
+            'origin_id' => $originId,
+            'timestamp' => $timesTamp,
+        ];
+
+        $params = http_build_query($requestAll);
+
+        $getResult = self::curl($url, $params, $ispost = 1, $https = 0);;
+
+        $result = json_decode($getResult,true);
 
         if ($result['error'] == 0) {
             return self::success('操作成功！');

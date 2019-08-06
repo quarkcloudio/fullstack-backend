@@ -19,7 +19,6 @@ class Printer extends Model
      * @var array
      */
     protected $fillable = [
-        'shop_id',
         'name',
         'machine_code',
         'phone',

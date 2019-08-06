@@ -15,7 +15,6 @@ class CreatePrintersTable extends Migration
     {
         Schema::create('printers', function (Blueprint $table) {
             $table->increments('id')->unsigned();
-            $table->integer('shop_id')->default(0);
             $table->string('name')->comment('打印机名称');
             $table->string('machine_code')->comment('易联云打印机终端号');
             $table->string('phone')->comment('手机卡号码');

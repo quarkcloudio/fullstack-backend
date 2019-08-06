@@ -17,6 +17,7 @@ class CreateShopsTable extends Migration
             $table->engine='innodb';
             $table->increments('id')->unsigned();
             $table->integer('mch_id')->default(0);
+            $table->integer('printer_id')->default(0);
             $table->string('title')->comment('店铺名称');
             $table->string('logo')->comment('店铺logo');
             $table->integer('category_id')->comment('店铺分类');

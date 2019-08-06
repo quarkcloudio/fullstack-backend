@@ -19,7 +19,8 @@ class Shop extends Model
      * @var array
      */
     protected $fillable = [
-        'mch_id', 
+        'mch_id',
+        'printer_id',
         'title',
         'logo',
         'category_id',
