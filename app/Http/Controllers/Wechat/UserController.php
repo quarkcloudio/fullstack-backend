@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\Helper;
 use App\User;
 
-class UserController extends CommonController
+class UserController extends Controller
 {
     /**
      * Show the application dashboard.

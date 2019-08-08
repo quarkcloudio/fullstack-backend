@@ -10,10 +10,10 @@ use App\Models\PostRelationships;
 use App\Services\Helper;
 use DB;
 
-class SearchController extends CommonController
+class SearchController extends Controller
 {
 	/**
-     * 搜索模块
+     * 
      * @author tangtanglove
 	 */
     public function index(Request $request)

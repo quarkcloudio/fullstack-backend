@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Services\Helper;
 
-class PageController extends BaseController
+class PageController extends Controller
 {
 	/**
      * 单页

@@ -11,7 +11,7 @@ use App\User;
 use App\Services\Helper;
 use Session;
 
-class CommentController extends CommonController
+class CommentController extends Controller
 {
 	/**
      * 根据对象获取评论列表

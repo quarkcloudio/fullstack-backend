@@ -14,7 +14,7 @@ use App\Models\OrderDetail;
 use App\Services\Helper;
 use DB;
 
-class GoodsController extends BaseController
+class GoodsController extends Controller
 {
 	/**
      * 商品主题页

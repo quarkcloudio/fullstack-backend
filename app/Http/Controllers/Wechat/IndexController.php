@@ -11,7 +11,7 @@ use App\Services\Helper;
 use EasyWeChat\Foundation\Application;
 use DB;
 
-class IndexController extends CommonController
+class IndexController extends Controller
 {
 
     public function index()

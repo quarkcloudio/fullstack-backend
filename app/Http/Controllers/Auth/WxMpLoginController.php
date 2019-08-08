@@ -57,22 +57,8 @@ class WxMpLoginController extends Controller
         if(empty($code) || empty($vi) || empty($encryptedData)) {
             return $this->error('错误！');
         }
-
-        $config = [
-            'app_id' => 'wx0e5fb627b65902ba',
-            'secret' => '72f45799d866f1bba59d5998831bdddb',
         
-            // 下面为可选项
-            // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
-            'response_type' => 'array',
-        
-            'log' => [
-                'level' => 'debug',
-                'file'  => storage_path('/logs/easywechat/'.date('Ymd').'.log'),
-            ]
-        ];
-        
-        $app = Factory::miniProgram($config);
+        $app = Factory::miniProgram(Helper::wechatMPConfig());
 
         $wxMpAuth = $app->auth->session($code);
 
@@ -87,8 +73,7 @@ class WxMpLoginController extends Controller
             $query->where('wechat_openid',$wxMpAuth['openid']);
         }
 
-        $user = $query->where('status',1)
-        ->first();
+        $user = $query->where('status',1)->first();
 
         if(empty($user)) {
 

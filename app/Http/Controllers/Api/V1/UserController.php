@@ -13,7 +13,7 @@ use DB;
 use Cache;
 use Hash;
 
-class UserController extends CommonController
+class UserController extends Controller
 {
     // 获取个人中心
     public function index(Request $request)

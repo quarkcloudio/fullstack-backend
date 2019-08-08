@@ -8,7 +8,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class CategoryController extends BaseController
+class CategoryController extends Controller
 {
     public function index(Request $request)
     {

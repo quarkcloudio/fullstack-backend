@@ -57,3 +57,8 @@ Route::group(['prefix' => 'cashier','namespace' => 'Cashier'],function ($router)
     $router->get('virtuaCurrency/successPage', 'Cashier\\VirtuaCurrencyController@successPage')->name('cashier/virtuaCurrency/successPage');
     $router->get('virtuaCurrency/errorPage', 'Cashier\\VirtuaCurrencyController@errorPage')->name('cashier/virtuaCurrency/errorPage');
 });
+
+// PC已登录路由组
+Route::group(['namespace' => 'Home','middleware' => ['web']],function ($router) {
+
+});

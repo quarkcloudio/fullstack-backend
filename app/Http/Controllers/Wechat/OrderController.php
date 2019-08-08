@@ -14,7 +14,7 @@ use App\Services\Helper;
 use DB;
 use Session;
 
-class OrderController extends CommonController
+class OrderController extends Controller
 {
 	/**
      * 订单列表

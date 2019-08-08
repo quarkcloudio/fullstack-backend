@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use App\Services\Helper;
 use DB;
 
-class PluginController extends BaseController
+class PluginController extends Controller
 {
 	/**
-     * 搜索模块
+     * 
      * @author tangtanglove
 	 */
     public function form(Request $request)

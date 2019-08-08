@@ -35,7 +35,7 @@ class AppServiceInit
 
         if(!empty($user)) {
             define('UID',$user->id);
-            define('USERNAME',$user->name);
+            define('USERNAME',$user->username);
             define('NICKNAME',$user->nickname);
         } else {
             define('UID','');

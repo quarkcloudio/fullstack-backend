@@ -10,7 +10,7 @@ use App\Models\PostRelationships;
 use App\Services\Helper;
 use DB;
 
-class PageController extends BaseController
+class PageController extends Controller
 {
 	/**
      * 单页

@@ -9,7 +9,7 @@ use App\Models\BannerCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class BannerController extends BaseController
+class BannerController extends Controller
 {
     public function index(Request $request)
     {

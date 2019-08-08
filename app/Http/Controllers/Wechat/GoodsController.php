@@ -13,7 +13,7 @@ use App\Services\Helper;
 use EasyWeChat\Factory;
 use DB;
 
-class GoodsController extends CommonController
+class GoodsController extends Controller
 {
 	/**
      * 商品主题页

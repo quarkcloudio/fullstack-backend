@@ -13,7 +13,7 @@ use App\Services\Helper;
 use DB;
 use Session;
 
-class CartController extends CommonController
+class CartController extends Controller
 {
 	/**
      * 购物车列表

@@ -45,64 +45,59 @@ class WxMpLoginController extends Controller
     }
 
     /**
-     * 登录方法
-     * @author  tangtanglove <dai_hang_love@126.com>
+     * 授权方法
+     *
+     * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
     {
-        $code = $request->input('code');
-        $vi = $request->input('vi');
-        $encryptedData = $request->input('encryptedData');
+        $targetUrl   = $request->input('targetUrl');
 
-        if(empty($code) || empty($vi) || empty($encryptedData)) {
-            return $this->error('错误！');
+        $app = Factory::officialAccount(Helper::wechatConfig());
+        $oauth = $app->oauth;
+
+        $user = Auth::user();
+        // 未登录
+        if (empty($user)) {
+            Session::put('target_url', $targetUrl);
+            return $oauth->redirect();
+        }
+    }
+
+    /**
+     * 授权回调方法
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function callback()
+    {
+        $app = Factory::officialAccount(Helper::wechatConfig());
+        $oauth = $app->oauth;
+
+        // 获取 OAuth 授权结果用户信息
+        $wechatUser = $oauth->user()->toArray();
+
+        // 定义对象
+        $query = User::query()->where('wechat_openid', $wechatUser['original']['openid']);
+
+        if(isset($wechatUser['original']['unionid'])) {
+            $query->orWhere('wechat_unionid', $wechatUser['original']['unionid']);
         }
 
-        $config = [
-            'app_id' => 'wx0e5fb627b65902ba',
-            'secret' => '72f45799d866f1bba59d5998831bdddb',
-        
-            // 下面为可选项
-            // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
-            'response_type' => 'array',
-        
-            'log' => [
-                'level' => 'debug',
-                'file'  => storage_path('/logs/easywechat/'.date('Ymd').'.log'),
-            ]
-        ];
-        
-        $app = Factory::miniProgram($config);
-
-        $wxMpAuth = $app->auth->session($code);
-
-        $query = User::query();
-
-        if(isset($wxMpAuth['unionid'])) {
-            $query->where('wechat_unionid',$wxMpAuth['unionid']);
-        } else {
-            if(empty($wxMpAuth['openid'])) {
-                return $this->error('授权失败！');
-            }
-            $query->where('wechat_openid',$wxMpAuth['openid']);
-        }
-
-        $user = $query->where('status',1)
-        ->first();
+        $user = $query->first();
 
         if(empty($user)) {
 
-            $decryptedData = $app->encryptor->decryptData($wxMpAuth['session_key'], $vi, $encryptedData);
-
-            // 不存在用户，插入到数据库中
+            // 组合数组
             $data['username'] = Helper::makeRand(8) . '-' . time(); // 临时用户名
-            $data['nickname'] = $decryptedData['nickName'];
-            $data['sex'] = $decryptedData['gender'];
+            $data['nickname'] = Helper::filterEmoji($wechatUser['nickname']);
+            $data['sex'] = $wechatUser['original']['sex'];
             $data['password'] = bcrypt(env('APP_KEY'));
-            $data['cover_id'] = $decryptedData['avatarUrl'];
-            $data['wechat_openid'] = $decryptedData['openId'];
-            if(isset($decryptedData['unionId'])) {
-                $data['wechat_unionid'] = $decryptedData['unionId'];
+            $data['cover_id'] = $wechatUser['avatar'];
+            $data['wechat_openid'] = $wechatUser['original']['openid'];
+            
+            if(isset($wechatUser['original']['unionid'])) {
+                $data['wechat_unionid'] = $wechatUser['original']['unionid'];
             }
             $data['last_login_ip'] = Helper::clientIp();
             $data['last_login_time'] = date('Y-m-d H:i:s');
@@ -120,18 +115,18 @@ class WxMpLoginController extends Controller
             }
 
         } else {
+
             // 存在则登录
             $uid = $user['id'];
         }
 
-        $loginResult = Auth::loginUsingId($uid);
+        // 快捷登录
+        Auth::loginUsingId($uid);
 
-        if(empty($loginResult)) {
-
-            return $this->error('登录失败！');
+        $targetUrl = Session::get('target_url');
+        // 跳转
+        if($targetUrl) {
+            return redirect(url($targetUrl));
         }
-
-        $result['token'] = Auth::user()->createToken('FullStack')->accessToken;
-        return $this->success('登录成功！','',$result);
     }
 }

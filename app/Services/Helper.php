@@ -917,6 +917,44 @@ class Helper
         return $config;
     }
 
+    // 返回小程序配置
+    static function wechatMPConfig($id = '')
+    {
+        if(empty($id)) {
+            $wechatId = Session::get('wechat_id');
+        } else {
+            $wechatId = $id;
+        }
+
+        if(!empty($wechatId)) {
+            $wechat = Wechat::find($wechatId);
+        } else {
+            $wechat = Wechat::where('status',1)->first();
+        }
+
+        if(empty($wechat)) {
+            return self::error('无此小程序配置！');
+        }
+
+        $config = [
+            'debug'     => true,
+            'app_id'    => $wechat['appid'],
+            'secret'    => $wechat['secret'],
+            'token'     => $wechat['token'],
+            'aes_key'   => $wechat['aes_key'],
+            'oauth' => [
+                'scopes'   => ['snsapi_userinfo'],
+                'callback' => url('wechat/auth/callback'),
+            ],
+            'log' => [
+                'level' => 'debug',
+                'file'  => storage_path('/logs/easywechat/easywechat_'.date('Ymd').'.log'),
+            ]
+        ];
+
+        return $config;
+    }
+
     // 返回微信支付配置
     static function wechatPayConfig()
     {

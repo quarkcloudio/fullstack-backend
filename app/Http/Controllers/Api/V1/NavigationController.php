@@ -8,7 +8,7 @@ use App\Models\Navigation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class NavigationController extends BaseController
+class NavigationController extends Controller
 {
     public function index(Request $request)
     {

@@ -9,7 +9,7 @@ use App\Models\Post;
 use App\Services\Helper;
 use DB;
 
-class ArticleController extends BaseController
+class ArticleController extends Controller
 {
 	/**
      * 文章主题页

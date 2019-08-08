@@ -41,6 +41,12 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
+        $this->mapMiniprogramRoutes();
+
+        $this->mapMobileRoutes();
+
+        $this->mapWechatRoutes();
+        
         //
     }
 
@@ -86,5 +92,48 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/admin.php'));
+    }
+
+    /**
+     * Define the "wechat miniprogram" routes for the application.
+     *
+     * These routes are typically stateless.
+     *
+     * @return void
+     */
+    protected function mapMiniprogramRoutes()
+    {
+        Route::prefix('miniprogram')
+             ->middleware('api')
+             ->namespace($this->namespace)
+             ->group(base_path('routes/miniprogram.php'));
+    }
+
+    /**
+     * Define the "mobile" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapMobileRoutes()
+    {
+        Route::middleware('web')
+             ->namespace($this->namespace)
+             ->group(base_path('routes/mobile.php'));
+    }
+
+    /**
+     * Define the "wechat" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWechatRoutes()
+    {
+        Route::middleware('web')
+             ->namespace($this->namespace)
+             ->group(base_path('routes/wechat.php'));
     }
 }

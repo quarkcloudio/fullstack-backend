@@ -10,7 +10,7 @@ use App\Models\Comment;
 use App\Services\Helper;
 use App\User;
 
-class ArticleController extends BaseController
+class ArticleController extends Controller
 {
 	/**
      * 文章主题页
