@@ -3,12 +3,9 @@
 namespace App\Http\Controllers\Wechat;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\PostCate;
-use App\Models\Post;
-use App\Models\PostRelationships;
 use App\Services\Helper;
-use EasyWeChat\Foundation\Application;
+use Illuminate\Http\Request;
+use EasyWeChat\Factory;
 use DB;
 
 class IndexController extends Controller
@@ -17,15 +14,12 @@ class IndexController extends Controller
     public function index()
     {
         $jsApi = '';
-
-        // 微信中登录认证
-        if(isset($_SERVER['HTTP_USER_AGENT'])) {
-            if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
-                $app = new Application(Helper::wechatConfig());
-                $js = $app->js;
-                $jsApi = $js->config(array('onMenuShareTimeline','onMenuShareAppMessage'));
-            }
+        if(Helper::isWechat()) {
+            $app = Factory::officialAccount(Helper::wechatConfig());
+            $jsApi = $app->jssdk->buildConfig(array('onMenuShareTimeline','onMenuShareAppMessage'), $debug = false, $beta = false, $json = true);    
         }
-        return view('wechat/index/index',compact('jsApi'));
+
+        $data['jsApi'] = $jsApi;
+        return view('wechat/index/index',$data);
     }
 }

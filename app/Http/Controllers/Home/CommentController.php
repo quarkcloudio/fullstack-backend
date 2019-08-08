@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\PC\Plugin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\PC\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Comment;
@@ -16,7 +15,7 @@ use App\Models\GroupbuyOrder;
 use Session;
 use DB;
 
-class CommentController extends BaseController
+class CommentController extends Controller
 {
 	/**
      * 根据对象获取评论列表

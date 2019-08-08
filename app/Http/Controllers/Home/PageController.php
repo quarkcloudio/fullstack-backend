@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\PC\Content;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\PC\BaseController;
 use Illuminate\Http\Request;
 use App\Models\PostCate;
 use App\Models\Post;
@@ -11,7 +10,7 @@ use App\Models\PostRelationships;
 use App\Services\Helper;
 use DB;
 
-class PageController extends BaseController
+class PageController extends Controller
 {
 	/**
      * 单页

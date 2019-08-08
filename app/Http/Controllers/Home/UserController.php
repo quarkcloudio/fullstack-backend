@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\PC\User;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\PC\CommonController;
+use App\Http\Controllers\Controller;
 use App\User;
 use App\Services\Helper;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +11,7 @@ use App\Models\Sms;
 use Hash;
 use Session;
 
-class UserController extends CommonController
+class UserController extends Controller
 {
     /**
      * 用户中心

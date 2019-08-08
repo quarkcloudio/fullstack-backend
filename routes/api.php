@@ -13,6 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api', 'throttle:60,1')->group(['prefix' => 'v1','namespace' => 'Api\\V1'],function ($router) {
+Route::group(['prefix' => 'v1','namespace' => 'Api\\V1','middleware' => ['auth:api','throttle:60,1']],function ($router) {
     $router->get('index/index', 'IndexController@index')->name('api/v1/index/index');
 });
