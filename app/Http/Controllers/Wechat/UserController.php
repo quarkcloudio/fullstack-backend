@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Mobile;
+namespace App\Http\Controllers\Wechat;
 
 use Illuminate\Http\Request;
 use App\Services\Helper;
@@ -53,6 +53,5 @@ class UserController extends Controller
             $user = User::where('id',$uid)->first();
             return view('wechat/user/phone',compact('user'));
         }
-
     }
 }
