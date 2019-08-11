@@ -880,68 +880,44 @@ class Helper
     }
 
     // 返回公众号配置
-    static function wechatConfig($id = '')
+    static function wechatConfig($type = 'fwh')
     {
-        if(empty($id)) {
-            $wechatId = Session::get('wechat_id');
-        } else {
-            $wechatId = $id;
-        }
+        switch ($type) {
+            case 'dyh':
 
-        if(!empty($wechatId)) {
-            $wechat = Wechat::find($wechatId);
-        } else {
-            $wechat = Wechat::where('status',1)->first();
-        }
+                // 订阅号
+                $appid  = self::config('WECHAT_DYH_APPID');
+                $secret = self::config('WECHAT_DYH_APPSECRET');
+                $token  = self::config('WECHAT_DYH_TOKEN');
+                $aesKey = self::config('WECHAT_DYH_ENCODINGAESKEY');
+                break;
+            case 'fwh':
 
-        if(empty($wechat)) {
-            return self::error('无此公众号配置！');
+                // 服务号
+                $appid  = self::config('WECHAT_FWH_APPID');
+                $secret = self::config('WECHAT_FWH_APPSECRET');
+                $token  = self::config('WECHAT_FWH_TOKEN');
+                $aesKey = self::config('WECHAT_FWH_ENCODINGAESKEY');
+                break;
+            case 'mp':
+            
+                // 小程序
+                $appid  = self::config('WECHAT_MP_APPID');
+                $secret = self::config('WECHAT_MP_APPSECRET');
+                $token  = self::config('WECHAT_MP_TOKEN');
+                $aesKey = self::config('WECHAT_MP_ENCODINGAESKEY');
+                break;
+            default:
+                return self::error('请指定公众号类型！');
+                break;
         }
 
         $config = [
             'debug'     => true,
-            'app_id'    => $wechat['appid'],
-            'secret'    => $wechat['secret'],
-            'token'     => $wechat['token'],
-            'aes_key'   => $wechat['aes_key'],
-            'oauth' => [
-                'scopes'   => ['snsapi_userinfo'],
-                'callback' => url('wechat/auth/callback'),
-            ],
-            'log' => [
-                'level' => 'debug',
-                'file'  => storage_path('/logs/easywechat/easywechat_'.date('Ymd').'.log'),
-            ]
-        ];
-
-        return $config;
-    }
-
-    // 返回小程序配置
-    static function wechatMPConfig($id = '')
-    {
-        if(empty($id)) {
-            $wechatId = Session::get('wechat_id');
-        } else {
-            $wechatId = $id;
-        }
-
-        if(!empty($wechatId)) {
-            $wechat = Wechat::find($wechatId);
-        } else {
-            $wechat = Wechat::where('status',1)->first();
-        }
-
-        if(empty($wechat)) {
-            return self::error('无此小程序配置！');
-        }
-
-        $config = [
-            'debug'     => true,
-            'app_id'    => $wechat['appid'],
-            'secret'    => $wechat['secret'],
-            'token'     => $wechat['token'],
-            'aes_key'   => $wechat['aes_key'],
+            'app_id'    => $appid,
+            'secret'    => $secret,
+            'token'     => $token,
+            'aes_key'   => $aesKey,
             'oauth' => [
                 'scopes'   => ['snsapi_userinfo'],
                 'callback' => url('wechat/auth/callback'),

@@ -20,8 +20,22 @@ class ServerController extends Controller
      */
     public function token(Request $request)
     {
-        // 这里使用的是订阅号
-        $app = Factory::officialAccount(Helper::wechatConfig());
+
+        $type = $request->get('type');
+
+        switch ($type) {
+            case 'dyh':
+                // 这里使用的是订阅号
+                $app = Factory::officialAccount(Helper::wechatConfig('dyh'));
+                break;
+            case 'fwh':
+                // 这里使用的是服务号
+                $app = Factory::officialAccount(Helper::wechatConfig('fwh'));
+                break;
+            default:
+                $app = Factory::officialAccount(Helper::wechatConfig('fwh'));
+                break;
+        }
 
         // 从项目实例中得到服务端应用实例。
         $app->server->push(function ($message) {

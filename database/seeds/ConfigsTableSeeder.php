@@ -41,13 +41,13 @@ class ConfigsTableSeeder extends Seeder
             ['id' => 23,'title' => '企业代码','type' => 'text','name' => 'SIOO_CODE','group_name' => '希奥短信','value' => '','remark' => '','status' => 1],
             ['id' => 24,'title' => '用户密码','type' => 'text','name' => 'SIOO_PASSWORD','group_name' => '希奥短信','value' => '','remark' => '','status' => 1],
 
-            ['id' => 25,'title' => 'app_id','type' => 'text','name' => 'WECHAT_PAY_APP_ID','group_name' => '微信支付','value' => '','remark' => 'JSAPI支付授权目录，例如：http://www.web.com/wechat/wechat/','status' => 1],
+            ['id' => 25,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_PAY_APP_ID','group_name' => '微信支付','value' => '','remark' => 'AppID（JSAPI支付授权目录，例如：http://www.web.com/wechat/wechat/）','status' => 1],
             ['id' => 26,'title' => 'merchant_id','type' => 'text','name' => 'WECHAT_PAY_MERCHANTID','group_name' => '微信支付','value' => '','remark' => '','status' => 1],
             ['id' => 27,'title' => 'key','type' => 'text','name' => 'WECHAT_PAY_KEY','group_name' => '微信支付','value' => '','remark' => '','status' => 1],
             ['id' => 28,'title' => 'apiclient_cert','type' => 'file','name' => 'WECHAT_PAY_APICLIENT_CERT','group_name' => '微信支付','value' => '','remark' => '','status' => 1],
             ['id' => 29,'title' => 'apiclient_key','type' => 'file','name' => 'WECHAT_PAY_APICLIENT_KEY','group_name' => '微信支付','value' => '','remark' => '','status' => 1],
 
-            ['id' => 30,'title' => 'app_id','type' => 'text','name' => 'WECHAT_APP_PAY_APP_ID','group_name' => '微信APP支付','value' => '','remark' => '需要在开放平台申请','status' => 1],
+            ['id' => 30,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_APP_PAY_APP_ID','group_name' => '微信APP支付','value' => '','remark' => 'AppID（需要在开放平台申请）','status' => 1],
             ['id' => 31,'title' => 'merchant_id','type' => 'text','name' => 'WECHAT_APP_PAY_MERCHANTID','group_name' => '微信APP支付','value' => '','remark' => '','status' => 1],
             ['id' => 32,'title' => 'key','type' => 'text','name' => 'WECHAT_APP_PAY_KEY','group_name' => '微信APP支付','value' => '','remark' => '','status' => 1],
             ['id' => 33,'title' => 'apiclient_cert','type' => 'file','name' => 'WECHAT_APP_PAY_APICLIENT_CERT','group_name' => '微信APP支付','value' => '','remark' => '','status' => 1],
@@ -58,16 +58,20 @@ class ConfigsTableSeeder extends Seeder
             ['id' => 37,'title' => 'private_key','type' => 'textarea','name' => 'ALIPAY_PRIVATE_KEY','group_name' => '支付宝','value' => '','remark' => '','status' => 1],
             ['id' => 38,'title' => 'ali_public_key','type' => 'textarea','name' => 'ALIPAY_PUBLIC_KEY','group_name' => '支付宝','value' => '','remark' => '','status' => 1],
 
-            ['id' => 39,'title' => 'QQ Key','type' => 'text','name' => 'QQ_APP_KEY','group_name' => '社交登录','value' => '','remark' => '','status' => 1],
-            ['id' => 40,'title' => 'QQ Secret','type' => 'text','name' => 'QQ_APP_SECRET','group_name' => '社交登录','value' => '','remark' => '','status' => 1],
+            ['id' => 39,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_DYH_APPID','group_name' => '微信订阅号','value' => '','remark' => 'AppID','status' => 1],
+            ['id' => 40,'title' => '开发者密码','type' => 'text','name' => 'WECHAT_DYH_APPSECRET','group_name' => '微信订阅号','value' => '','remark' => 'AppSecret','status' => 1],
+            ['id' => 41,'title' => '令牌','type' => 'text','name' => 'WECHAT_DYH_TOKEN','group_name' => '微信订阅号','value' => '','remark' => 'Token（服务器地址：https://website.com/wechat/server/token?type=dyh）','status' => 1],
+            ['id' => 42,'title' => '消息密钥','type' => 'textarea','name' => 'WECHAT_DYH_ENCODINGAESKEY','group_name' => '微信订阅号','value' => '','remark' => 'EncodingAESKey','status' => 1],
 
-            ['id' => 41,'title' => '微博 Key','type' => 'text','name' => 'WEIBO_APP_KEY','group_name' => '社交登录','value' => '','remark' => '','status' => 1],
-            ['id' => 42,'title' => '微博 Secret','type' => 'text','name' => 'WEIBO_APP_SECRET','group_name' => '社交登录','value' => '','remark' => '','status' => 1],
+            ['id' => 43,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_FWH_APPID','group_name' => '微信服务号','value' => '','remark' => 'AppID','status' => 1],
+            ['id' => 44,'title' => '开发者密码','type' => 'text','name' => 'WECHAT_FWH_APPSECRET','group_name' => '微信服务号','value' => '','remark' => 'AppSecret','status' => 1],
+            ['id' => 45,'title' => '令牌','type' => 'text','name' => 'WECHAT_FWH_TOKEN','group_name' => '微信服务号','value' => '','remark' => 'Token（服务器地址：https://website.com/wechat/server/token?type=fwh）','status' => 1],
+            ['id' => 46,'title' => '消息密钥','type' => 'textarea','name' => 'WECHAT_FWH_ENCODINGAESKEY','group_name' => '微信服务号','value' => '','remark' => 'EncodingAESKey','status' => 1],
 
-            ['id' => 43,'title' => '微信 Key','type' => 'text','name' => 'WECHAT_APP_KEY','group_name' => '社交登录','value' => '','remark' => '','status' => 1],
-            ['id' => 44,'title' => '微信 Secret','type' => 'text','name' => 'WECHAT_APP_SECRET','group_name' => '社交登录','value' => '','remark' => '','status' => 1],
+            ['id' => 47,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_MP_APPID','group_name' => '微信小程序','value' => '','remark' => 'AppID','status' => 1],
+            ['id' => 48,'title' => '开发者密码','type' => 'text','name' => 'WECHAT_MP_APPSECRET','group_name' => '微信小程序','value' => '','remark' => 'AppSecret','status' => 1],
 
-            ['id' => 45,'title' => '开发者模式','type' => 'switch','name' => 'APP_DEBUG','group_name' => '基本','value' => '1','remark' => '','status' => 1],
+            ['id' => 49,'title' => '开发者模式','type' => 'switch','name' => 'APP_DEBUG','group_name' => '基本','value' => '1','remark' => '','status' => 1],
         ]);
     }
 }
