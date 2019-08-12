@@ -19,6 +19,6 @@ class Area extends Model
      * @var array
      */
     protected $fillable = [
-        'area_name','pid','short_name','lng','lat','level','position','sort'
+        'id','area_name','pid','short_name','lng','lat','level','position','sort'
     ];
 }
