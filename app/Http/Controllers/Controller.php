@@ -6,8 +6,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use App\Services\Helper;
+use Request;
 
 class Controller extends BaseController
 {
@@ -19,9 +19,7 @@ class Controller extends BaseController
     */
     public function error($msg,$url = '')
     {
-        $request = new Request;
-
-        if($request->ajax() || $this->isApi()) {
+        if(Request::ajax() || $this->isApi()) {
             $result['msg'] = $msg;
             $result['url'] = $url;
             $result['status'] = 'error';
@@ -41,9 +39,7 @@ class Controller extends BaseController
     */
     public function success($msg,$url ='',$data = '',$pagination = [],$search = [],$status = 'success')
     {
-        $request = new Request;
-
-        if($request->ajax() || $this->isApi()) {
+        if(Request::ajax() || $this->isApi()) {
             $result['msg'] = $msg;
             $result['url'] = $url;
             $result['data'] = $data;
