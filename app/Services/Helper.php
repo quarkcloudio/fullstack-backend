@@ -765,7 +765,7 @@ class Helper
                         $baseUrl = 'https://';
                     }
 
-                    $url = $baseUrl.$_SERVER['HTTP_HOST'].'/'.Storage::url($picture['path']);
+                    $url = $baseUrl.$_SERVER['HTTP_HOST'].Storage::url($picture['path']);
                 }
 
                 $result = $url;
