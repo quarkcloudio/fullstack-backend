@@ -3,21 +3,38 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Services\Helper;
+use App\User;
+use App\Models\ActionLog;
+use App\Models\Sms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\Helper;
-use App\Models\User;
-use App\Models\ActionLog;
-use Laravel\Passport\Client;
+use Session;
 
 class LoginController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Login Controller
+    |--------------------------------------------------------------------------
+    |
+    | This controller handles authenticating users for the application and
+    | redirecting them to your home screen. The controller uses a trait
+    | to conveniently provide its functionality to your applications.
+    |
+    */
+
+    use AuthenticatesUsers;
+
     /**
-     * Where to redirect users after login / registration.
+     * Where to redirect users after login.
      *
      * @var string
      */
-    protected $redirectTo = '/index';
+    protected $redirectTo = '/home';
+
+    protected $username;
 
     /**
      * Create a new controller instance.
@@ -30,198 +47,173 @@ class LoginController extends Controller
     }
 
     /**
-     * 用户退出方法
-     * @author  tangtanglove <dai_hang_love@126.com>
-     */
-    public function logout()
-    {
-        $result = Auth::logout();
-
-        if($result !== false) {
-            return $this->success('已退出！');
-        } else {
-            return $this->error('错误！');
-        }
-    }
-
-    /**
-     * 登录方法
+     * 通用登录
      * @author  tangtanglove <dai_hang_love@126.com>
      */
     public function login(Request $request)
     {
         $type = $request->input('type');
-
-        switch ($type) {
-            case 'account':
-
-                // 账号登录
-                $loginResult = $this->accountLogin($request);
-                break;
-            case 'mobile':
-
-                // 手机登录
-                $loginResult = $this->mobileLogin($request);
-                break;
-            default:
-                return $this->error('参数错误！');
-                break;
-        }
-
-        if ($loginResult['status'] === 'success') {
-
-            $data['msg'] = '登录成功';
-            $data['status'] = 'success';
-            $data['type'] = $type;
-            $data['uid'] = $loginResult['data']['uid'];
-            $data['username'] = $loginResult['data']['username'];
-            $data['nickname'] = $loginResult['data']['nickname'];
-            $data['currentAuthority'] = 'admin';
-            $data['token'] = $loginResult['data']['token'];
-
-            return $data;
-        } else {
-
-            $data['msg'] = '登录失败';
-            $data['status'] = 'error';
-            $data['type'] = $type;
-
-            return $data;
-        }
-
-    }
-
-    /**
-     * 账号登录方法
-     * @author  tangtanglove <dai_hang_love@126.com>
-     */
-    protected function accountLogin($request)
-    {
-        $username = $request->input('username');
-        $password = $request->input('password');
-        $captcha = $request->input('captcha');
-
-        // 一天内累计6次登录错误，则必须开启验证码
-        $loginErrorTimes = ActionLog::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
-        ->where('action',$username.'LOGIN_ERROR')
-        ->count();
-        
-        if($loginErrorTimes > 6) {
-            $getCaptcha = session('captcha');
-            if(empty($captcha) || ($captcha != $getCaptcha)) {
-                return $this->error('验证码错误！');
+        if($request->isMethod('post')) {
+            $username = $request->input('username');
+            $password = $request->input('password');
+            $captcha = $request->input('captcha');
+            // 一天内累计6次登录错误，则必须开启验证码
+            $loginErrorCount = Log::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
+            ->where('action',$username.'LOGIN_ERROR')
+            ->count();
+            
+            if($loginErrorCount > 6) {
+                $getCaptcha = Session::get('captcha');
+                if(empty($captcha) || ($captcha != $getCaptcha)) {
+                    return $this->error('验证码错误！');
+                }
             }
-        }
 
-        if(empty($username)) {
-            return $this->error('用户名不能为空！');
-        }
+            if(empty($username) || empty($password)) {
+                return $this->error('用户名或密码不能为空！');
+            }
 
-        if(empty($password)) {
-            return $this->error('密码不能为空！');
-        }
+            // 用户名登录
+            $nameLoginSuccess = Auth::guard('web')->attempt(['name' => $username, 'password' => $password]);
 
-        $loginResult = Auth::attempt(['username' => $username, 'password' => $password]);
+            // 邮箱登录
+            $emailLoginSuccess = Auth::guard('web')->attempt(['email' => $username, 'password' => $password]);
 
-        if($loginResult) {
+            // 手机登录
+            $phoneLoginSuccess = Auth::guard('web')->attempt(['phone' => $username, 'password' => $password]);
+            
+            if ($nameLoginSuccess || $emailLoginSuccess || $phoneLoginSuccess) {
+                $id = auth('web')->user()->id;
 
-            $user = Auth::user();
+                // 更新登录信息
+                $data['last_login_ip'] = $_SERVER["REMOTE_ADDR"];
+                $data['last_login_time'] = date('Y-m-d H:i:s');
+                User::where('id',$id)->update($data);
 
-            // 更新登录信息
-            $data['last_login_ip'] = Helper::clientIp();
-            $data['last_login_time'] = date('Y-m-d H:i:s');
-            Admin::where('id',$user->id)->update($data);
+                // 根据ip获取地址
+                $getAddress = Helper::getAddress($_SERVER["REMOTE_ADDR"]);
 
-            // 记录日志
-            $log['action'] = '管理员登录';
-            $log['type'] = 'ADMIN';
-            $log['remark'] = Auth::user()->username.'登录后台';
-            Helper::actionLog($log);
+                // 记录登录日志
+                $log['action'] = '用户登录';
+                $log['type'] = 'USER';
+                $log['remark'] = '浏览器 '.$getAddress['province'].' '.$getAddress['city'];
+                Helper::actionLog($log);
 
-            $result['uid'] = $user->id;
-            $result['username'] = $user->username;
-            $result['nickname'] = $user->nickname;
-            $result['token'] = $user->createToken('FullStack')->accessToken;
+                if(Helper::isMobile()){
+                    return $this->success('登录成功','mobile/index/index');
+                }else{
+                    return $this->success('登录成功','pc/index/index');
+                }
+                
+            } else {
 
-            return $this->success('登录成功！','',$result);
+                // 记录登录日志
+                $log['action'] = $username.'LOGIN_ERROR';
+                $log['remark'] = '用户'.$username.'尝试登录出错！';
+                Helper::actionLog($log);
+
+                // 清除验证码
+                Session::put('captcha','');
+                
+                return $this->error('用户名或密码错误！');
+            }
         } else {
-
-            // 记录登录日志
-            $log['action'] = $username.'LOGIN_ERROR';
-            $log['type'] = 'ADMIN';
-            $log['remark'] = '管理员'.$username.'尝试登录出错！';
-            Helper::actionLog($log);
-
-            // 清除验证码
-            session(['captcha'=>null]);
-
-            return $this->error('登录失败！');
+            return view('auth/login');
         }
     }
 
     /**
-     * 手机登录方法
+     * 快捷登录
      * @author  tangtanglove <dai_hang_love@126.com>
      */
-    protected function mobileLogin($request)
+    public function quickLogin(Request $request)
     {
+
         $phone = $request->input('phone');
         $code = $request->input('code');
 
-        if(empty($phone)) {
-            return $this->error('手机号不能为空！');
-        }
-
-        if(empty($code)) {
-            return $this->error('短信验证码不能为空！');
-        }
-
         $validateStatus = Helper::validateSmsCode($phone,$code);
 
-        if($validateStatus['status'] !== 'success') {
-            return $this->error($validateStatus['msg']);
+        if($validateStatus != 'ok') {
+            return $this->error($validateStatus);
         }
 
-        $getPhone = Admin::where('phone',$phone)->first();
+        $hasPhone = User::where('phone',$phone)->first();
 
-        if(empty($getPhone)) {
-            return $this->error('无此用户！');
+        if(empty($hasPhone)) {
+            $data['phone'] = $phone;
+            $data['password'] = bcrypt(env('APP_KEY'));
+            $data['money'] = 0;
+            $data['point'] = 0;
+            $data['status'] = 1;
+            $data['created_at'] = date('Y-m-d H:i:s');
+
+            $uid = User::insertGetId($data);
+            if($uid) {
+                $updateData['name'] = Helper::createRand().'-ID'.$uid;
+                $updateData['nickname'] = Helper::createRand().'-ID'.$uid;
+                User::where('id',$uid)->update($updateData);
+            } else {
+                return $this->error('注册失败，请重试！');
+            }
         } else {
-            $uid = $getPhone->id;
+            $uid = $hasPhone->id;
         }
 
         // 通过uid登录
-        $result = Auth::loginUsingId($uid);
+        $quickLoginSuccess = Auth::loginUsingId($uid);
 
-        if($result) {
-
-            $user = Auth::user();
+        if ($quickLoginSuccess) {
+            $id = auth('web')->user()->id;
 
             // 更新登录信息
-            $data['last_login_ip'] = Helper::clientIp();
-            $data['last_login_time'] = date('Y-m-d H:i:s');
-            User::where('id',$user->id)->update($data);
+            $loginData['last_login_ip'] = $_SERVER["REMOTE_ADDR"];
+            $loginData['last_login_time'] = date('Y-m-d H:i:s');
+            User::where('id',$id)->update($loginData);
 
-            // 记录日志
+            // 根据ip获取地址
+            $getAddress = Helper::getAddress($_SERVER["REMOTE_ADDR"]);
+
+            // 记录登录日志
             $log['action'] = '用户登录';
-            $log['type'] = 'USER';
-            $log['remark'] = Auth::user()->username.'登录后台';
+            $log['remark'] = '浏览器 '.$getAddress['province'].' '.$getAddress['city'];
             Helper::actionLog($log);
 
-            $result['uid'] = $user->id;
-            $result['username'] = $user->username;
-            $result['nickname'] = $user->nickname;
-
-            return $this->success('登录成功！','',$result);
+            return $this->success('登录成功','mobile/index/index');
         } else {
 
             // 记录登录日志
             $log['action'] = $phone.'LOGIN_ERROR';
-            $log['type'] = 'USER';
             $log['remark'] = '用户'.$phone.'尝试登录出错！';
-            Helper::actionLog($log);
+            Helper::log($log);
 
-            return $this->error('登录失败！');
+            return $this->error('用户名或密码错误！');
         }
+    }
+
+    /**
+     * 获取登录错误次数
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function loginErrorTimes(Request $request)
+    {
+        $username = $request->input('username');
+
+        // 一天内累计6次登录错误，则必须开启验证码
+        $loginErrorCount = ActionLog::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
+        ->where('action',$username.'LOGIN_ERROR')
+        ->count();
+
+        return $this->success($loginErrorCount);
+    }
+
+    /**
+     * 退出
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function logout()
+    {
+        $result = Auth::guard('web')->logout();
+        return redirect('login');
     }
 }

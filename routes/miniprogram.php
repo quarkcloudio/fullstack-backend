@@ -13,9 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-// 小程序api
-Route::any('wxMpLogin/login', 'Auth\\WxMpLoginController@login')->name('api/wxMpLogin/login');
-
 Route::group(['prefix' => 'miniprogram','namespace' => 'MiniProgram','middleware' => 'auth:api'],function ($router) {
     // 小程序登录认证后路由
 });

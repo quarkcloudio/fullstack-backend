@@ -920,7 +920,7 @@ class Helper
             'aes_key'   => $aesKey,
             'oauth' => [
                 'scopes'   => ['snsapi_userinfo'],
-                'callback' => url('wechat/auth/callback'),
+                'callback' => url('wxLogin/callback'),
             ],
             'log' => [
                 'level' => 'debug',

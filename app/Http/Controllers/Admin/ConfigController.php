@@ -87,6 +87,7 @@ class ConfigController extends BuilderController
                         }
                     
                         $controls[] = File::make($config['title'],$config['name'])
+                        ->limitType(['','text/plain','image/jpeg','image/png'])
                         ->extra($config['remark'])
                         ->value($file);
                         break;
