@@ -90,6 +90,8 @@ class WxMpLoginController extends Controller
 
             // 组合数组
             $data['username'] = Helper::makeRand(8) . '-' . time(); // 临时用户名
+            $data['email'] = Helper::makeRand(8) . '-' . time(); // 临时邮箱
+            $data['phone'] = Helper::makeRand(8) . '-' . time(); // 临时手机号
             $data['nickname'] = Helper::filterEmoji($wechatUser['nickname']);
             $data['sex'] = $wechatUser['original']['sex'];
             $data['password'] = bcrypt(env('APP_KEY'));
@@ -108,7 +110,9 @@ class WxMpLoginController extends Controller
                 return $this->error('创建用户错误！');
             }
 
-            $updateResult = User::where('id',$uid)->update(['username' => Helper::makeRand(8) . '-' . $uid]);
+            $updateData['phone'] = $updateData['email'] = $updateData['username'] = Helper::makeRand(8) . '-' . $uid;
+
+            $updateResult = User::where('id',$uid)->update($updateData);
 
             if(empty($updateResult)) {
                 return $this->error('更新临时用户名错误！');
