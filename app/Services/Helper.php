@@ -402,7 +402,7 @@ class Helper
             // https状态 todo
             $httpsStatus = self::config('SSL_OPEN');
 
-            $httpsStatus == 'on' ? $baseUrl = 'http:s//' : $baseUrl = 'http://';
+            $httpsStatus == 1 ? $baseUrl = 'https://' : $baseUrl = 'http://';
 
             $getUrl = $baseUrl.$host.$requestUri;
 
