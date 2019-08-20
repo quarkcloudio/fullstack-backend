@@ -186,7 +186,7 @@ class PictureController extends BuilderController
      public function save(Request $request)
      {
  
-        if(Helper::getConfig('OSS_OPEN') == 'on') {
+        if(Helper::getConfig('OSS_OPEN') == 1) {
             $this->error('云存储暂不此操作！');
         }
 
@@ -262,7 +262,7 @@ class PictureController extends BuilderController
      */
     public function update(Request $request)
     {
-        if(Helper::getConfig('OSS_OPEN') == 'on') {
+        if(Helper::getConfig('OSS_OPEN') == 1) {
             $this->error('云存储暂不此操作！');
         }
 
@@ -369,7 +369,7 @@ class PictureController extends BuilderController
             $this->error('参数错误！');
         }
 
-        if(Helper::config('OSS_OPEN') == 'on') {
+        if(Helper::config('OSS_OPEN') == 1) {
             $this->error('云存储暂不此操作！');
         }
 
@@ -395,7 +395,7 @@ class PictureController extends BuilderController
     {
         $ossOpen = Helper::config('OSS_OPEN');
 
-        if($ossOpen == 'on') {
+        if($ossOpen == 1) {
             $driver = 'oss';
         } else {
             $driver = 'local';

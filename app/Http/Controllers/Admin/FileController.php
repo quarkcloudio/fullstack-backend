@@ -354,7 +354,7 @@ class FileController extends BuilderController
      */
     public function update(Request $request)
     {
-        if(Helper::getConfig('OSS_OPEN') == 'on') {
+        if(Helper::getConfig('OSS_OPEN') == 1) {
             $this->error('云存储暂不此操作！');
         }
 

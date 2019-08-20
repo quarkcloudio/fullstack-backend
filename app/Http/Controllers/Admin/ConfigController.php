@@ -71,7 +71,7 @@ class ConfigController extends BuilderController
                     case 'text':
                         $controls[] = Input::make($config['title'],$config['name'])
                         ->extra($config['remark'])
-                        ->style(['width'=>400])
+                        ->style(['width'=>200])
                         ->value($config['value']);
                         break;
                     case 'file':
@@ -98,11 +98,18 @@ class ConfigController extends BuilderController
                         ->value($config['value']);
                         break;
                     case 'switch':
+
+                        if($config['value'] == 1) {
+                            $config['value'] = true;
+                        } else {
+                            $config['value'] = false;
+                        }
+
                         $controls[] = SwitchButton::make($config['title'],$config['name'])
                         ->extra($config['remark'])
                         ->checkedText('开启')
                         ->unCheckedText('关闭')
-                        ->value(true);
+                        ->value($config['value']);
                         break;
                     case 'picture':
 
@@ -153,7 +160,8 @@ class ConfigController extends BuilderController
 
         return $this->success('获取成功！','',$data);
     }
-     /**
+
+    /**
     * 保存站点配置数据
     *
     * @param  Request  $request
@@ -179,6 +187,21 @@ class ConfigController extends BuilderController
                 } else {
                     $value = null;
                 }
+            }
+
+            if($config['name'] == 'APP_DEBUG') {
+
+                if($value) {
+                    $data = [
+                        'APP_DEBUG' => 'true'
+                    ];
+                } else {
+                    $data = [
+                        'APP_DEBUG' => 'false'
+                    ];
+                }
+
+                $this->modifyEnv($data);
             }
 
             $getResult = Config::where('name',$key)->update(['value'=>$value]);
@@ -574,4 +597,30 @@ class ConfigController extends BuilderController
         }
     }
     
+    /**
+     * 改变env文件
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    function modifyEnv(array $data) 
+    {
+        $envPath = base_path() . DIRECTORY_SEPARATOR . '.env';
+
+        $contentArray = collect(file($envPath, FILE_IGNORE_NEW_LINES));
+        
+        $contentArray->transform(function ($item) use ($data){
+            foreach ($data as $key => $value){
+                if(str_contains($item, $key)){
+                    return $key . '=' . $value;
+                }
+            }
+            
+            return $item;
+        });
+        
+        $content = implode($contentArray->toArray(), "\n");
+        
+        \File::put($envPath, $content);
+    }
 }

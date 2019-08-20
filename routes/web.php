@@ -60,5 +60,5 @@ Route::group(['prefix' => 'cashier','namespace' => 'Cashier'],function ($router)
 
 // PC已登录路由组
 Route::group(['namespace' => 'Home','middleware' => ['auth']],function ($router) {
-
+    $router->get('index/index', 'IndexController@index')->name('home/index/index');
 });

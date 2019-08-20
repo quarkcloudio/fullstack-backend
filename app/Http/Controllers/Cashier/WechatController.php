@@ -17,7 +17,7 @@ use Session;
 use Illuminate\Support\Facades\Auth;
 	
 class WechatController extends Controller	
-{	
+{
     /**
      * 微信公众号或者H5网站支付
      */

@@ -43,6 +43,13 @@ class AppServiceInit
             define('NICKNAME','');
         }
 
+        if(!(strpos(Route::currentRouteName(),'api/admin') !== false)) {
+            if(Helper::config('WEB_SITE_OPEN') != 1) {
+                echo '网站关闭！';
+                die();
+            }
+        }
+
         return $next($request);
     }
 }

@@ -400,7 +400,7 @@ class Helper
             $requestUri = $_SERVER['REQUEST_URI'];
 
             // https状态 todo
-            $httpsStatus = self::config('HTTPS_STATUS');
+            $httpsStatus = self::config('SSL_OPEN');
 
             $httpsStatus == 'on' ? $baseUrl = 'http:s//' : $baseUrl = 'http://';
 
@@ -584,7 +584,7 @@ class Helper
                         if(!strstr($value,"v.qq.com")) {
                             if(strpos($value,'../') !== false) {
                                 $objects[$key]['cover_path'.$key1] = 'http://'.$_SERVER['HTTP_HOST'].'/'.str_replace('../','',$value);
-                                if(self::config('HTTPS_STATUS') == 'on') {
+                                if(self::config('SSL_OPEN') == 1) {
                                     $objects[$key]['cover_path'.$key1] = 'https://'.$_SERVER['HTTP_HOST'].'/'.str_replace('../','',$value);
                                 }
                             } else {
@@ -632,7 +632,7 @@ class Helper
                         if(strpos($value,'../') !== false) {
                             $objects['content'] = str_replace($value,'http://'.$_SERVER['HTTP_HOST'].'/'.str_replace('../','',$value),$objects['content']);
 
-                            if(self::config('HTTPS_STATUS') == 'on') {
+                            if(self::config('SSL_OPEN') == 1) {
                                 $objects['content'] = str_replace($value,'https://'.$_SERVER['HTTP_HOST'].'/'.str_replace('../','',$value),$objects['content']);
                             }
                         }
@@ -716,7 +716,7 @@ class Helper
             if(strpos($value,'../') !== false) {
                 $baseUrl = 'http://';
 
-                if (self::config('HTTPS_STATUS') == 'on') {
+                if (self::config('SSL_OPEN') == 1) {
                     $baseUrl = 'https://';
                 }
 
@@ -761,7 +761,7 @@ class Helper
                     $url = $picture['path'];
                 } else {
                     $baseUrl = 'http://';
-                    if(self::config('HTTPS_STATUS') == 'on') {
+                    if(self::config('SSL_OPEN') == 1) {
                         $baseUrl = 'https://';
                     }
 
@@ -794,7 +794,7 @@ class Helper
                 } else {
                     $baseUrl = 'http://';
 
-                    if(self::config('HTTPS_STATUS') == 'on') {
+                    if(self::config('SSL_OPEN') == 1) {
                         $baseUrl = 'https://';
                     }
 
