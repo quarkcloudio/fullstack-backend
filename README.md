@@ -1,4 +1,4 @@
-# Fullstack CMS
+# FullStack
 
 鉴于市面上CMS都已陈旧的情况，作者用更先进的laravel和ant-design重新设计、架构新时代的CMS。开源不易，请尊重版权！ 
 
