@@ -574,4 +574,46 @@ class UserController extends BuilderController
             }
         }
     }
+
+    /**
+     * 用户建议搜索列表
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function suggest(Request $request)
+    {
+        // 获取参数
+        $search    = $request->input('search');
+        
+        // 定义对象
+        $query = User::query();
+
+        // 查询用户名
+        if(!empty($search)) {
+            $query->where('users.username','like','%'.$search.'%');
+        }
+
+        // 查询数量
+        $count = $query
+        ->where('users.status', '>', 0)
+        ->count();
+
+        // 查询列表
+        $lists = $query
+        ->limit(20)
+        ->where('users.status', '>', 0)
+        ->orderBy('id', 'desc')
+        ->select('users.username as name','users.id as value')
+        ->get()
+        ->toArray();
+
+        if($lists) {
+            $data = $lists;
+        } else {
+            $data = [];
+        }
+
+        return $this->success('获取成功！','',$data);
+    }
 }

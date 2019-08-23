@@ -37,6 +37,8 @@ class Shop extends Model
         'county',
         'town',
         'address',
+        'longitude',
+        'latitude',
         'business_license_cover_id',
         'corporate_name',
         'corporate_idcard',

@@ -53,6 +53,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/user/save', 'Admin\\UserController@save')->name('api/admin/user/save');
     Route::post('admin/user/changeStatus', 'Admin\\UserController@changeStatus')->name('api/admin/user/changeStatus');
     Route::any('admin/user/recharge', 'Admin\\UserController@recharge')->name('api/admin/user/recharge');
+    Route::any('admin/user/suggest', 'Admin\\UserController@suggest')->name('api/admin/user/suggest');
 
     Route::get('admin/admin/index', 'Admin\\AdminController@index')->name('api/admin/admin/index');
     Route::get('admin/admin/create', 'Admin\\AdminController@create')->name('api/admin/admin/create');

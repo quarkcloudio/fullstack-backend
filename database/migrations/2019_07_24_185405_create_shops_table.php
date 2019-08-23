@@ -34,6 +34,8 @@ class CreateShopsTable extends Migration
             $table->string('county')->comment('县');
             $table->string('town')->comment('镇')->nullable();
             $table->string('address')->comment('详细地址');
+            $table->string('longitude')->comment('经度');
+            $table->string('latitude')->comment('纬度');
             $table->integer('business_license_cover_id')->comment('营业执照照片');
             $table->string('corporate_name')->comment('法人姓名');
             $table->string('corporate_idcard')->comment('法人身份证号');
