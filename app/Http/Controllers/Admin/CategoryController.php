@@ -47,7 +47,7 @@ class CategoryController extends BuilderController
     {
         // 获取参数
         $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',10));
+        $pageSize  = intval($request->get('pageSize',1000));
         $search     = $request->get('search');
             
         // 定义对象
@@ -160,7 +160,7 @@ class CategoryController extends BuilderController
      */
     public function form($data = [])
     {
-        $categorys         = Category::all()->toArray();
+        $categorys         = Category::where('status',1)->get()->toArray();
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 

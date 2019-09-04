@@ -28,7 +28,7 @@ class ArticleController extends Controller
             $articles[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
 
-        return view('article_index',compact('articles'));
+        return view('home/'.$category->index_tpl,compact('articles'));
     }
 
 	/**
@@ -61,7 +61,7 @@ class ArticleController extends Controller
         foreach ($articles as $key => $value) {
             $articles[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
-        return view('pc/content/'.$category->lists_tpl,compact('articles','category'));
+        return view('home/'.$category->lists_tpl,compact('articles','category'));
     }
 
 	/**
@@ -122,6 +122,6 @@ class ArticleController extends Controller
             ->get()
             ->toArray();
         }
-        return view('pc/content/'.$category['detail_tpl'],compact('article','category','prev','next'));
+        return view('home/'.$category['detail_tpl'],compact('article','category','prev','next'));
     }
 }

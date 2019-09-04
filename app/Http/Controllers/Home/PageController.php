@@ -35,6 +35,6 @@ class PageController extends Controller
         if (empty($page)) {
             return view('common/404_two');
         }
-        return view('pc/content/'.$page->page_tpl,compact('page'));
+        return view('home/'.$page->page_tpl,compact('page'));
     }
 }

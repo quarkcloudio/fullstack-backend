@@ -144,14 +144,19 @@ class NavigationController extends BuilderController
         }
 
         // 查询列表
-        $navigations = Navigation::all();
+        $navigations = Navigation::where('status',1)->get()->toArray();
+        $navigationTrees     = Helper::listToTree($navigations);
+        $navigationTreeLists = Helper::treeToOrderList($navigationTrees,0,'title');
 
+        // 模板数据
         $list = [];
-        foreach ($navigations as $key => $navigation) {
-            $list[] = [
-                'name'=>$navigation['title'],
-                'value'=>$navigation['id'],
-            ];
+
+        $list[0]['name'] = '请选择父节点';
+        $list[0]['value'] = '0';
+
+        foreach ($navigationTreeLists as $key => $navigationTreeList) {
+            $list[$key+1]['name'] = $navigationTreeList['title'];
+            $list[$key+1]['value'] = $navigationTreeList['id'];
         }
 
         $controls = [
@@ -215,6 +220,8 @@ class NavigationController extends BuilderController
 
         if($coverId) {
             $coverId = $coverId[0]['id'];
+        } else {
+            $coverId = 0;
         }
 
         $data['title'] = $title;
@@ -282,6 +289,7 @@ class NavigationController extends BuilderController
         $pid           =   $request->json('pid',0);
         $sort          =   $request->json('sort',0);
         $url           =   $request->json('url');
+        $coverId       =   $request->json('cover_id');
         $status        =   $request->json('status','');
 
         if (empty($id)) {
@@ -298,10 +306,17 @@ class NavigationController extends BuilderController
             $status = 2; //禁用
         }
 
+        if($coverId) {
+            $coverId = $coverId[0]['id'];
+        } else {
+            $coverId = 0;
+        }
+
         $data['title'] = $title;
         $data['pid'] = $pid;
         $data['sort'] = $sort;
         $data['url'] = $url;
+        $data['cover_id'] = $coverId;
         $data['status'] = $status;
 
         $result = Navigation::where('id',$id)->update($data);

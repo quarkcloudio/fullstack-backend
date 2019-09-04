@@ -30,7 +30,7 @@ class Shop extends Model
         'cover_ids',
         'level',
         'position',
-        'name',
+        'username',
         'phone',
         'province',
         'city',

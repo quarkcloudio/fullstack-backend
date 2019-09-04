@@ -27,7 +27,7 @@ class CreateShopsTable extends Migration
             $table->string('cover_ids')->comment('店铺封面');
             $table->string('level')->comment('店铺排序，越大越靠前');
             $table->tinyInteger('position')->comment('推荐位');
-            $table->string('name')->comment('店铺联系人');
+            $table->string('username')->comment('店铺联系人');
             $table->string('phone')->comment('店铺电话');
             $table->string('province')->comment('省');
             $table->string('city')->comment('市');

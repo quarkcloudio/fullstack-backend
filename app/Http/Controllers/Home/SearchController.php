@@ -48,7 +48,7 @@ class SearchController extends Controller
         foreach ($lists as $key => $value) {
             $lists[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
-        return view('pc/plugin/search/index',compact('lists','query'));
+        return view('home/search',compact('lists','query'));
     }
 
 }

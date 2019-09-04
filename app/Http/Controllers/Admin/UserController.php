@@ -608,12 +608,6 @@ class UserController extends BuilderController
         ->get()
         ->toArray();
 
-        if($lists) {
-            $data = $lists;
-        } else {
-            $data = [];
-        }
-
-        return $this->success('获取成功！','',$data);
+        return $this->success('获取成功！','',$lists);
     }
 }

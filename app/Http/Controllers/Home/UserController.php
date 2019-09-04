@@ -22,7 +22,7 @@ class UserController extends Controller
     {
         $id = auth('web')->user()->id;
         $user = User::where('id',$id)->first();
-        return view('pc/user/index',compact('user'));
+        return view('home/user/index',compact('user'));
     }
 
     /**
@@ -48,7 +48,7 @@ class UserController extends Controller
         } else {
             $id = auth('web')->user()->id;
             $user = User::where('id',$id)->first();
-            return view('pc/user/profile',compact('user'));
+            return view('home/user/profile',compact('user'));
         }
     }
 
@@ -61,7 +61,7 @@ class UserController extends Controller
     {
         $id = auth('web')->user()->id;
         $user = User::where('id',$id)->first();
-        return view('pc/user/safety',compact('user'));
+        return view('home/user/safety',compact('user'));
     }
 
     /**
@@ -100,14 +100,14 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/pc/user/safety');
+                return $this->success('操作成功！','/home/user/safety');
             } else {
                 return $this->error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
             $user = User::where('id',$id)->first();
-            return view('pc/user/username',compact('user'));
+            return view('home/user/username',compact('user'));
         }
     }
 
@@ -152,14 +152,14 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/pc/user/safety');
+                return $this->success('操作成功！','/home/user/safety');
             } else {
                 return $this->error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
             $user = User::where('id',$id)->first();
-            return view('pc/user/password',compact('user'));
+            return view('home/user/password',compact('user'));
         }
     }
 
@@ -222,14 +222,14 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/pc/user/user/profile');
+                return $this->success('操作成功！','/home/user/user/profile');
             } else {
                 return $this->error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
             $user = User::where('id',$id)->first();
-            return view('pc/user/password',compact('user'));
+            return view('home/user/password',compact('user'));
         }
     }
 
@@ -262,7 +262,7 @@ class UserController extends Controller
                 return $this->error('此邮箱已经注册！');
             }
 
-            $url = url('pc/user/changeEmail?token='.$token);
+            $url = url('home/user/changeEmail?token='.$token);
 
             $content = '请打开如下链接：'.$url.'，进行邮箱修改。如非本人操作，请忽略。';
 
@@ -276,7 +276,7 @@ class UserController extends Controller
         } else {
             $id = auth('web')->user()->id;
             $user = User::where('id',$id)->first();
-            return view('pc/user/email',compact('user'));
+            return view('home/user/email',compact('user'));
         }
     }
 
@@ -312,7 +312,7 @@ class UserController extends Controller
 
         $user = User::where('id',$id)->first();
 
-        return view('pc/user/changeEmail',compact('user','message'));
+        return view('home/user/changeEmail',compact('user','message'));
     }
     
     /**
@@ -364,14 +364,14 @@ class UserController extends Controller
             $result = User::where('id',$id)->update($data);
 
             if($result) {
-                return $this->success('操作成功！','/pc/user/profile');
+                return $this->success('操作成功！','/home/user/profile');
             } else {
                 return $this->error('操作失败！');
             }
         } else {
             $id = auth('web')->user()->id;
             $user = User::where('id',$id)->first();
-            return view('pc/user/phone',compact('user'));
+            return view('home/user/phone',compact('user'));
         }
     }
 }
