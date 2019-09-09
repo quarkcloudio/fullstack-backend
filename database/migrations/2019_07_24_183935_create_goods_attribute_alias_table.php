@@ -16,9 +16,9 @@ class CreateGoodsAttributeAliasTable extends Migration
         Schema::create('goods_attribute_alias', function (Blueprint $table) {
             $table->engine='innodb';
             $table->increments('id');             
-            $table->integer('goods_attribute_id')->nullable()->COMMENT('商品规格id');
-            $table->integer('goods_sku_id')->nullable()->COMMENT('商品单元id');
-            $table->string('name')->nullable()->COMMENT('规格别名');     
+            $table->integer('goods_attribute_id')->nullable()->comment('商品规格id');
+            $table->integer('goods_sku_id')->nullable()->comment('商品单元id');
+            $table->string('name')->nullable()->comment('规格别名');     
         });
     }
 

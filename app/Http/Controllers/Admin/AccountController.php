@@ -164,7 +164,6 @@ class AccountController extends Controller
 
             // 查询列表
             $data = Menu::where('status', 1)
-            ->where('show', 1)
             ->where('guard_name', 'admin')
             ->orderBy('sort', 'asc')
             ->get()
@@ -181,7 +180,6 @@ class AccountController extends Controller
 
             // 三级查询列表
             $lists = Menu::where('status', 1)
-            ->where('show', 1)
             ->where('guard_name', 'admin')
             ->where('pid','<>', 0)
             ->whereIn('id',$menuIds)
@@ -197,7 +195,6 @@ class AccountController extends Controller
 
             // 二级菜单查询列表
             $lists1 = Menu::where('status', 1)
-            ->where('show', 1)
             ->where('guard_name', 'admin')
             ->whereIn('id',$pids)
             ->orderBy('sort', 'asc')
@@ -214,7 +211,6 @@ class AccountController extends Controller
 
             // 一级菜单查询列表
             $lists2 = Menu::where('status', 1)
-            ->where('show', 1)
             ->where('guard_name', 'admin')
             ->where('pid', 0)
             ->whereIn('id',$pids1)
@@ -227,6 +223,10 @@ class AccountController extends Controller
 
         foreach ($data as $key => $value) {
             $data[$key]['locale'] = 'menu'.str_replace("/",".",$value['path']);
+            if(!$value['show']) {
+                $data[$key]['hideInMenu'] = true;
+            }
+
             if(empty($data[$key]['icon'])) {
                 unset($data[$key]['icon']);
             }

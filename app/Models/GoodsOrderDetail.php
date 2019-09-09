@@ -22,7 +22,7 @@ class GoodsOrderDetail extends Model
         'uid',
         'goods_id',
         'goods_sku_id',
-        'mall_order_id',
+        'goods_order_id',
         'title',
         'num',
         'goods_price',

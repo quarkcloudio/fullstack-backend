@@ -160,4 +160,77 @@ Route::group(['middleware' => ['admin']], function() {
     Route::get('admin/file/download', 'Admin\\FileController@download')->name('api/admin/file/download');
     Route::post('admin/file/update', 'Admin\\FileController@update')->name('api/admin/file/update');
     Route::post('admin/file/changeStatus', 'Admin\\FileController@changeStatus')->name('api/admin/file/changeStatus');
+
+    // 商城
+    Route::get('admin/shop/index', 'Admin\\ShopController@index')->name('api/admin/shop/index');
+    Route::get('admin/shop/create', 'Admin\\ShopController@create')->name('api/admin/shop/create');
+    Route::post('admin/shop/store', 'Admin\\ShopController@store')->name('api/admin/shop/store');
+    Route::get('admin/shop/edit', 'Admin\\ShopController@edit')->name('api/admin/shop/edit');
+    Route::post('admin/shop/save', 'Admin\\ShopController@save')->name('api/admin/shop/save');
+    Route::post('admin/shop/changeStatus', 'Admin\\ShopController@changeStatus')->name('api/admin/shop/changeStatus');
+
+    Route::get('admin/shop/categoryIndex', 'Admin\\ShopController@categoryIndex')->name('api/admin/shop/categoryIndex');
+    Route::get('admin/shop/categoryCreate', 'Admin\\ShopController@categoryCreate')->name('api/admin/shop/categoryCreate');
+    Route::post('admin/shop/categoryStore', 'Admin\\ShopController@categoryStore')->name('api/admin/shop/categoryStore');
+    Route::get('admin/shop/categoryEdit', 'Admin\\ShopController@categoryEdit')->name('api/admin/shop/categoryEdit');
+    Route::post('admin/shop/categorySave', 'Admin\\ShopController@categorySave')->name('api/admin/shop/categorySave');
+    Route::post('admin/shop/categoryChangeStatus', 'Admin\\ShopController@categoryChangeStatus')->name('api/admin/shop/categoryChangeStatus');
+
+    Route::get('admin/goods/index', 'Admin\\GoodsController@index')->name('api/admin/goods/index');
+    Route::get('admin/goods/create', 'Admin\\GoodsController@create')->name('api/admin/goods/create');
+    Route::post('admin/goods/store', 'Admin\\GoodsController@store')->name('api/admin/goods/store');
+    Route::get('admin/goods/edit', 'Admin\\GoodsController@edit')->name('api/admin/goods/edit');
+    Route::post('admin/goods/save', 'Admin\\GoodsController@save')->name('api/admin/goods/save');
+    Route::post('admin/goods/changeStatus', 'Admin\\GoodsController@changeStatus')->name('api/admin/goods/changeStatus');
+
+    Route::get('admin/goods/categoryIndex', 'Admin\\GoodsController@categoryIndex')->name('api/admin/goods/categoryIndex');
+    Route::get('admin/goods/categoryCreate', 'Admin\\GoodsController@categoryCreate')->name('api/admin/goods/categoryCreate');
+    Route::post('admin/goods/categoryStore', 'Admin\\GoodsController@categoryStore')->name('api/admin/goods/categoryStore');
+    Route::get('admin/goods/categoryEdit', 'Admin\\GoodsController@categoryEdit')->name('api/admin/goods/categoryEdit');
+    Route::post('admin/goods/categorySave', 'Admin\\GoodsController@categorySave')->name('api/admin/goods/categorySave');
+    Route::post('admin/goods/categoryChangeStatus', 'Admin\\GoodsController@categoryChangeStatus')->name('api/admin/goods/categoryChangeStatus');
+
+    Route::get('admin/goods/typeIndex', 'Admin\\GoodsController@typeIndex')->name('api/admin/goods/typeIndex');
+    Route::get('admin/goods/typeCreate', 'Admin\\GoodsController@typeCreate')->name('api/admin/goods/typeCreate');
+    Route::post('admin/goods/typeStore', 'Admin\\GoodsController@typeStore')->name('api/admin/goods/typeStore');
+    Route::get('admin/goods/typeEdit', 'Admin\\GoodsController@typeEdit')->name('api/admin/goods/typeEdit');
+    Route::post('admin/goods/typeSave', 'Admin\\GoodsController@typeSave')->name('api/admin/goods/typeSave');
+    Route::post('admin/goods/typeChangeStatus', 'Admin\\GoodsController@typeChangeStatus')->name('api/admin/goods/typeChangeStatus');
+
+    Route::get('admin/goods/spuIndex', 'Admin\\GoodsController@spuIndex')->name('api/admin/goods/spuIndex');
+    Route::get('admin/goods/spuCreate', 'Admin\\GoodsController@spuCreate')->name('api/admin/goods/spuCreate');
+    Route::post('admin/goods/spuStore', 'Admin\\GoodsController@spuStore')->name('api/admin/goods/spuStore');
+    Route::get('admin/goods/spuEdit', 'Admin\\GoodsController@spuEdit')->name('api/admin/goods/spuEdit');
+    Route::post('admin/goods/spuSave', 'Admin\\GoodsController@spuSave')->name('api/admin/goods/spuSave');
+    Route::post('admin/goods/spuChangeStatus', 'Admin\\GoodsController@spuChangeStatus')->name('api/admin/goods/spuChangeStatus');
+
+    Route::get('admin/goods/skuIndex', 'Admin\\GoodsController@skuIndex')->name('api/admin/goods/skuIndex');
+    Route::get('admin/goods/skuCreate', 'Admin\\GoodsController@skuCreate')->name('api/admin/goods/skuCreate');
+    Route::post('admin/goods/skuStore', 'Admin\\GoodsController@skuStore')->name('api/admin/goods/skuStore');
+    Route::get('admin/goods/skuEdit', 'Admin\\GoodsController@skuEdit')->name('api/admin/goods/skuEdit');
+    Route::post('admin/goods/skuSave', 'Admin\\GoodsController@skuSave')->name('api/admin/goods/skuSave');
+    Route::post('admin/goods/skuChangeStatus', 'Admin\\GoodsController@skuChangeStatus')->name('api/admin/goods/skuChangeStatus');
+
+    Route::get('admin/goodsBrand/index', 'Admin\\GoodsBrandController@index')->name('api/admin/goodsBrand/index');
+    Route::get('admin/goodsBrand/create', 'Admin\\GoodsBrandController@create')->name('api/admin/goodsBrand/create');
+    Route::post('admin/goodsBrand/store', 'Admin\\GoodsBrandController@store')->name('api/admin/goodsBrand/store');
+    Route::get('admin/goodsBrand/edit', 'Admin\\GoodsBrandController@edit')->name('api/admin/goodsBrand/edit');
+    Route::post('admin/goodsBrand/save', 'Admin\\GoodsBrandController@save')->name('api/admin/goodsBrand/save');
+    Route::post('admin/goodsBrand/changeStatus', 'Admin\\GoodsBrandController@changeStatus')->name('api/admin/goodsBrand/changeStatus');
+
+    Route::get('admin/goodsOrder/index', 'Admin\\GoodsOrderController@index')->name('api/admin/goodsOrder/index');
+    Route::get('admin/goodsOrder/edit', 'Admin\\GoodsOrderController@edit')->name('api/admin/goodsOrder/edit');
+    Route::post('admin/goodsOrder/save', 'Admin\\GoodsOrderController@save')->name('api/admin/goodsOrder/save');
+    Route::post('admin/goodsOrder/changeStatus', 'Admin\\GoodsOrderController@changeStatus')->name('api/admin/goodsOrder/changeStatus');
+    
+    Route::get('admin/goodsOrder/commentIndex', 'Admin\\GoodsOrderController@commentIndex')->name('api/admin/goodsOrder/commentIndex');
+    Route::get('admin/goodsOrder/commentEdit', 'Admin\\GoodsOrderController@commentEdit')->name('api/admin/goodsOrder/commentEdit');
+    Route::post('admin/goodsOrder/commentSave', 'Admin\\GoodsOrderController@commentSave')->name('api/admin/goodsOrder/commentSave');
+    Route::post('admin/goodsOrder/commentChangeStatus', 'Admin\\GoodsOrderController@commentChangeStatus')->name('api/admin/goodsOrder/commentChangeStatus');
+    
+    Route::get('admin/goodsOrder/afterSaleIndex', 'Admin\\GoodsOrderController@afterSaleIndex')->name('api/admin/goodsOrder/afterSaleIndex');
+    Route::get('admin/goodsOrder/afterSaleEdit', 'Admin\\GoodsOrderController@afterSaleEdit')->name('api/admin/goodsOrder/afterSaleEdit');
+    Route::post('admin/goodsOrder/afterSaleSave', 'Admin\\GoodsOrderController@afterSaleSave')->name('api/admin/goodsOrder/afterSaleSave');
+    Route::post('admin/goodsOrder/afterSaleChangeStatus', 'Admin\\GoodsOrderController@afterSaleChangeStatus')->name('api/admin/goodsOrder/afterSaleChangeStatus');
+    
 });

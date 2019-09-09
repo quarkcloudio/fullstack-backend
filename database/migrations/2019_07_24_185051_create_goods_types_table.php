@@ -16,9 +16,10 @@ class CreateGoodsTypesTable extends Migration
         Schema::create('goods_types', function (Blueprint $table) {
             $table->engine='innodb';
             $table->increments('id');
-            $table->string('name')->nullable();             
-            $table->string('description')->nullable();           
-            $table->integer('sort')->nullable();    
+            $table->string('name')->nullable()->comment('商品类型：用于对商品属性的分类');
+            $table->string('description')->nullable()->comment('商品类型描述');
+            $table->integer('sort')->nullable()->comment('排序');
+            $table->tinyInteger('status')->default('1');
         });
     }
 

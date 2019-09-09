@@ -18,8 +18,8 @@ class CreateGoodsPhotosTable extends Migration
             $table->increments('id');
             $table->integer('goods_id')->unsigned()->nullable(); 
             $table->integer('goods_sku_id')->nullable();            
-            $table->integer('cover_id')->default('0')->nullable()->COMMENT('商品相册'); 
-            $table->integer('sort')->default('0')->nullable()->COMMENT('排序');    
+            $table->integer('cover_id')->default('0')->nullable()->comment('商品相册'); 
+            $table->integer('sort')->default('0')->nullable()->comment('排序');    
         });
     }
 

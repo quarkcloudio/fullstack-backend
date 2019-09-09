@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBugsTable extends Migration
+class CreateWechatUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateBugsTable extends Migration
      */
     public function up()
     {
-        Schema::create('bugs', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
-            $table->longText('content');
-            $table->text('cover_ids')->nullable();
-            $table->tinyInteger('status')->default(1);
+        Schema::create('wechat_users', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('wechat_openid');
+            $table->string('wechat_unionid')->nullable();
+            $table->string('type')->comment('DYH,FWH,MP');
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateBugsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bugs');
+        Schema::dropIfExists('wechat_users');
     }
 }

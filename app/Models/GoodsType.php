@@ -21,6 +21,7 @@ class GoodsType extends Model
     protected $fillable = [
         'name',
         'description',
-        'sort'
+        'sort',
+        'status'
     ];
 }

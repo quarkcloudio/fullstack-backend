@@ -36,10 +36,10 @@ class CreateShopsTable extends Migration
             $table->string('address')->comment('详细地址');
             $table->string('longitude')->comment('经度');
             $table->string('latitude')->comment('纬度');
-            $table->integer('business_license_cover_id')->comment('营业执照照片');
-            $table->string('corporate_name')->comment('法人姓名');
-            $table->string('corporate_idcard')->comment('法人身份证号');
-            $table->integer('corporate_idcard_cover_id')->comment('法人身份证照片');
+            $table->integer('business_license_cover_id')->nullable()->comment('营业执照照片');
+            $table->string('corporate_name')->nullable()->comment('法人姓名');
+            $table->string('corporate_idcard')->nullable()->comment('法人身份证号');
+            $table->integer('corporate_idcard_cover_id')->nullable()->comment('法人身份证照片');
             $table->tinyInteger('comment')->default('0')->comment('评论数');
             $table->tinyInteger('view')->default('0')->comment('浏览数量');
             $table->string('comment_status')->default('open')->comment('是否允许评论');

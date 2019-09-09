@@ -26,16 +26,16 @@ use App\Builder\Lists\Tables\Column;
 use App\Builder\Lists\ListBuilder;
 use App\Services\Helper;
 use EasyWeChat\Factory;
-use App\Models\Post;
+use App\Models\Goods;
 use App\Models\Category;
 use App\Models\Comment;
 use DB;
 
-class CommentController extends BuilderController
+class GoodsOrderController extends BuilderController
 {
     public function __construct()
     {
-        $this->pageTitle = '评论';
+        $this->pageTitle = '订单评论';
     }
 
     /**
@@ -43,7 +43,7 @@ class CommentController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function index(Request $request)
+    public function commentIndex(Request $request)
     {
         // 获取参数
         $current   = intval($request->get('current',1));
@@ -51,20 +51,13 @@ class CommentController extends BuilderController
         $search    = $request->get('search');
             
         // 定义对象
-        $query = Comment::query();
+        $query = Comment::where('comments.type','ORDER');
 
         // 查询
         if(!empty($search)) {
             // 标题
             if(isset($search['title'])) {
                 $query->where('comments.title','like','%'.$search['title'].'%');
-            }
-
-            // 类型
-            if(isset($search['typeid'])) {
-                if(!empty($search['typeid'])) {
-                    $query->where('comments.type',$search['typeid']);
-                }
             }
 
             // 状态
@@ -89,7 +82,7 @@ class CommentController extends BuilderController
         $lists = $query
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
-        ->orderBy('id', 'desc')
+        ->orderBy('comments.id', 'desc')
         ->get()
         ->toArray();
 
@@ -101,49 +94,6 @@ class CommentController extends BuilderController
         $pagination['pageSize'] = $pageSize;
         // 总数量
         $pagination['total'] = $total;
-
-        //获取类型
-        $commentTypes = DB::table('comments')->select('type')->distinct()->get()->toArray();
-
-        $types[] = [
-            'name'=>'所有类型',
-            'value'=>'0',
-        ];
-
-        foreach ($commentTypes as $key => $value) {
-            switch ($value->type) {
-                case 'ARTICLE':
-                    $types[] = [
-                        'name'=>'文章评论',
-                        'value'=>'ARTICLE',
-                    ];
-                    break;
-                case 'PAGE':
-                    $types[] = [
-                        'name'=>'单页评论',
-                        'value'=>'PAGE',
-                    ];
-                    break;
-                case 'ORDER':
-                    $types[] = [
-                        'name'=>'团购评论',
-                        'value'=>'ORDER',
-                    ];
-                    break;
-                default:
-                    $types[] = [
-                        'name'=>'未知',
-                        'value'=>'WEIZHI',
-                    ];
-                    break;
-            } 
-        }
-
-        foreach ($lists as $key => $value) {
-            if(empty($value['title'])) {
-                $lists[$key]['title'] = '暂无';
-            }
-        }
 
         $status = [
             [
@@ -161,14 +111,12 @@ class CommentController extends BuilderController
         ];
 
         $searchs = [
-            Select::make('评论类型','types')->option($types)->value('0'),
             Select::make('状态','status')->option($status)->value('0'),
             Input::make('搜索内容','title'),
             Button::make('搜索')->onClick('search'),
         ];
 
         $advancedSearchs = [
-            Select::make('评论类型','types')->option($types)->value('0'),
             RangePicker::make('评论时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
             Select::make('状态','status')->option($status)->value('0'),
             Button::make('搜索')->type('primary')->onClick('search'),
@@ -177,8 +125,7 @@ class CommentController extends BuilderController
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('评论对象','object_title')->withA('admin/plugin/'.$this->controllerName().'/edit'),
-            Column::make('类型','type'),
+            Column::make('评论对象','object_title')->withA('admin/mall/goodsOrder/commentEdit'),
             Column::make('用户','uid'),
             Column::make('评论标题','title'),
             Column::make('内容','content'),
@@ -187,13 +134,13 @@ class CommentController extends BuilderController
         ];
 
         $headerButtons = [
-            Button::make('刷新')->icon('reload')->type('default')->href('admin/plugin/'.$this->controllerName().'/index'),
+            Button::make('刷新')->icon('reload')->type('default')->href('admin/mall/goodsOrder/commentIndex'),
         ];
 
         $actions = [
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/changeStatus'),
-            Button::make('编辑')->type('link')->href('admin/plugin/'.$this->controllerName().'/edit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/commentChangeStatus'),
+            Button::make('编辑')->type('link')->href('admin/mall/goodsOrder/commentEdit'),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/commentChangeStatus'),
         ];
 
         $lists = $this->commentListsFormat($lists);
@@ -232,39 +179,15 @@ class CommentController extends BuilderController
                         $lists[$key]['status'] = '未知';
                         break;
                 }
-                //格式化评论类型
-                switch ($value['type']) {
-                    case 'ARTICLE':
-                        $lists[$key]['type'] = '文章评论';
 
-                        // 评论对象标题
-                        $post = Post::where('id',$value['object_id'])->first();
-                        if($post['title']) {
-                            $lists[$key]['object_title'] = $post['title'];
-                        } else {
-                            $lists[$key]['object_title'] = '暂无';
-                        }
-                        break;
-                    case 'PAGE':
-                        $lists[$key]['type'] = '单页评论';
-
-                        // 评论对象标题
-                        $post = Post::where('id',$value['object_id'])->first();
-                        if($post['title']) {
-                            $lists[$key]['object_title'] = $post['title'];
-                        } else {
-                            $lists[$key]['object_title'] = '暂无';
-                        }
-                        break;
-                    case 'ORDER':
-                        $lists[$key]['type'] = '订单评论';
-                        $lists[$key]['object_title'] = '暂无';
-                        break;
-                    default:
-                        $lists[$key]['type'] = '未知';
-                        $lists[$key]['object_title'] = '暂无';
-                        break;
-                }  
+                //评论对象
+                $goods = DB::table('goods')->where('id',$value['object_id'])->first();
+                if($goods) {
+                    $lists[$key]['object_title'] = $goods['goods_name'];
+                } else {
+                    $lists[$key]['object_title'] = '暂无';
+                }
+                
                 //格式化用户ID
                 $users=DB::table('users')->where('id',$value['uid'])->get();
                 foreach($users as $user){
@@ -282,24 +205,24 @@ class CommentController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function form($data = [])
+    public function commentForm($data = [])
     {
         if(isset($data['id'])) {
-            $action = 'admin/'.$this->controllerName().'/save';
+            $action = 'admin/'.$this->controllerName().'/commentSave';
         } else {
-            $action = 'admin/'.$this->controllerName().'/store';
+            $action = 'admin/'.$this->controllerName().'/commentStore';
         }
 
         $controls = [
             ID::make('ID','id'),
-            Input::make('标题','title')->style(['width'=>200]),
-            Image::make('晒图','cover_ids')->mode('multiple'),
-            Input::make('类型','type')->style(['width'=>200]),
-            Input::make('内容','content')->style(['width'=>200]),
-            InputNumber::make('顶','ding')->style(['width'=>200]),
-            Input::make('举报','report')->style(['width'=>200]),
-            Input::make('评分','rate')->style(['width'=>200]),
-            DatePicker::make('评论时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
+            Text::make('评论对象','object_title')->style(['width'=>400])->value($data['object_title']),
+            Text::make('标题','title')->style(['width'=>400])->value($data['title']),
+            Image::make('晒图','cover_ids')->mode('multiple')->rule('1111'),
+            Text::make('内容','content')->style(['width'=>400])->value($data['content']),
+            Text::make('顶','ding')->style(['width'=>200])->value($data['ding']),
+            Text::make('举报','report')->style(['width'=>200])->value($data['report']),
+            Text::make('评分','rate')->style(['width'=>200])->value($data['rate']),
+            Text::make('评论时间')->style(['width'=>200])->value($data['created_at']),
             SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
             Button::make('提交')
             ->type('primary')
@@ -318,29 +241,29 @@ class CommentController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function edit(Request $request)
+    public function commentEdit(Request $request)
     {
         $id = $request->input('id');
 
-        $comment = Comment::find($id);
+        $comment = Comment::find($id)->toArray();
 
+        //评论对象
+        $goods =  Goods::find($comment['object_id']);
+        if($goods['goods_name']) {
+            $comment['object_title'] = $goods['goods_name'];
+        } else {
+            $comment['object_title'] = '暂无';
+        }
+        
         //获取图片
-        $comment['cover_ids'] = json_decode($comment['cover_ids'],true);
-
-        switch ($comment['type']) {
-            case 'ARTICLE':
-                $comment['type'] = '文章评论';
-                break;
-            case 'PAGE':
-                $comment['type'] = '单页评论';
-                break;
-            case 'ORDER':
-                $comment['type'] = '订单评论';
-                break;
-            default:
-                $comment['type'] = '未知';
-                break;
-        }  
+        $cover_ids = json_decode($comment['cover_ids'],true);
+        unset($comment['cover_ids']);
+        foreach($cover_ids as $key=>$cover_id) {
+            $comment['cover_ids'][$key]['id'] =$cover_id;
+            $comment['cover_ids'][$key]['uid'] =$cover_id;
+            $comment['cover_ids'][$key]['name'] = Helper::getPicture($cover_id,'name');
+            $comment['cover_ids'][$key]['url'] = Helper::getPicture($cover_id);
+        }
         
         switch ($comment['report']) {
             case '0':
@@ -359,8 +282,14 @@ class CommentController extends BuilderController
                 $comment['report'] = '未知';
                 break;
         }
-        
-        $data = $this->form($comment);
+
+        if ($comment['status'] == 1) {
+            $comment['status'] = true;
+        } else {
+            $comment['status'] = false;
+        }
+
+        $data = $this->commentForm($comment);
         
         return $this->success('获取成功！','',$data);
     }
@@ -371,19 +300,17 @@ class CommentController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function save(Request $request)
+    public function commentSave(Request $request)
     {
         $id      =   $request->json('id');
         $status  =   $request->json('status');
 
-        $comment = Comment::find($id);
+        $comment = Comment::find($id)->toArray();
 
         if ($status == 'on') {
             $status = 1;
-            $this->updateCommentNum($comment,'increment');
         } else {
             $status = 2; //禁用
-            $this->updateCommentNum($comment,'decrement');
         }
        
         $data['status'] = $status;
@@ -391,7 +318,7 @@ class CommentController extends BuilderController
         $result = Comment::where('id',$id)->update($data);
 
         if ($result) {
-            return $this->success('操作成功！','index');
+            return $this->success('操作成功！','CommentIndex');
         } else {
             return $this->error('操作失败！');
         }
@@ -403,7 +330,7 @@ class CommentController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function changeStatus(Request $request)
+    public function commentChangeStatus(Request $request)
     {
         $id = $request->json('id');
         $status = $request->json('status');
@@ -427,41 +354,6 @@ class CommentController extends BuilderController
             return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
-        }
-    }
- 
-    /**
-     * 更新对象评论数量
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    protected function updateCommentNum($comment,$type)
-    {
-        if($type == 'increment') {
-
-            // 评论对象评论数量增加
-            switch ($comment['type']) {
-                case 'ARTICLE':
-                    Post::where('id',$comment['object_id'])->increment('comment',1);
-                    break;
-                
-                default:
-                    return $this->error('参数错误！');
-                    break;
-            }
-        } elseif($type == 'decrement') {
-
-            // 评论对象评论数量减少
-            switch ($comment['type']) {
-                case 'ARTICLE':
-                    Post::where('id',$comment['object_id'])->decrement('comment',1);
-                    break;
-                
-                default:
-                    return $this->error('参数错误！');
-                    break;
-            }
         }
     }
 }

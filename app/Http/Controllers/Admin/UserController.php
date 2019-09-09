@@ -610,4 +610,5 @@ class UserController extends BuilderController
 
         return $this->success('获取成功！','',$lists);
     }
+
 }

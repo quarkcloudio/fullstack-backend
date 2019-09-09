@@ -16,8 +16,8 @@ class CreateGoodsAttributeValuesTable extends Migration
         Schema::create('goods_attribute_values', function (Blueprint $table) {
             $table->engine='innodb';
             $table->increments('id');             
-            $table->integer('goods_attribute_id')->nullable()->COMMENT('商品属性id');
-            $table->string('vname')->nullable()->COMMENT('属性值名称');
+            $table->integer('goods_attribute_id')->nullable()->comment('商品属性id');
+            $table->string('vname')->nullable()->comment('属性值名称');
             $table->string('sort')->nullable();      
         });
     }

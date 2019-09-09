@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class GoodsCategory extends Model
+class GoodsBrand extends Model
 {
-    use SoftDeletes;
-    /**
+     /**
      * 该模型是否被自动维护时间戳
      *
      * @var bool
@@ -21,19 +19,14 @@ class GoodsCategory extends Model
      * @var array
      */
     protected $fillable = [
-        'pid',
-        'title',
-        'sort',
-        'cover_id',
-        'goods_brand_ids',
         'name',
+        'letter',
+        'site_url',
+        'logo',
+        'promotion_image',
         'description',
-        'index_tpl',
-        'lists_tpl',
-        'detail_tpl',
-        'page_num',
+        'is_recommend',
+        'sort',
         'status'
     ];
-     
-    protected $dates = ['delete_at'];
 }

@@ -22,7 +22,7 @@ class Banner extends Model
      * @var array
      */
     protected $fillable = [
-        'category_id','title', 'url','cover_id','sort','deadline','status'
+        'category_id','title', 'url_type', 'url','cover_id','sort','deadline','status'
     ];
 
      protected $dates = ['delete_at'];

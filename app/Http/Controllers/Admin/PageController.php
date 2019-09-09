@@ -47,8 +47,8 @@ class PageController extends BuilderController
     {
         // 获取参数
         $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',1000));
-        $search    = $request->get('search');
+        $pageSize  = intval($request->get('pageSize',10));
+        $search     = $request->get('search');
             
         // 定义对象
         $query = Post::query();
@@ -203,7 +203,6 @@ class PageController extends BuilderController
             Image::make('封面图','cover_ids')->mode('multiple'),
             Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys),
             Editor::make('内容','content'),
-            Input::make('页面模板','page_tpl')->style(['width'=>200]),
             DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
             SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
             Button::make('提交')
@@ -257,7 +256,6 @@ class PageController extends BuilderController
         $coverIds       =   $request->json('cover_ids',0);
         $fileId         =   $request->json('file_id',0);
         $status         =   $request->json('status');
-        $pageTpl        =   $request->json('page_tpl','');
         
         if (empty($title)) {
             return $this->error('标题必须填写！');
@@ -297,7 +295,6 @@ class PageController extends BuilderController
         $data['file_id'] = json_encode($fileId);
         $data['status'] = $status;
         $data['type'] = 'PAGE';
-        $data['page_tpl'] = $pageTpl;
 
         $result = Post::create($data);
 
@@ -370,7 +367,6 @@ class PageController extends BuilderController
         $coverIds       =   $request->json('cover_ids',0);
         $fileId         =   $request->json('file_id',0);
         $status         =   $request->json('status');
-        $pageTpl        =   $request->json('page_tpl','');
         
         if (empty($title)) {
             return $this->error('标题必须填写！');
@@ -410,7 +406,6 @@ class PageController extends BuilderController
         $data['file_id'] = json_encode($fileId);
         $data['status'] = $status;
         $data['type'] = 'PAGE';
-        $data['page_tpl'] = $pageTpl;
 
         $result = Post::where('id',$id)->update($data);
         if ($result) {

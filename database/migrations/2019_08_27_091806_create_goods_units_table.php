@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBrokesTable extends Migration
+class CreateGoodsUnitsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateBrokesTable extends Migration
      */
     public function up()
     {
-        Schema::create('brokes', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
-            $table->integer('uid')->nullable();
-            $table->string('name')->nullable();
-            $table->string('phone')->nullable();
-            $table->longText('content');
-            $table->text('cover_ids')->nullable();
+        Schema::create('goods_units', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name')->nullable()->comment('单位名称：千克');
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
@@ -32,6 +28,6 @@ class CreateBrokesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('brokes');
+        Schema::dropIfExists('goods_units');
     }
 }

@@ -11,6 +11,10 @@
 |
 */
 
+Route::get('/', function () {
+    return view('welcome');
+});
+
 // tools路由组
 Route::group(['prefix' => 'tools','namespace' => 'Tools'],function ($router)
 {
@@ -54,17 +58,7 @@ Route::group(['prefix' => 'cashier','namespace' => 'Cashier'],function ($router)
     $router->get('virtuaCurrency/errorPage', 'VirtuaCurrencyController@errorPage')->name('cashier/virtuaCurrency/errorPage');
 });
 
-// Home未登录路由组
-Route::group(['namespace' => 'Home'],function ($router) {
-    $router->get('/', 'IndexController@index')->name('/');
-    $router->get('home/index/index', 'IndexController@index')->name('home/index/index');
-    $router->get('home/page/index', 'PageController@index')->name('home/page/index');
-    $router->get('home/article/index', 'ArticleController@index')->name('home/article/index');
-    $router->get('home/article/list', 'ArticleController@list')->name('home/article/list');
-    $router->get('home/article/detail', 'ArticleController@detail')->name('home/article/detail');
-});
-
-// Home已登录路由组
+// PC已登录路由组
 Route::group(['namespace' => 'Home','middleware' => ['auth']],function ($router) {
-
+    $router->get('index/index', 'IndexController@index')->name('home/index/index');
 });
