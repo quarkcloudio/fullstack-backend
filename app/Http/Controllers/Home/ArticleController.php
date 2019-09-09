@@ -17,6 +17,19 @@ class ArticleController extends Controller
 	 */
     public function index(Request $request)
     {
+        $id      = $request->input('id');
+        $name    = $request->input('name');
+
+        if (!empty($id)) {
+            $category = Category::where('id', $id)->first();
+        } elseif(!empty($name)) {
+            $category = Category::where('name', $name)->first();
+        }
+
+        if(empty($category)) {
+            abort(404, 'Not Found');
+        }
+
         $articles = Post::where('type', 'ARTICLE')
         ->where('category_id', $category->id)
         ->orderBy('level', 'desc')
@@ -28,7 +41,7 @@ class ArticleController extends Controller
             $articles[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
 
-        return view('home/'.$category->index_tpl,compact('articles'));
+        return view('home/'.$category->index_tpl,compact('articles','category'));
     }
 
 	/**
