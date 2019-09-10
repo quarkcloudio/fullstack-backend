@@ -997,20 +997,33 @@ class GoodsController extends BuilderController
         $detailTpl      =   $request->json('detail_tpl');
         $pageNum        =   $request->json('page_num');
         $status         =   $request->json('status');
+        $brandIds       =   $request->json('brand_ids');
+
+        $attributeSpuIds          =   $request->json('attribute_spu_ids');
+        $attributeSpuSorts        =   $request->json('attribute_spu_sorts');
+        $attributeSpuGroups       =   $request->json('attribute_spu_groups');
+
+        $attributeSkuIds          =   $request->json('attribute_sku_ids');
+        $attributeSkuSorts        =   $request->json('attribute_sku_sorts');
+        $attributeSkuGroups       =   $request->json('attribute_sku_groups');
         
         if (empty($title)) {
             return $this->error('标题必须填写！');
         }
+
         if (empty($name)) {
             return $this->error('名称必须填写！');
         }
+
         if (empty($pageNum)) {
             return $this->error('分页数量必须填写！');
         }
+
         $hasTitle = GoodsCategory::where('title',$title)->first();
         if($hasTitle) {
             return $this->error('此分类标题已存在！');
         }
+
         if ($status == true) {
             $status = 1;
         } else {
@@ -1034,8 +1047,32 @@ class GoodsController extends BuilderController
         $data['detail_tpl']     = $detailTpl;
         $data['page_num']       = $pageNum;
         $data['status']         = $status;
+        $data['goods_brand_ids'] = json_encode($brandIds);
 
         $result = GoodsCategory::create($data);
+
+        if($result) {
+            if($attributeSpuIds) {
+                foreach ($attributeSpuIds as $key => $attributeSpuId) {
+                    $data1['goods_category_id'] = $result->id;
+                    $data1['goods_attribute_id'] = $attributeSpuId;
+                    $data1['gorup_name'] = $attributeSpuGroups[$key];
+                    $data1['sort'] = $attributeSpuSorts[$key];
+                    $data1['type'] = 1;
+                    GoodsCategoryAttribute::create($data1);
+                }
+            }
+            if($attributeSkuIds) {
+                foreach ($attributeSkuIds as $key => $attributeSkuId) {
+                    $data2['goods_category_id'] = $result->id;
+                    $data2['goods_attribute_id'] = $attributeSkuId;
+                    $data2['gorup_name'] = $attributeSkuGroups[$key];
+                    $data2['sort'] = $attributeSkuSorts[$key];
+                    $data2['type'] = 2;
+                    GoodsCategoryAttribute::create($data2);
+                }
+            }
+        }
 
         if($result) {
             return $this->success('操作成功！','categoryIndex');
@@ -1058,6 +1095,21 @@ class GoodsController extends BuilderController
             return $this->error('参数错误！');
         }
 
+        $categorys         = GoodsCategory::all()->toArray();
+        $categoryTrees     = Helper::listToTree($categorys);
+        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
+
+        // 模板数据
+        $getCategorys = [];
+
+        $getCategorys[0]['name'] = '请选择分类';
+        $getCategorys[0]['value'] = '0';
+
+        foreach ($categoryTreeLists as $key => $categoryTreeList) {
+            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
+            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
+        }
+
         $data = GoodsCategory::find($id)->toArray();
 
         $cover_id = $data['cover_id'];
@@ -1069,13 +1121,29 @@ class GoodsController extends BuilderController
         $data['cover_id'][0]['name'] = Helper::getPicture($cover_id,'name');
         $data['cover_id'][0]['url'] = Helper::getPicture($cover_id);
 
+        $goodsBrands = GoodsBrand::where('status',1)->select('id as key','name as title')->get();
+
+        $data['categorys'] = $getCategorys;
+        $data['goodsBrands'] = $goodsBrands;
+        $data['goodsBrandSelectedKeys'] = json_decode($data['goods_brand_ids']);
+
+        $goodsTypes[0]['name'] = '请选择商品类型';
+        $goodsTypes[0]['value'] = '0';
+
+        $getGoodsTypes = GoodsType::where('status',1)->select('name','id as value')->get();
+
+        foreach ($getGoodsTypes as $key => $getGoodsType) {
+            $goodsTypes[$key+1]['name'] = $getGoodsType['name'];
+            $goodsTypes[$key+1]['value'] = $getGoodsType['value'];
+        }
+
+        $data['goodsTypes'] = $goodsTypes;
+
         if ($data['status'] == 1) {
             $data['status'] = true;
         } else {
             $data['status'] = false;
         }
-
-        $data = $this->categoryForm($data);
         
         if(!empty($data)) {
             return $this->success('操作成功！','',$data);
@@ -1912,9 +1980,10 @@ class GoodsController extends BuilderController
     {
         $this->pageTitle = '商品规格';
         // 获取参数
-        $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',10));
-        $search    = $request->get('search');
+        $current            = intval($request->get('current',1));
+        $pageSize           = intval($request->get('pageSize',10));
+        $search             = $request->get('search');
+        $skuSelectedIds     = $request->get('skuSelectedIds');
             
         // 定义对象
         $query = GoodsAttribute::query();
@@ -1942,6 +2011,10 @@ class GoodsController extends BuilderController
                     $query->where('goods_attributes.status',$search['status']);
                 }
             }
+        }
+
+        if(isset($skuSelectedIds)) {
+            $query->whereNotIn('goods_attributes.id', $skuSelectedIds);
         }
 
         // 查询数量

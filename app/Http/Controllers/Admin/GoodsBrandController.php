@@ -217,16 +217,20 @@ class GoodsBrandController extends BuilderController
         // 删除url
         unset($requestData['actionUrl']);
 
-        $logo = $requestData['logo'];
-        if($logo) {
+        if(isset($requestData['logo'][0]['id'])) {
+            $logo = $requestData['logo'];
             unset($requestData['logo']);
             $requestData['logo'] = $logo[0]['id'];
+        } else {
+            $requestData['logo'] = 0;
         }
 
-        $promotionImage = $requestData['promotion_image'];
-        if($promotionImage) {
+        if(isset($requestData['promotion_image'][0]['id'])) {
+            $promotionImage = $requestData['promotion_image'];
             unset($requestData['promotion_image']);
             $requestData['promotion_image'] = $promotionImage[0]['id'];
+        } else {
+            $requestData['promotion_image'] = 0;
         }
 
         // 表单验证错误提示信息
