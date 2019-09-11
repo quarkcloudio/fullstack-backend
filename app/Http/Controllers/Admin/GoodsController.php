@@ -971,6 +971,8 @@ class GoodsController extends BuilderController
 
         $data['goodsTypes'] = $goodsTypes;
 
+        $data['phone'] = Helper::phoneInfo('15076569631');
+
         if(!empty($data)) {
             return $this->success('获取成功！','',$data);
         } else {

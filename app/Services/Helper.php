@@ -1380,7 +1380,7 @@ class Helper
         
         $url = 'https://open-api.10ss.net/oauth/oauth';
         $params = http_build_query($requestAll);
-        return self::curl($url, $params, $ispost = 1, $https = 0);
+        return self::curl($url, $params, 'post',0, 0);
     }
 
     /**
@@ -1405,7 +1405,7 @@ class Helper
 
         $url = 'https://open-api.10ss.net/oauth/oauth';
         $params = http_build_query($requestAll);
-        return self::curl($url, $params, $ispost = 1, $https = 0);
+        return self::curl($url, $params, 'post',0, 0);
     }
 
     /**
@@ -1429,7 +1429,7 @@ class Helper
             'timestamp' => $timesTamp,
         ];
         $params = http_build_query($requestAll);
-        return self::curl($url, $params, $ispost = 1, $https = 0);;
+        return self::curl($url, $params, 'post',0, 0);
     }
 
     /**
@@ -1491,7 +1491,7 @@ class Helper
 
         $params = http_build_query($requestAll);
 
-        $getResult = self::curl($url, $params, $ispost = 1, $https = 0);;
+        $getResult = self::curl($url, $params, 'post',0, 0);
 
         $result = json_decode($getResult,true);
 
@@ -1577,21 +1577,57 @@ class Helper
     }
 
     // 获取手机号区域信息
-    static function phoneInfo($phone)
+    static function phoneInfo($phone,$type = '360')
     {
-        $host = "https://ali-mobile.showapi.com";
-        $path = "/6-1";
-        $method = "GET";
-        $appcode = self::config('PHONEINFO_APPCODE');
-        $headers = array();
-        array_push($headers, "Authorization:APPCODE " . $appcode);
-        $querys = "num=".$phone;
-        $bodys = "";
-        $url = $host . $path . "?" . $querys;
-    
-        $result = self::curl($url);
+        switch ($type) {
+            case 'baidu':
+                $url = "http://mobsec-dianhua.baidu.com/dianhua_api/open/location";
+                $querys['tel'] = $phone;
+                $phoneData = self::curl($url, $querys, 'get',false, true);
+                $phoneData = json_decode($phoneData,true);
 
-        return json_decode($result,true);
+                $result['province'] = $phoneData['response'][$phone]['detail']['province'];
+                $result['city'] = $phoneData['response'][$phone]['detail']['area'][0]['city'];
+                $result['operator'] = $phoneData['response'][$phone]['detail']['operator'];
+                break;
+            case '360':
+                $url = "https://cx.shouji.360.cn/phonearea.php";
+                $querys['number'] = $phone;
+                $phoneData = self::curl($url, $querys, 'get',false, true);
+                $phoneData = json_decode($phoneData,true);
+
+                $result['province'] = $phoneData['data']['province'];
+                $result['city'] = $phoneData['data']['city'];
+                $result['operator'] = $phoneData['data']['sp'];
+                break;
+            case 'taobao':
+                $url = "http://tcc.taobao.com/cc/json/mobile_tel_segment.htm";
+                $querys['tel'] = $phone;
+                $phoneData = self::curl($url, $querys, 'get',false, true);
+
+                $phoneData = trim(explode('=',$phoneData)[1]);
+                $phoneData = iconv('gbk','utf-8', $phoneData);
+                $phoneData = str_replace("'",'"', $phoneData);
+                $phoneData = preg_replace('/(\w+):/is', '"$1":', $phoneData);
+                $phoneData = json_decode($phoneData,true);
+
+                $result['province'] = $phoneData['province'];
+                $result['city'] = '';
+                $result['operator'] = $phoneData['catName'];
+                break;
+            default:
+                $url = "http://mobsec-dianhua.baidu.com/dianhua_api/open/location";
+                $querys['tel'] = $phone;
+                $phoneData = self::curl($url, $querys, 'get',false, true);
+                $phoneData = json_decode($phoneData,true);
+
+                $result['province'] = $phoneData['response'][$phone]['detail']['province'];
+                $result['city'] = $phoneData['response'][$phone]['detail']['area']['city'];
+                $result['operator'] = $phoneData['response'][$phone]['detail']['operator'];
+                break;
+        }
+
+        return $result;
     }
 
     // 腾讯云语音识别，$audioFile='http://www.website/1.mp3'，必须安装ffmpeg程序
@@ -1706,7 +1742,7 @@ class Helper
         $url = 'https://aai.tencentcloudapi.com';
         $headers = array("Host:aai.tencentcloudapi.com", "Content-Type:application/x-www-form-urlencoded", "charset=UTF-8");
 
-        $result = curl($url, $params, $method = 'post', $headers);
+        $result = self::curl($url, $params, $method = 'post', $headers);
 
         return json_decode($result,true);
     }
