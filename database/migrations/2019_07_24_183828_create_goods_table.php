@@ -17,7 +17,7 @@ class CreateGoodsTable extends Migration
             $table->engine='innodb';
             $table->increments('id')->unsigned();            
             $table->integer('shop_id')->unsigned()->nullable()->comment('商家ID');
-            $table->integer('category_id')->nullable()->comment('商品主分类');
+            $table->integer('goods_category_id')->nullable()->comment('商品主分类');
             $table->string('shop_self_category_ids')->nullable()->comment('商家商品分类');
             $table->string('tags')->nullable()->comment('标签');            
             $table->string('goods_name')->nullable()->comment('商品名称');

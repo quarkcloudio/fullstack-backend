@@ -755,7 +755,6 @@ class Helper
         // 图片存在
         if(!empty($picture)) {
             if ($field == 'path') {
-
                 // 存在http，本身为图片地址
                 if(strpos($picture['path'],'http') !== false) {
                     $url = $picture['path'];
@@ -764,15 +763,12 @@ class Helper
                     if(self::config('SSL_OPEN') == 1) {
                         $baseUrl = 'https://';
                     }
-
                     $url = $baseUrl.$_SERVER['HTTP_HOST'].Storage::url($picture['path']);
                 }
-
                 $result = $url;
             } else {
                 $result = $picture[$field];
             }
-
             return $result;
         }
         
@@ -1577,7 +1573,7 @@ class Helper
     }
 
     // 获取手机号区域信息
-    static function phoneInfo($phone,$type = '360')
+    static function phoneInfo($phone,$type = 'baidu')
     {
         switch ($type) {
             case 'baidu':

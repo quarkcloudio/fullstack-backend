@@ -67,8 +67,8 @@ class GoodsController extends BuilderController
         if(!empty($search)) {
 
             // 用户名
-            if(isset($search['title'])) {
-                $query->where('title','like','%'.$search['title'].'%');
+            if(isset($search['goods_name'])) {
+                $query->where('goods_name','like','%'.$search['goods_name'].'%');
             }
 
             // 状态
@@ -126,18 +126,19 @@ class GoodsController extends BuilderController
 
         $searchs = [
             Select::make('状态','status')->option($status)->value('0'),
-            Input::make('搜索内容','title'),
+            Input::make('搜索内容','goods_name'),
             Button::make('搜索')->onClick('search'),
         ];
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('logo','logo')->isImage(),
-            Column::make('商家名称','title')->withA('admin/mall/'.$this->controllerName().'/edit'),
-            Column::make('店铺联系人','username'),
-            Column::make('店铺电话','phone'),
+            Column::make('商品封面','cover_id')->isImage(),
+            Column::make('商品名称','goods_name')->withA('admin/mall/'.$this->controllerName().'/edit'),
+            Column::make('商品标签','tags'),
+            Column::make('售价','goods_price'),
+            Column::make('库存','stock_num'),
             Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
-            Column::make('创建时间','created_at'),
+            Column::make('发布时间','created_at'),
         ];
 
         $headerButtons = [
@@ -151,7 +152,7 @@ class GoodsController extends BuilderController
         ];
 
         foreach ($lists as $key => $value) {
-            $lists[$key]['logo'] = Helper::getPicture($value['logo']);
+            $lists[$key]['cover_id'] = Helper::getPicture($value['cover_id']);
         }
 
         $lists = Helper::listsFormat($lists);
@@ -938,7 +939,7 @@ class GoodsController extends BuilderController
      */
     public function categoryCreate(Request $request)
     {
-        $categorys         = GoodsCategory::all()->toArray();
+        $categorys         = GoodsCategory::where('status',1)->get()->toArray();
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
@@ -970,8 +971,6 @@ class GoodsController extends BuilderController
         }
 
         $data['goodsTypes'] = $goodsTypes;
-
-        $data['phone'] = Helper::phoneInfo('15076569631');
 
         if(!empty($data)) {
             return $this->success('获取成功！','',$data);
@@ -1021,7 +1020,8 @@ class GoodsController extends BuilderController
             return $this->error('分页数量必须填写！');
         }
 
-        $hasTitle = GoodsCategory::where('title',$title)->first();
+        $hasTitle = GoodsCategory::where('title',$title)->where('status',1)->first();
+
         if($hasTitle) {
             return $this->error('此分类标题已存在！');
         }
@@ -1097,7 +1097,7 @@ class GoodsController extends BuilderController
             return $this->error('参数错误！');
         }
 
-        $categorys         = GoodsCategory::all()->toArray();
+        $categorys         = GoodsCategory::where('status',1)->get()->toArray();
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
@@ -1116,12 +1116,13 @@ class GoodsController extends BuilderController
 
         $cover_id = $data['cover_id'];
 
-        unset($data['cover_id']);
-
-        $data['cover_id'][0]['id'] =$cover_id;
-        $data['cover_id'][0]['uid'] =$cover_id;
-        $data['cover_id'][0]['name'] = Helper::getPicture($cover_id,'name');
-        $data['cover_id'][0]['url'] = Helper::getPicture($cover_id);
+        if($cover_id) {
+            unset($data['cover_id']);
+            $data['cover_id'][0]['id'] =$cover_id;
+            $data['cover_id'][0]['uid'] =$cover_id;
+            $data['cover_id'][0]['name'] = Helper::getPicture($cover_id,'name');
+            $data['cover_id'][0]['url'] = Helper::getPicture($cover_id);
+        }
 
         $goodsBrands = GoodsBrand::where('status',1)->select('id as key','name as title')->get();
 
@@ -1140,6 +1141,52 @@ class GoodsController extends BuilderController
         }
 
         $data['goodsTypes'] = $goodsTypes;
+
+        $spuSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
+        ->where('type',1)
+        ->pluck('goods_attribute_id');
+        $data['spuSelectedIds'] = $spuSelectedIds;
+
+        $skuSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
+        ->where('type',2)
+        ->pluck('goods_attribute_id');
+        $data['skuSelectedIds'] = $skuSelectedIds;
+
+        // 定义对象
+        $spuSelectedDatas = GoodsAttribute::whereIn('id', $spuSelectedIds)
+        ->where('status', '>', 0)
+        ->where('type', 1)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->toArray();
+
+        $data['spuSelectedKeys'] = [];
+
+        foreach ($spuSelectedDatas as $key => $spuSelectedData) {
+            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$spuSelectedData['id'])->pluck('vname')->toArray();
+            $spuSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
+            $data['spuSelectedKeys'][] = $key;
+        }
+
+        $data['spuSelectedData'] = $spuSelectedDatas;
+
+        // 定义对象
+        $skuSelectedDatas = GoodsAttribute::whereIn('id', $skuSelectedIds)
+        ->where('status', '>', 0)
+        ->where('type', 2)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->toArray();
+
+        $data['skuSelectedKeys'] = [];
+
+        foreach ($skuSelectedDatas as $key => $skuSelectedData) {
+            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$skuSelectedData['id'])->pluck('vname')->toArray();
+            $skuSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
+            $data['skuSelectedKeys'][] = $key;
+        }
+
+        $data['skuSelectedData'] = $skuSelectedDatas;
 
         if ($data['status'] == 1) {
             $data['status'] = true;
@@ -1167,32 +1214,47 @@ class GoodsController extends BuilderController
         $name           =   $request->json('name');
         $description    =   $request->json('description');
         $sort           =   $request->json('sort');
+        $pid            =   $request->json('pid');
         $coverId        =   $request->json('cover_id');
         $indexTpl       =   $request->json('index_tpl');
         $listsTpl       =   $request->json('lists_tpl');
         $detailTpl      =   $request->json('detail_tpl');
         $pageNum        =   $request->json('page_num');
         $status         =   $request->json('status');
+        $brandIds       =   $request->json('brand_ids');
+
+        $attributeSpuIds          =   $request->json('attribute_spu_ids');
+        $attributeSpuSorts        =   $request->json('attribute_spu_sorts');
+        $attributeSpuGroups       =   $request->json('attribute_spu_groups');
+
+        $attributeSkuIds          =   $request->json('attribute_sku_ids');
+        $attributeSkuSorts        =   $request->json('attribute_sku_sorts');
+        $attributeSkuGroups       =   $request->json('attribute_sku_groups');
         
         if (empty($title)) {
             return $this->error('标题必须填写！');
         }
+
         if (empty($name)) {
             return $this->error('名称必须填写！');
         }
+
         if (empty($pageNum)) {
             return $this->error('分页数量必须填写！');
         }
-        $hasTitle = GoodsCategory::where('id','<>',$id)->where('title',$title)->first();
+
+        $hasTitle = GoodsCategory::where('id','<>',$id)->where('title',$title)->where('status',1)->first();
+
         if($hasTitle) {
             return $this->error('此分类标题已存在！');
         }
+
         if ($status == true) {
             $status = 1;
         } else {
             $status = 2; //禁用
         }
-
+        
         if($coverId) {
             $coverId = $coverId[0]['id'];
         } else {
@@ -1203,15 +1265,42 @@ class GoodsController extends BuilderController
         $data['name']           = $name;
         $data['description']    = $description;
         $data['sort']           = $sort;
+        $data['pid']            = $pid;
         $data['cover_id']       = $coverId;
         $data['index_tpl']      = $indexTpl;
         $data['lists_tpl']      = $listsTpl;
         $data['detail_tpl']     = $detailTpl;
         $data['page_num']       = $pageNum;
         $data['status']         = $status;
+        $data['goods_brand_ids'] = json_encode($brandIds);
 
         $result = GoodsCategory::where('id',$id)->update($data);
-        if ($result) {
+
+        if($result !== false) {
+            GoodsCategoryAttribute::where('goods_category_id',$id)->delete();
+            if($attributeSpuIds) {
+                foreach ($attributeSpuIds as $key => $attributeSpuId) {
+                    $data1['goods_category_id'] = $id;
+                    $data1['goods_attribute_id'] = $attributeSpuId;
+                    $data1['gorup_name'] = $attributeSpuGroups[$key];
+                    $data1['sort'] = $attributeSpuSorts[$key];
+                    $data1['type'] = 1;
+                    GoodsCategoryAttribute::create($data1);
+                }
+            }
+            if($attributeSkuIds) {
+                foreach ($attributeSkuIds as $key => $attributeSkuId) {
+                    $data2['goods_category_id'] = $id;
+                    $data2['goods_attribute_id'] = $attributeSkuId;
+                    $data2['gorup_name'] = $attributeSkuGroups[$key];
+                    $data2['sort'] = $attributeSkuSorts[$key];
+                    $data2['type'] = 2;
+                    GoodsCategoryAttribute::create($data2);
+                }
+            }
+        }
+
+        if($result) {
             return $this->success('操作成功！','categoryIndex');
         } else {
             return $this->error('操作失败！');
