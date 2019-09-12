@@ -15,6 +15,7 @@ class CreateGoodsUnitsTable extends Migration
     {
         Schema::create('goods_units', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('shop_id')->default('0');
             $table->string('name')->nullable()->comment('单位名称：千克');
             $table->tinyInteger('status')->default(1);
             $table->timestamps();

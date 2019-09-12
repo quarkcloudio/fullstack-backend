@@ -25,6 +25,7 @@ class Goods extends Model
            'goods_category_id',
            'shop_self_category_ids',
            'tags',
+           'goods_mode',
            'goods_name',
            'keywords',
            'description',
