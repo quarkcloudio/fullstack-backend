@@ -29,6 +29,7 @@ class CreateGoodsTable extends Migration
             $table->integer('goods_brand_id')->nullable()->comment('品牌ID');
             $table->string('goods_attrs')->nullable()->comment('平台系统属性');
             $table->string('other_attrs')->nullable()->comment('商家自定义属性');
+            $table->integer('buy_limit')->nullable()->comment('每人限购数量');
             $table->integer('goods_moq')->nullable()->comment('最小起订量');
             $table->decimal('goods_price',10,2)->nullable()->comment('店铺价:价格必须是0.01~9999999之间的数字，且不能高于市场价');
             $table->decimal('market_price',10,2)->nullable()->comment('市场价:为0则商品详情页不显示，价格必须是0.00~9999999之间的数字，此价格仅为市场参考售价，请根据该实际情况认真填写');
@@ -58,6 +59,14 @@ class CreateGoodsTable extends Migration
             $table->integer('sales_num')->nullable()->comment('销量');
             $table->integer('fake_sales_num')->nullable()->comment('虚拟销量');
             $table->string('comment_status')->nullable();
+            $table->tinyInteger('effective_type')->default('1')->nullable()->comment('当商品为电子卡券类型商品时，兑换生效期类型：1付款完成立即生效，2付款完成N小时后生效,3付款完成次日生效');
+            $table->integer('effective_hour')->nullable()->comment('当商品为电子卡券类型商品时，兑换生效期类型为付款完成N小时后生效，例如：12，为12小时候生效');
+            $table->tinyInteger('valid_period_type')->default('1')->nullable()->comment('当商品为电子卡券类型商品时，使用有效期类型：1长期有效，2具有明确截止时间例如2019-01-01到2019-01-31，3自购买之日起，N小时内有效,4自购买之日起，N天内有效');
+            $table->timestamp('add_time_begin')->nullable()->comment('当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，开始时间');
+            $table->timestamp('add_time_end')->nullable()->comment('当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，结束时间');
+            $table->integer('valid_period_hour')->nullable()->comment('当商品为电子卡券类型商品时，使用有效期类型为3自购买之日起，N小时内有效');
+            $table->integer('valid_period_day')->nullable()->comment('当商品为电子卡券类型商品时，使用有效期类型为4自购买之日起，N天内有效');
+            $table->tinyInteger('is_expired_refund')->default('1')->nullable()->comment('当商品为电子卡券类型商品时，是否支持过期退款');
             $table->tinyInteger('rate')->nullable();
             $table->tinyInteger('status')->default('1')->nullable()->comment('1出售中，2审核中，3已下架，4商品违规下架');
             $table->string('goods_reason')->nullable()->comment('违规下架原因');

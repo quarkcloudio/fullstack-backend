@@ -39,6 +39,8 @@ use App\Models\GoodsAttributeAlia;
 use App\Models\GoodsCategoryAttribute;
 use App\Models\GoodsInfoAttributeValue;
 use App\Models\GoodsBrand;
+use App\Models\GoodsUnit;
+use App\Models\Shop;
 
 class GoodsController extends BuilderController
 {
@@ -167,199 +169,6 @@ class GoodsController extends BuilderController
     }
 
     /**
-     * Form页面模板
-     * 
-     * @param  Request  $request
-     * @return Response
-     */
-    public function form($data = [])
-    {
-        if(isset($data['id'])) {
-            $action = 'admin/'.$this->controllerName().'/save';
-        } else {
-            $action = 'admin/'.$this->controllerName().'/store';
-        }
-
-        $categorys         = GoodsCategory::where('status',1)->get()->toArray();
-        $categoryTrees     = Helper::listToTree($categorys);
-        $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
-
-        // 模板数据
-        $getCategorys = [];
-
-        $getCategorys[0]['name'] = '请选择分类';
-        $getCategorys[0]['value'] = '0';
-
-        foreach ($categoryTreeLists as $key => $categoryTreeList) {
-            $getCategorys[$key+1]['name'] = $categoryTreeList['title'];
-            $getCategorys[$key+1]['value'] = $categoryTreeList['id'];
-        }
-
-        $checkboxList = [
-            [
-                'name'=>'首页推荐',
-                'value'=>1,
-            ],
-            [
-                'name'=>'频道推荐',
-                'value'=>2,
-            ],
-            [
-                'name'=>'列表推荐',
-                'value'=>4,
-            ],
-            [
-                'name'=>'详情推荐',
-                'value'=>8,
-            ],
-        ];
-
-        $openDays = [
-            [
-                'name'=>'周一',
-                'value'=>1,
-            ],
-            [
-                'name'=>'周二',
-                'value'=>2,
-            ],
-            [
-                'name'=>'周三',
-                'value'=>3,
-            ],
-            [
-                'name'=>'周四',
-                'value'=>4,
-            ],
-            [
-                'name'=>'周五',
-                'value'=>5,
-            ],
-            [
-                'name'=>'周六',
-                'value'=>6,
-            ],
-            [
-                'name'=>'周日',
-                'value'=>7,
-            ],
-        ];
-
-        if($data) {
-
-            // 定义对象
-            $options = User::where('users.id',$data['uid'])
-            ->select('users.username as name','users.id as value')
-            ->get()
-            ->toArray();
-            $bindUser = SearchInput::make('绑定用户','uid')
-            ->style(['width'=>200])
-            ->option($options)
-            ->dataSource('admin/user/suggest');
-
-            // 商家地域
-            $data['area'] = [$data['province'],$data['city'],$data['county']];
-
-            // 地图坐标
-            $map = Map::make('商家坐标','map')
-            ->style(['width'=>'100%','height'=>400])
-            ->position($data['longitude'],$data['latitude']);
-
-        } else {
-            $bindUser = SearchInput::make('绑定用户','uid')
-            ->style(['width'=>200])
-            ->dataSource('admin/user/suggest');
-
-            // 地图坐标
-            $map = Map::make('商家坐标','map')
-            ->style(['width'=>'100%','height'=>400]);
-        }
-
-
-        $oneControls = [
-            ID::make('ID','id'),
-            Input::make('商家名称','title')->style(['width'=>400]),
-            Image::make('Logo','logo'),
-            Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
-            $bindUser,
-            Input::make('标签','tags')->style(['width'=>400]),
-            TextArea::make('描述','description')->style(['width'=>400]),
-            Image::make('封面图','cover_ids')->mode('multiple'),
-            Editor::make('内容','content'),
-            Input::make('联系人','username')->style(['width'=>200]),
-            Input::make('商家电话','phone')->style(['width'=>200]),
-            Checkbox::make('营业日期','open_days')->list($openDays)->value([1,2,3,4,5,6,7]),
-            RangePicker::make('营业时间','open_times')->format('H:mm')->value(['00:00','23:59']),
-            SwitchButton::make('营业状态','comment_status')->checkedText('营业')->unCheckedText('打烊')->value(true),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action),
-        ];
-
-        $twoControls = [
-            InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
-            Checkbox::make('推荐位','position')->list($checkboxList),
-            SwitchButton::make('自营','is_self')->checkedText('是')->unCheckedText('否')->value(false),
-            SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
-
-        $threeControls = [
-            Area::make('商家地域','area')->style(['width'=>400]),
-            Input::make('详细地址','address')->style(['width'=>400]),
-            $map,
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
-
-        $fourControls = [
-            Input::make('法人姓名','corporate_name')->style(['width'=>200]),
-            Input::make('身份证号','corporate_idcard')->style(['width'=>200]),
-            Image::make('身份证照片','corporate_idcard_cover_id'),
-            Image::make('营业执照','business_license_cover_id'),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
-
-        $fiveControls = [
-            Input::make('开户行','bank_name')->style(['width'=>200]),
-            Input::make('收款人','bank_payee')->style(['width'=>200]),
-            Input::make('银行账号','bank_number')->style(['width'=>200]),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action)
-        ];
-
-        $tabPane = [
-            TabPane::make('基本信息',1)->controls($oneControls),
-            TabPane::make('扩展信息',2)->controls($twoControls),
-            TabPane::make('商铺位置',3)->controls($threeControls),
-            TabPane::make('资质证件',4)->controls($fourControls),
-            TabPane::make('打款信息',5)->controls($fiveControls)
-        ];
-
-        $tabs = Tabs::make('tab')->defaultActiveKey(1)->tabPanes($tabPane);
-
-        $result = $this->formBuilder($tabs,$data);
-
-        return $result;
-    }
-
-    /**
      * 添加页面
      * 
      * @param  Request  $request
@@ -367,7 +176,35 @@ class GoodsController extends BuilderController
      */
     public function create(Request $request)
     {
-        $data = $this->form();
+
+        $categorys = GoodsCategory::where('status',1)
+        ->select('goods_categories.id','goods_categories.pid','goods_categories.title as label','goods_categories.id as value')
+        ->get()
+        ->toArray();
+
+        $categoryTrees = Helper::listToTree($categorys,'id','pid','children',0);
+
+        $shops = Shop::where('status',1)
+        ->select('id','title')
+        ->get()
+        ->toArray();
+
+        $goodsUnits = GoodsUnit::where('status',1)
+        ->select('id','name')
+        ->get()
+        ->toArray();
+
+        $goodsBrands = GoodsBrand::where('status',1)
+        ->select('id','name')
+        ->get()
+        ->toArray();
+
+        // 模板数据
+        $data['categorys'] = $categoryTrees;
+        $data['shops'] = $shops;
+        $data['goodsUnits'] = $goodsUnits;
+        $data['goodsBrands'] = $goodsBrands;
+
         return $this->success('获取成功！','',$data);
     }
 
