@@ -26,7 +26,7 @@ class CreatePostsTable extends Migration
             $table->string('source')->nullable()->comment('文章来源')->default('');
             $table->string('description')->nullable()->default('');
             $table->string('password')->nullable()->default('');
-            $table->string('cover_ids')->nullable()->default('');
+            $table->text('cover_ids')->nullable()->default('');
             $table->integer('pid')->default(0)->nullable();
             $table->integer('level')->default(0)->nullable();
             $table->string('type')->default('ARTICLE')->comment('文章类型（ARTICLE/PAGE/LINK等）');

@@ -744,7 +744,10 @@ class Helper
         if(count(explode('[',$id))>1) {
             $ids = json_decode($id, true);
             if(isset($ids[$key])) {
-                $id = $ids[$key];
+                if($field == 'path') {
+                    $field = 'url';
+                }
+                return $ids[$key][$field];
             } else {
                 return '//'.$_SERVER['HTTP_HOST'].'/images/default.png';
             }
