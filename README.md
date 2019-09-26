@@ -20,7 +20,7 @@
 
 第三步：运行 composer install
 
-第四步：php artisan key:generate &&  php artisan passport:install
+第四步：php artisan key:generate &&  php artisan passport:install && php artisan storage:link
 
 第五步：php -S 127.0.0.1:8080 -t ./public
 

@@ -34,8 +34,10 @@ class AppServiceProvider extends ServiceProvider
             $jsApi = '';
 
             if(Helper::isWechat()) {
-                $app = Factory::officialAccount(Helper::wechatConfig());
-                $jsApi = $app->jssdk->buildConfig(array('onMenuShareTimeline','onMenuShareAppMessage'), $debug = false, $beta = false, $json = true);    
+                if(Helper::wechatConfig() != false) {
+                    $app = Factory::officialAccount(Helper::wechatConfig());
+                    $jsApi = $app->jssdk->buildConfig(array('onMenuShareTimeline','onMenuShareAppMessage'), $debug = false, $beta = false, $json = true);
+                } 
             }
 
             $view->with('uid', $uid)

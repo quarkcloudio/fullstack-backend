@@ -24,6 +24,7 @@ Route::group(['prefix' => 'tools','namespace' => 'Tools'],function ($router)
     $router->get('picture/getPicture', 'PictureController@getPicture')->name('tools/picture/getPicture');
     $router->post('picture/upload', 'PictureController@upload')->name('tools/picture/upload');
     $router->post('picture/base64Upload', 'PictureController@base64Upload')->name('tools/picture/base64Upload');
+    $router->get('picture/insert', 'PictureController@insert')->name('tools/picture/insert');
     $router->post('file/upload', 'FileController@upload')->name('tools/file/upload');
     $router->any('git/webhook', 'GitController@webhook')->name('tools/git/webhook');
 });
@@ -56,6 +57,20 @@ Route::group(['prefix' => 'cashier','namespace' => 'Cashier'],function ($router)
     $router->get('virtuaCurrency/appPay', 'VirtuaCurrencyController@appPay')->name('cashier/virtuaCurrency/appPay');
     $router->get('virtuaCurrency/successPage', 'VirtuaCurrencyController@successPage')->name('cashier/virtuaCurrency/successPage');
     $router->get('virtuaCurrency/errorPage', 'VirtuaCurrencyController@errorPage')->name('cashier/virtuaCurrency/errorPage');
+});
+
+// Home未登录路由组
+Route::group(['namespace' => 'Home'],function ($router) {
+    $router->get('/', 'IndexController@index')->name('/');
+    $router->get('home/index/index', 'IndexController@index')->name('home/index/index');
+    $router->get('home/page/index', 'PageController@index')->name('home/page/index');
+    $router->get('home/article/index', 'ArticleController@index')->name('home/article/index');
+    $router->get('home/article/list', 'ArticleController@list')->name('home/article/list');
+    $router->get('home/article/detail', 'ArticleController@detail')->name('home/article/detail');
+    $router->get('home/video/index', 'VideoController@index')->name('home/video/index');
+    $router->get('home/video/list', 'VideoController@list')->name('home/video/list');
+    $router->get('home/video/detail', 'VideoController@detail')->name('home/video/detail');
+    $router->any('home/search/index', 'SearchController@index')->name('home/search/index');
 });
 
 // PC已登录路由组

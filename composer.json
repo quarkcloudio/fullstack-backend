@@ -17,6 +17,7 @@
         "endroid/qrcode": "^2.5",
         "overtrue/easy-sms": "^1.0",
         "gregwar/captcha": "1.*",
+        "intervention/image": "^2.5",
         "maatwebsite/excel": "~2.1.0",
         "overtrue/pinyin": "~4.0",
         "overtrue/socialite": "~2.0",

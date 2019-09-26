@@ -39,6 +39,14 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/article/changeStatus', 'Admin\\ArticleController@changeStatus')->name('api/admin/article/changeStatus');
     Route::get('admin/article/myPublished', 'Admin\\ArticleController@myPublished')->name('api/admin/article/myPublished');
     
+    Route::get('admin/video/index', 'Admin\\VideoController@index')->name('api/admin/video/index');
+    Route::get('admin/video/create', 'Admin\\VideoController@create')->name('api/admin/video/create');
+    Route::post('admin/video/store', 'Admin\\VideoController@store')->name('api/admin/video/store');
+    Route::get('admin/video/edit', 'Admin\\VideoController@edit')->name('api/admin/video/edit');
+    Route::post('admin/video/save', 'Admin\\VideoController@save')->name('api/admin/video/save');
+    Route::post('admin/video/changeStatus', 'Admin\\VideoController@changeStatus')->name('api/admin/video/changeStatus');
+    Route::get('admin/video/myPublished', 'Admin\\VideoController@myPublished')->name('api/admin/video/myPublished');
+
     Route::get('admin/page/index', 'Admin\\PageController@index')->name('api/admin/page/index');
     Route::get('admin/page/create', 'Admin\\PageController@create')->name('api/admin/page/create');
     Route::post('admin/page/store', 'Admin\\PageController@store')->name('api/admin/page/store');
@@ -182,6 +190,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::get('admin/goods/edit', 'Admin\\GoodsController@edit')->name('api/admin/goods/edit');
     Route::post('admin/goods/save', 'Admin\\GoodsController@save')->name('api/admin/goods/save');
     Route::post('admin/goods/changeStatus', 'Admin\\GoodsController@changeStatus')->name('api/admin/goods/changeStatus');
+    Route::get('admin/goods/attribute', 'Admin\\GoodsController@attribute')->name('api/admin/goods/attribute');
 
     Route::get('admin/goods/categoryIndex', 'Admin\\GoodsController@categoryIndex')->name('api/admin/goods/categoryIndex');
     Route::get('admin/goods/categoryCreate', 'Admin\\GoodsController@categoryCreate')->name('api/admin/goods/categoryCreate');
@@ -210,6 +219,20 @@ Route::group(['middleware' => ['admin']], function() {
     Route::get('admin/goods/skuEdit', 'Admin\\GoodsController@skuEdit')->name('api/admin/goods/skuEdit');
     Route::post('admin/goods/skuSave', 'Admin\\GoodsController@skuSave')->name('api/admin/goods/skuSave');
     Route::post('admin/goods/skuChangeStatus', 'Admin\\GoodsController@skuChangeStatus')->name('api/admin/goods/skuChangeStatus');
+
+    Route::get('admin/goods/unitIndex', 'Admin\\GoodsController@unitIndex')->name('api/admin/goods/unitIndex');
+    Route::get('admin/goods/unitCreate', 'Admin\\GoodsController@unitCreate')->name('api/admin/goods/unitCreate');
+    Route::post('admin/goods/unitStore', 'Admin\\GoodsController@unitStore')->name('api/admin/goods/unitStore');
+    Route::get('admin/goods/unitEdit', 'Admin\\GoodsController@unitEdit')->name('api/admin/goods/unitEdit');
+    Route::post('admin/goods/unitSave', 'Admin\\GoodsController@unitSave')->name('api/admin/goods/unitSave');
+    Route::post('admin/goods/unitChangeStatus', 'Admin\\GoodsController@unitChangeStatus')->name('api/admin/goods/unitChangeStatus');
+
+    Route::get('admin/goods/layoutIndex', 'Admin\\GoodsController@layoutIndex')->name('api/admin/goods/layoutIndex');
+    Route::get('admin/goods/layoutCreate', 'Admin\\GoodsController@layoutCreate')->name('api/admin/goods/layoutCreate');
+    Route::post('admin/goods/layoutStore', 'Admin\\GoodsController@layoutStore')->name('api/admin/goods/layoutStore');
+    Route::get('admin/goods/layoutEdit', 'Admin\\GoodsController@layoutEdit')->name('api/admin/goods/layoutEdit');
+    Route::post('admin/goods/layoutSave', 'Admin\\GoodsController@layoutSave')->name('api/admin/goods/layoutSave');
+    Route::post('admin/goods/layoutChangeStatus', 'Admin\\GoodsController@layoutChangeStatus')->name('api/admin/goods/layoutChangeStatus');
 
     Route::get('admin/goodsBrand/index', 'Admin\\GoodsBrandController@index')->name('api/admin/goodsBrand/index');
     Route::get('admin/goodsBrand/create', 'Admin\\GoodsBrandController@create')->name('api/admin/goodsBrand/create');

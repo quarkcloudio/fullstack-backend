@@ -40,6 +40,7 @@ use App\Models\GoodsCategoryAttribute;
 use App\Models\GoodsInfoAttributeValue;
 use App\Models\GoodsBrand;
 use App\Models\GoodsUnit;
+use App\Models\GoodsLayout;
 use App\Models\Shop;
 
 class GoodsController extends BuilderController
@@ -199,11 +200,111 @@ class GoodsController extends BuilderController
         ->get()
         ->toArray();
 
+        $topLayouts = GoodsLayout::where('status',1)
+        ->where('position',1)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
+
+        $bottomLayouts = GoodsLayout::where('status',1)
+        ->where('position',2)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
+
+        $packingLayouts = GoodsLayout::where('status',1)
+        ->where('position',3)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
+
+        $serviceLayouts = GoodsLayout::where('status',1)
+        ->where('position',4)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
+
         // 模板数据
         $data['categorys'] = $categoryTrees;
         $data['shops'] = $shops;
         $data['goodsUnits'] = $goodsUnits;
         $data['goodsBrands'] = $goodsBrands;
+        $data['topLayouts'] = $topLayouts;
+        $data['bottomLayouts'] = $bottomLayouts;
+        $data['packingLayouts'] = $packingLayouts;
+        $data['serviceLayouts'] = $serviceLayouts;
+
+        return $this->success('获取成功！','',$data);
+    }
+
+    /**
+     * 根据分类获取商品属性
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function attribute(Request $request)
+    {
+        $categoryId  =   $request->get('categoryId','');
+        $shopId      =   $request->get('shopId','');
+
+        $systemSpus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        ->where('goods_category_attributes.goods_category_id',$categoryId)
+        ->where('goods_category_attributes.type',1)
+        ->orderBy('goods_attributes.sort','asc')
+        ->select('goods_attributes.id','goods_attributes.name','goods_attributes.style')
+        ->get()
+        ->toArray();
+
+        foreach($systemSpus as $key => $systemSpu)
+        {
+            $systemSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$systemSpu['id'])
+            ->orderBy('sort','asc')
+            ->get()
+            ->toArray();
+
+            $systemSpus[$key]['vname'] = $systemSpuVnames;
+        }
+
+        $shopSpus = GoodsAttribute::where('type',1)
+        ->where('shop_id',$shopId)
+        ->orderBy('sort','asc')
+        ->get()
+        ->toArray();
+
+        foreach($shopSpus as $key => $shopSpu)
+        {
+            $shopSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$shopSpus['id'])
+            ->orderBy('sort','asc')
+            ->get()
+            ->toArray();
+
+            $shopSpus[$key]['vname'] = $shopSpuVnames;
+        }
+
+        $skus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        ->where('goods_category_attributes.type',2)
+        ->whereRaw('(goods_category_attributes.goods_category_id = ? or goods_attributes.shop_id = ?)', [$categoryId, $shopId])
+        ->orderBy('goods_attributes.sort','asc')
+        ->select('goods_attributes.id','goods_attributes.name','goods_attributes.style')
+        ->get()
+        ->toArray();
+
+
+        foreach($skus as $key => $sku)
+        {
+            $skuVnames = GoodsAttributeValue::where('goods_attribute_id',$sku['id'])
+            ->orderBy('sort','asc')
+            ->get()
+            ->toArray();
+
+            $skus[$key]['vname'] = $skuVnames;
+        }
+
+        // 模板数据
+        $data['systemSpus'] = $systemSpus;
+        $data['shopSpus'] = $shopSpus;
+        $data['skus'] = $skus;
 
         return $this->success('获取成功！','',$data);
     }
@@ -2283,6 +2384,675 @@ class GoodsController extends BuilderController
 
         // 定义对象
         $query = GoodsAttribute::query();
+
+        if(is_array($id)) {
+            $query->whereIn('id',$id);
+        } else {
+            $query->where('id',$id);
+        }
+
+        $result = $query->update(['status'=>$status]);
+
+        if ($result) {
+            return $this->success('操作成功！');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 列表页面
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function unitIndex(Request $request)
+    {
+        $this->pageTitle = '商品单位';
+        // 获取参数
+        $current   = intval($request->get('current',1));
+        $pageSize  = intval($request->get('pageSize',10));
+        $search     = $request->get('search');
+            
+        // 定义对象
+        $query = GoodsUnit::query();
+
+        // 查询
+        if(!empty($search)) {
+
+            // 名称
+            if(isset($search['name'])) {
+                if(!empty($search['name'])) {
+                    $query->where('name',$search['name']);
+                }
+            }
+
+            // 状态
+            if(isset($search['status']) && $search['status'] !=0) {
+                if(!empty($search['status'])) {
+                    $query->where('status',$search['status']);
+                }
+            }
+        }
+
+        // 查询数量
+        $total = $query
+        ->where('status', '>', 0)
+        ->count();
+
+        // 查询列表
+        $lists = $query
+        ->skip(($current-1)*$pageSize)
+        ->take($pageSize)
+        ->where('status', '>', 0)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->toArray();
+
+        // 默认页码
+        $pagination['defaultCurrent'] = 1;
+        // 当前页码
+        $pagination['current'] = $current;
+        // 分页数量
+        $pagination['pageSize'] = $pageSize;
+        // 总数量
+        $pagination['total'] = $total;
+
+        foreach ($lists as $key => $list) {
+            $statue = $list['status'];
+            if($statue == 1) {
+                $lists[$key]['status'] = '正常';
+            }
+            if($statue == 2) {
+                $lists[$key]['status'] = '已禁用';
+            }
+        }
+
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Input::make('搜索内容','name'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('单位名称','name')->withA('admin/mall/'.$this->controllerName().'/unitEdit'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/goods/unitCreate'),
+        ];
+
+        $toolbarButtons = [
+            Button::make('启用')->type('primary')->onClick('multiChangeStatus','1','admin/'.$this->controllerName().'/unitChangeStatus'),
+            Button::make('禁用')->onClick('multiChangeStatus','2','admin/'.$this->controllerName().'/unitChangeStatus'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/unitChangeStatus'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/unitChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('编辑')->type('link')->href('admin/mall/goods/unitEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/unitChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
+
+        return $this->success('获取成功！','',$data);
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function unitForm($data = [])
+    {
+        $this->pageTitle = '商品单位';
+
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/unitSave';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/unitStore';
+        }
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('单位名称','name')->style(['width'=>200]),
+        ];
+
+        $controls[] = SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true);
+        $controls[] = Button::make('提交')
+        ->type('primary')
+        ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+        ->onClick('submit',null,$action);
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
+    }
+
+    /**
+     * 添加页面
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function unitCreate(Request $request)
+    {
+        $data = $this->unitForm();
+
+        if(!empty($data)) {
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
+    }
+
+    /**
+     * 保存方法
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function unitStore(Request $request)
+    {
+        $name           =   $request->json('name');
+        $status         =   $request->json('status');
+        
+        if (empty($name)) {
+            return $this->error('名称必须填写！');
+        }
+
+        if ($status == true) {
+            $status = 1;
+        } else {
+            $status = 2; //禁用
+        }
+
+        $data['name']           = $name;
+        $data['status']         = $status;
+
+        $result = GoodsUnit::create($data);
+
+        if($result) {
+            return $this->success('操作成功！','unitIndex');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 编辑页面
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function unitEdit(Request $request)
+    {
+        $id = $request->get('id');
+
+        if(empty($id)) {
+            return $this->error('参数错误！');
+        }
+
+        $data = GoodsUnit::find($id)->toArray();
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        $data = $this->unitForm($data);
+        
+        if(!empty($data)) {
+            return $this->success('操作成功！','',$data);
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 保存编辑数据
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function unitSave(Request $request)
+    {
+        $id             =   $request->json('id');
+        $name           =   $request->json('name');
+        $status         =   $request->json('status');
+        
+        if (empty($name)) {
+            return $this->error('名称必须填写！');
+        }
+
+        if ($status == true) {
+            $status = 1;
+        } else {
+            $status = 2; //禁用
+        }
+
+        $data['name']           = $name;
+        $data['status']         = $status;
+
+        $result = GoodsUnit::where('id',$id)->update($data);
+        if ($result) {
+            return $this->success('操作成功！','unitIndex');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 改变数据状态
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function unitChangeStatus(Request $request)
+    {
+        $id = $request->json('id');
+        $status = $request->json('status');
+
+        if(empty($id) || empty($status)) {
+            return $this->error('参数错误！');
+        }
+
+        // 定义对象
+        $query = GoodsUnit::query();
+
+        if(is_array($id)) {
+            $query->whereIn('id',$id);
+        } else {
+            $query->where('id',$id);
+        }
+
+        $result = $query->update(['status'=>$status]);
+
+        if ($result) {
+            return $this->success('操作成功！');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 列表页面
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function layoutIndex(Request $request)
+    {
+        $this->pageTitle = '详情版式';
+        // 获取参数
+        $current   = intval($request->get('current',1));
+        $pageSize  = intval($request->get('pageSize',10));
+        $search     = $request->get('search');
+            
+        // 定义对象
+        $query = GoodsLayout::query();
+
+        // 查询
+        if(!empty($search)) {
+
+            // 名称
+            if(isset($search['layout_name'])) {
+                if(!empty($search['layout_name'])) {
+                    $query->where('layout_name',$search['name']);
+                }
+            }
+
+            // 状态
+            if(isset($search['status']) && $search['status'] !=0) {
+                if(!empty($search['status'])) {
+                    $query->where('status',$search['status']);
+                }
+            }
+
+            // 位置
+            if(isset($search['position']) && $search['position'] !=0) {
+                if(!empty($search['position'])) {
+                    $query->where('position',$search['position']);
+                }
+            }
+        }
+
+        // 查询数量
+        $total = $query
+        ->where('status', '>', 0)
+        ->count();
+
+        // 查询列表
+        $lists = $query
+        ->skip(($current-1)*$pageSize)
+        ->take($pageSize)
+        ->where('status', '>', 0)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->toArray();
+
+        // 默认页码
+        $pagination['defaultCurrent'] = 1;
+        // 当前页码
+        $pagination['current'] = $current;
+        // 分页数量
+        $pagination['pageSize'] = $pageSize;
+        // 总数量
+        $pagination['total'] = $total;
+
+        foreach ($lists as $key => $list) {
+            $statue = $list['status'];
+            if($statue == 1) {
+                $lists[$key]['status'] = '正常';
+            }
+            if($statue == 2) {
+                $lists[$key]['status'] = '已禁用';
+            }
+
+            switch ($list['position']) {
+                case 1:
+                    $lists[$key]['position'] = '详情顶部';
+                    break;
+                case 2:
+                    $lists[$key]['position'] = '详情底部';
+                    break;
+                case 3:
+                    $lists[$key]['position'] = '包装清单';
+                    break;
+                case 4:
+                    $lists[$key]['position'] = '售后保障';
+                    break;
+                default:
+                    $lists[$key]['position'] = '未知';
+                    break;
+            }
+        }
+
+        $status = [
+            [
+                'name'=>'所有状态',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'正常',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'禁用',
+                'value'=>'2',
+            ],
+        ];
+
+        $positions = [
+            [
+                'name'=>'所有位置',
+                'value'=>'0',
+            ],
+            [
+                'name'=>'详情顶部',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'详情底部',
+                'value'=>'2',
+            ],
+            [
+                'name'=>'包装清单',
+                'value'=>'3',
+            ],
+            [
+                'name'=>'售后保障',
+                'value'=>'4',
+            ],
+        ];
+
+        $searchs = [
+            Select::make('状态','status')->option($status)->value('0'),
+            Select::make('位置','position')->option($positions)->value('0'),
+            Input::make('搜索内容','layout_name'),
+            Button::make('搜索')->onClick('search'),
+        ];
+
+        $columns = [
+            Column::make('ID','id'),
+            Column::make('版式名称','layout_name')->withA('admin/mall/'.$this->controllerName().'/layoutEdit'),
+            Column::make('模板位置','position'),
+            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
+        ];
+
+        $headerButtons = [
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/goods/layoutCreate'),
+        ];
+
+        $toolbarButtons = [
+            Button::make('启用')->type('primary')->onClick('multiChangeStatus','1','admin/'.$this->controllerName().'/layoutChangeStatus'),
+            Button::make('禁用')->onClick('multiChangeStatus','2','admin/'.$this->controllerName().'/layoutChangeStatus'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/layoutChangeStatus'),
+        ];
+
+        $actions = [
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/layoutChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('编辑')->type('link')->href('admin/mall/goods/layoutEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/layoutChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+        ];
+
+        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
+
+        return $this->success('获取成功！','',$data);
+    }
+
+    /**
+     * Form页面模板
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function layoutForm($data = [])
+    {
+        $this->pageTitle = '详情版式';
+
+        if(isset($data['id'])) {
+            $action = 'admin/'.$this->controllerName().'/layoutSave';
+        } else {
+            $action = 'admin/'.$this->controllerName().'/layoutStore';
+        }
+
+        $radioList = [
+            [
+                'name'=>'详情顶部',
+                'value'=>'1',
+            ],
+            [
+                'name'=>'详情底部',
+                'value'=>'2',
+            ],
+            [
+                'name'=>'包装清单',
+                'value'=>'3',
+            ],
+            [
+                'name'=>'售后保障',
+                'value'=>'4',
+            ],
+        ];
+
+        $controls = [
+            ID::make('ID','id'),
+            Input::make('版式名称','layout_name')->style(['width'=>200]),
+            Radio::make('模板位置','position')->list($radioList)->value('1'),
+            Editor::make('内容','content'),
+        ];
+
+        $controls[] = SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true);
+        $controls[] = Button::make('提交')
+        ->type('primary')
+        ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
+        ->onClick('submit',null,$action);
+
+        $result = $this->formBuilder($controls,$data);
+
+        return $result;
+    }
+
+    /**
+     * 添加页面
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function layoutCreate(Request $request)
+    {
+        $data = $this->layoutForm();
+
+        if(!empty($data)) {
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
+    }
+
+    /**
+     * 保存方法
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function layoutStore(Request $request)
+    {
+        $layoutName     =   $request->json('layout_name');
+        $position       =   $request->json('position');
+        $content        =   $request->json('content');
+        $status         =   $request->json('status');
+        
+        if (empty($layoutName)) {
+            return $this->error('名称必须填写！');
+        }
+
+        if ($status == true) {
+            $status = 1;
+        } else {
+            $status = 2; //禁用
+        }
+
+        $data['layout_name']    = $layoutName;
+        $data['position']       = $position;
+        $data['content']        = $content;
+        $data['status']         = $status;
+
+        $result = GoodsLayout::create($data);
+
+        if($result) {
+            return $this->success('操作成功！','layoutIndex');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 编辑页面
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function layoutEdit(Request $request)
+    {
+        $id = $request->get('id');
+
+        if(empty($id)) {
+            return $this->error('参数错误！');
+        }
+
+        $data = GoodsLayout::find($id)->toArray();
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
+        $data = $this->layoutForm($data);
+        
+        if(!empty($data)) {
+            return $this->success('操作成功！','',$data);
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 保存编辑数据
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function layoutSave(Request $request)
+    {
+        $id             =   $request->json('id');
+        $layoutName     =   $request->json('layout_name');
+        $position       =   $request->json('position');
+        $content        =   $request->json('content');
+        $status         =   $request->json('status');
+        
+        if (empty($layoutName)) {
+            return $this->error('名称必须填写！');
+        }
+
+        if ($status == true) {
+            $status = 1;
+        } else {
+            $status = 2; //禁用
+        }
+
+        $data['layout_name']           = $layoutName;
+        $data['position']       = $position;
+        $data['content']        = $content;
+        $data['status']         = $status;
+
+        $result = GoodsLayout::where('id',$id)->update($data);
+        if ($result) {
+            return $this->success('操作成功！','layoutIndex');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 改变数据状态
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function layoutChangeStatus(Request $request)
+    {
+        $id = $request->json('id');
+        $status = $request->json('status');
+
+        if(empty($id) || empty($status)) {
+            return $this->error('参数错误！');
+        }
+
+        // 定义对象
+        $query = GoodsLayout::query();
 
         if(is_array($id)) {
             $query->whereIn('id',$id);

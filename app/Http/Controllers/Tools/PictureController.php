@@ -9,6 +9,7 @@ use App\Services\Helper;
 use App\Models\Picture;
 use OSS\OssClient;
 use OSS\Core\OssException;
+use Intervention\Image\ImageManager;
 
 class PictureController extends Controller
 {
@@ -416,5 +417,29 @@ class PictureController extends Controller
 
         // 返回数据
         return $this->success('上传成功！','',$result);
+    }
+
+    /**
+     * 插入图片
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function insert(Request $request)
+    {
+        $source = $request->input('source');
+        $insert = $request->input('insert');
+
+        // create an image manager instance with favored driver
+        $manager = new ImageManager(array('driver' => 'GD'));
+        ini_set('default_socket_timeout', 1);
+
+        // to finally create image instances
+        $image = $manager->make($source);
+
+        // paste another image
+        $image->insert($insert);
+
+        return $image->response('png');
     }
 }

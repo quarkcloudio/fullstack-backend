@@ -908,21 +908,25 @@ class Helper
                 break;
         }
 
-        $config = [
-            'debug'     => true,
-            'app_id'    => $appid,
-            'secret'    => $secret,
-            'token'     => $token,
-            'aes_key'   => $aesKey,
-            'oauth' => [
-                'scopes'   => ['snsapi_userinfo'],
-                'callback' => url('wxLogin/callback'),
-            ],
-            'log' => [
-                'level' => 'debug',
-                'file'  => storage_path('/logs/easywechat/easywechat_'.date('Ymd').'.log'),
-            ]
-        ];
+        $config = false;
+
+        if(!empty($appid) && !empty($secret)) {
+            $config = [
+                'debug'     => true,
+                'app_id'    => $appid,
+                'secret'    => $secret,
+                'token'     => $token,
+                'aes_key'   => $aesKey,
+                'oauth' => [
+                    'scopes'   => ['snsapi_userinfo'],
+                    'callback' => url('wxLogin/callback'),
+                ],
+                'log' => [
+                    'level' => 'debug',
+                    'file'  => storage_path('/logs/easywechat/easywechat_'.date('Ymd').'.log'),
+                ]
+            ];
+        }
 
         return $config;
     }

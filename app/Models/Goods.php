@@ -60,11 +60,17 @@ class Goods extends Model
            'view',
            'sales_num',
            'comment_status',
+           'effective_type',
+           'effective_hour',
+           'valid_period_type',
+           'add_time_begin',
+           'add_time_end',
+           'valid_period_hour',
+           'valid_period_day',
+           'is_expired_refund',
            'rate',
            'status',
-           'goods_reason',
-           'opened_at',
-           'closed_at',        
+           'goods_reason',    
            'is_sku'
        ];
         

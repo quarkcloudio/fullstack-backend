@@ -27,14 +27,14 @@ use App\Builder\Lists\Tables\Column;
 use App\Builder\Lists\ListBuilder;
 use App\Builder\Tabs;
 use App\Builder\TabPane;
-use App\Models\Post;
+use App\Models\Video;
 use App\Models\Category;
 
-class ArticleController extends BuilderController
+class VideoController extends BuilderController
 {
     public function __construct()
     {
-        $this->pageTitle = '文章';
+        $this->pageTitle = '视频';
     }
 
     /**
@@ -51,44 +51,43 @@ class ArticleController extends BuilderController
         $search    = $request->get('search');
             
         // 定义对象
-        $query = Post::query();
+        $query = Video::query();
 
         // 查询
         if(!empty($search)) {
             // 标题
             if(isset($search['title'])) {
-                $query->where('posts.title','like','%'.$search['title'].'%');
+                $query->where('videos.title','like','%'.$search['title'].'%');
             }
 
             // 分类
             if(isset($search['category_id'])) {
                 if(!empty($search['category_id'])) {
-                    $query->where('posts.category_id',$search['category_id']);
+                    $query->where('videos.category_id',$search['category_id']);
                 }
             }
 
             // 状态
             if(isset($search['status'])) {
                 if(!empty($search['status'])) {
-                    $query->where('posts.status',$search['status']);
+                    $query->where('videos.status',$search['status']);
                 }
             }
         }
 
         // 查询数量
         $total = $query
-        ->where('posts.status', '>', 0)
-        ->where('posts.type', 'ARTICLE')
+        ->where('videos.status', '>', 0)
         ->count();
 
         // 查询列表
         $lists = $query
-        ->join('categories', 'posts.category_id', '=', 'categories.id')
+        ->join('categories', 'videos.category_id', '=', 'categories.id')
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
-        ->where('posts.status', '>', 0)
+        ->where('videos.status', '>', 0)
         ->orderBy('id', 'desc')
-        ->select('posts.*','categories.name as category_name','categories.title as category_title')
+        ->select('videos.*','categories.name as category_name','categories.title as category_title')
         ->get()
         ->toArray();
 
@@ -107,7 +106,7 @@ class ArticleController extends BuilderController
         // 总数量
         $pagination['total'] = $total;
 
-        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
+        $categorys         = Category::where('type','VIDEO')->get()->toArray();
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
@@ -171,7 +170,7 @@ class ArticleController extends BuilderController
      */
     public function form($data = [])
     {
-        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
+        $categorys         = Category::where('type','VIDEO')->get()->toArray();
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
@@ -238,11 +237,11 @@ class ArticleController extends BuilderController
             Input::make('作者','author')->style(['width'=>200]),
             Input::make('来源','source')->style(['width'=>200]),
             Checkbox::make('推荐位','position')->list($checkboxList),
-            Radio::make('展现形式','show_type')->list($radioList)->value(1),
             Image::make('封面图','cover_ids')->mode('multiple'),
             Select::make('分类','category_id')->style(['width'=>200])->option($getCategorys)->value('0'),
             SwitchButton::make('允许评论','comment_status')->checkedText('是')->unCheckedText('否')->value(true),
-            Editor::make('内容','content'),
+            File::make('视频文件','path')->limitType(['video/mp4'])->limitNum(1)->limitSize(200),
+            InputNumber::make('视频时长','duration')->value(0),
             DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
             SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
             Button::make('提交')
@@ -257,7 +256,6 @@ class ArticleController extends BuilderController
             InputNumber::make('浏览量','view')->value(0),
             InputNumber::make('评论量','comment')->value(0),
             Input::make('访问密码','password')->style(['width'=>200]),
-            File::make('附件','file_id'),
             SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
             Button::make('提交')
             ->type('primary')
@@ -317,9 +315,9 @@ class ArticleController extends BuilderController
         $view           =   $request->json('view',0);
         $password       =   $request->json('password');
         $position       =   $request->json('position',0);
-        $showType       =   $request->json('show_type');
         $coverIds       =   $request->json('cover_ids',0);
-        $fileId         =   $request->json('file_id',0);
+        $duration       =   $request->json('duration');
+        $path           =   $request->json('path',0);
         $status         =   $request->json('status');
         
         if (empty($title)) {
@@ -330,8 +328,10 @@ class ArticleController extends BuilderController
             return $this->error('请选择分类！');
         }
 
-        if($fileId) {
-            $fileId = $fileId[0]['id'];
+        if($path) {
+            $path = $path[0]['id'];
+        } else {
+            return $this->error('请上传视频！');
         }
 
         if ($commentStatus == true) {
@@ -361,17 +361,16 @@ class ArticleController extends BuilderController
         $data['comment'] = $comment;
         $data['view'] = $view;
         $data['password'] = $password;
-        $data['show_type'] = $showType;
+        $data['duration'] = $duration;
         $data['position'] = collect($position)->sum();
         $data['cover_ids'] = json_encode($coverIds);
-        $data['file_id'] = $fileId;
+        $data['path'] = $path;
         $data['status'] = $status;
-        $data['type'] = 'ARTICLE';
 
-        $result = Post::create($data);
+        $result = Video::create($data);
 
         if($result) {
-            return $this->success('操作成功！','/article/index');
+            return $this->success('操作成功！','/video/index');
         } else {
             return $this->error('操作失败！');
         }
@@ -391,18 +390,18 @@ class ArticleController extends BuilderController
             return $this->error('参数错误！');
         }
 
-        $data = Post::find($id)->toArray();
+        $data = Video::find($id)->toArray();
 
         $data['cover_ids'] = json_decode($data['cover_ids'],true);
 
-        $fileId = $data['file_id'];
+        $path = $data['path'];
 
-        unset($data['file_id']);
+        unset($data['path']);
 
-        $data['file_id'][0]['id'] =$fileId;
-        $data['file_id'][0]['uid'] =$fileId;
-        $data['file_id'][0]['name'] = Helper::getFile($fileId,'name');
-        $data['file_id'][0]['url'] = Helper::getFile($fileId);
+        $data['path'][0]['id'] =$path;
+        $data['path'][0]['uid'] =$path;
+        $data['path'][0]['name'] = Helper::getFile($path,'name');
+        $data['path'][0]['url'] = Helper::getFile($path);
 
         $position = [];
 
@@ -459,7 +458,6 @@ class ArticleController extends BuilderController
         $categoryId     =   $request->json('category_id',0);
         $tags           =   $request->json('tags','');
         $commentStatus  =   $request->json('comment_status');
-        $content        =   $request->json('content','');
         $createdAt      =   $request->json('created_at');
         $name           =   $request->json('name','');
         $author         =   $request->json('author','');
@@ -468,9 +466,9 @@ class ArticleController extends BuilderController
         $view           =   $request->json('view',0);
         $password       =   $request->json('password');
         $position       =   $request->json('position',0);
-        $showType       =   $request->json('show_type');
+        $duration       =   $request->json('duration');
         $coverIds       =   $request->json('cover_ids',0);
-        $fileId         =   $request->json('file_id',0);
+        $path           =   $request->json('path',0);
         $status         =   $request->json('status');
         
         if (empty($title)) {
@@ -479,6 +477,12 @@ class ArticleController extends BuilderController
 
         if (empty($categoryId)) {
             return $this->error('请选择分类！');
+        }
+
+        if($path) {
+            $path = $path[0]['id'];
+        } else {
+            return $this->error('请上传视频！');
         }
 
         if ($commentStatus == true) {
@@ -499,7 +503,6 @@ class ArticleController extends BuilderController
         $data['category_id'] = $categoryId;
         $data['tags'] = $tags;
         $data['comment_status'] = $commentStatus;
-        $data['content'] = $content;
         $data['created_at'] = $createdAt;
         $data['name'] = $name;
         $data['author'] = $author;
@@ -507,14 +510,13 @@ class ArticleController extends BuilderController
         $data['comment'] = $comment;
         $data['view'] = $view;
         $data['password'] = $password;
-        $data['show_type'] = $showType;
+        $data['duration'] = $duration;
         $data['position'] = collect($position)->sum();
         $data['cover_ids'] = json_encode($coverIds);
-        $data['file_id'] = json_encode($fileId);
+        $data['path'] = $path;
         $data['status'] = $status;
-        $data['type'] = 'ARTICLE';
 
-        $result = Post::where('id',$id)->update($data);
+        $result = Video::where('id',$id)->update($data);
         if ($result) {
             return $this->success('操作成功！','index');
         } else {
@@ -538,7 +540,7 @@ class ArticleController extends BuilderController
         }
 
         // 定义对象
-        $query = Post::query();
+        $query = Video::query();
 
         if(is_array($id)) {
             $query->whereIn('id',$id);
@@ -567,50 +569,50 @@ class ArticleController extends BuilderController
         $search = $request->get('search');
             
         // 定义对象
-        $query = Post::query();
+        $query = Video::query();
 
         // 查询
         if(!empty($search)) {
             // 标题
             if(isset($search['title'])) {
-                $query->where('posts.title','like','%'.$search['title'].'%');
+                $query->where('videos.title','like','%'.$search['title'].'%');
             }
 
             // 分类
             if(isset($search['category_id'])) {
                 if(!empty($search['category_id'])) {
-                    $query->where('posts.category_id',$search['category_id']);
+                    $query->where('videos.category_id',$search['category_id']);
                 }
             }
 
             // 状态
             if(isset($search['status'])) {
                 if(!empty($search['status'])) {
-                    $query->where('posts.status',$search['status']);
+                    $query->where('videos.status',$search['status']);
                 }
             }
 
             // 作者
             if(isset($search['author'])) {
                 if(!empty($search['author'])) {
-                    $query->where('posts.author',$search['author']);
+                    $query->where('videos.author',$search['author']);
                 }
             }
 
             // 时间范围
             if(isset($search['dateRange'])) {
                 if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('posts.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                    $query->whereBetween('videos.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
                 }
             }
         }
 
         // 查询列表
         $lists = $query
-        ->join('categories', 'posts.category_id', '=', 'categories.id')
-        ->where('posts.status', '>', 0)
+        ->join('categories', 'videos.category_id', '=', 'categories.id')
+        ->where('videos.status', '>', 0)
         ->orderBy('id', 'desc')
-        ->select('posts.*','categories.name as category_name','categories.title as category_title')
+        ->select('videos.*','categories.name as category_name','categories.title as category_title')
         ->get()
         ->toArray();
 
@@ -635,48 +637,48 @@ class ArticleController extends BuilderController
         $search    = $request->get('search');
             
         // 定义对象
-        $query = Post::query();
+        $query = Video::query();
 
         if(ADMINID) {
-            $query->where('posts.adminid',ADMINID);
+            $query->where('videos.adminid',ADMINID);
         }
 
         // 查询
         if(!empty($search)) {
             // 标题
             if(isset($search['title'])) {
-                $query->where('posts.title','like','%'.$search['title'].'%');
+                $query->where('videos.title','like','%'.$search['title'].'%');
             }
 
             // 分类
             if(isset($search['category_id'])) {
                 if(!empty($search['category_id'])) {
-                    $query->where('posts.category_id',$search['category_id']);
+                    $query->where('videos.category_id',$search['category_id']);
                 }
             }
 
             // 状态
             if(isset($search['status'])) {
                 if(!empty($search['status'])) {
-                    $query->where('posts.status',$search['status']);
+                    $query->where('videos.status',$search['status']);
                 }
             }
         }
 
         // 查询数量
         $total = $query
-        ->where('posts.status', '>', 0)
-        ->where('posts.type', 'ARTICLE')
+        ->where('videos.status', '>', 0)
+        
         ->count();
 
         // 查询列表
         $lists = $query
-        ->join('categories', 'posts.category_id', '=', 'categories.id')
+        ->join('categories', 'videos.category_id', '=', 'categories.id')
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
-        ->where('posts.status', '>', 0)
+        ->where('videos.status', '>', 0)
         ->orderBy('id', 'desc')
-        ->select('posts.*','categories.name as category_name','categories.title as category_title')
+        ->select('videos.*','categories.name as category_name','categories.title as category_title')
         ->get()
         ->toArray();
 
@@ -695,7 +697,7 @@ class ArticleController extends BuilderController
         // 总数量
         $pagination['total'] = $total;
 
-        $categorys         = Category::where('type','ARTICLE')->get()->toArray();
+        $categorys         = Category::where('type','VIDEO')->get()->toArray();
         $categoryTrees     = Helper::listToTree($categorys);
         $categoryTreeLists = Helper::treeToOrderList($categoryTrees,0,'title');
 
@@ -735,7 +737,7 @@ class ArticleController extends BuilderController
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('标题','title')->withA('admin/article/edit'),
+            Column::make('标题','title')->withA('admin/video/edit'),
             Column::make('作者','author'),
             Column::make('分类','category_title'),
             Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
