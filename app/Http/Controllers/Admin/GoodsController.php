@@ -274,7 +274,7 @@ class GoodsController extends BuilderController
 
         foreach($shopSpus as $key => $shopSpu)
         {
-            $shopSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$shopSpus['id'])
+            $shopSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$shopSpu['id'])
             ->orderBy('sort','asc')
             ->get()
             ->toArray();
