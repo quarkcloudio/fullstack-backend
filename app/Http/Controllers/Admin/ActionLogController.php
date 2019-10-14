@@ -56,9 +56,9 @@ class ActionLogController extends BuilderController
         if(!empty($search)) {
 
             // 用户名
-            if(isset($search['name'])) {
-                $admin = Admin::where('name',$search['name'])->first();
-                $user = User::where('name',$search['name'])->first();
+            if(isset($search['username'])) {
+                $admin = Admin::where('username',$search['username'])->first();
+                $user = User::where('username',$search['username'])->first();
                 if(!empty($admin)) {
                     $adminId = $admin['id'];
                     $query->where('adminid',$adminId);

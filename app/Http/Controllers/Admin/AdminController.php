@@ -62,7 +62,7 @@ class AdminController extends BuilderController
 
             // 用户名
             if(isset($search['username'])) {
-                $query->where('name','like','%'.$search['username'].'%');
+                $query->where('username','like','%'.$search['username'].'%');
             }
 
             // 昵称
