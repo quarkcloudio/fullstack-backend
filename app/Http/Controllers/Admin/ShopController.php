@@ -472,7 +472,9 @@ class ShopController extends BuilderController
         $data['content'] = $content;
         $data['cover_ids'] = json_encode($coverIds);
         $data['level'] = $level;
-        $data['position'] = collect($position)->sum();
+        if($position) {
+            $data['position'] = collect($position)->sum();
+        }
         $data['username'] = $username;
         $data['phone'] = $phone;
         $data['province'] = $area[0];
@@ -713,7 +715,9 @@ class ShopController extends BuilderController
         $data['content'] = $content;
         $data['cover_ids'] = json_encode($coverIds);
         $data['level'] = $level;
-        $data['position'] = collect($position)->sum();
+        if($position) {
+            $data['position'] = collect($position)->sum();
+        }
         $data['username'] = $username;
         $data['phone'] = $phone;
         $data['province'] = $area[0];

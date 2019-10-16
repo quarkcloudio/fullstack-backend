@@ -43,6 +43,7 @@ use App\Models\GoodsUnit;
 use App\Models\GoodsLayout;
 use App\Models\GoodsSku;
 use App\Models\Shop;
+use DB;
 
 class GoodsController extends BuilderController
 {
@@ -393,6 +394,7 @@ class GoodsController extends BuilderController
             $status = 2;
         }
 
+        $data['goods_name'] = $goodsName;
         $data['shop_id'] = $shopId;
         $data['goods_category_id'] = $goodsCategoryId[count($goodsCategoryId)-1];
         $data['goods_mode'] = $goodsMode;
@@ -459,6 +461,8 @@ class GoodsController extends BuilderController
             }
         }
 
+        $result = false;
+
         // 启动事务
         DB::beginTransaction();
         try {
@@ -474,9 +478,13 @@ class GoodsController extends BuilderController
             // 平台系统属性
             $data['goods_attrs'] = json_encode($systemSpus);
 
+            $shopSpus = [];
+
             // "other_attr_name":"产地","other_attr_value":"唐山",
-            foreach($shopSpuNames as $key => $shopSpuName) {
-                $shopSpus[] = ['other_attr_name' => $shopSpuName,'other_attr_value' => $shopSpuValues[$key]];
+            if(!empty($shopSpuNames)) {
+                foreach($shopSpuNames as $key => $shopSpuName) {
+                    $shopSpus[] = ['other_attr_name' => $shopSpuName,'other_attr_value' => $shopSpuValues[$key]];
+                }
             }
 
             // 商家自定义属性
@@ -564,12 +572,11 @@ class GoodsController extends BuilderController
             DB::commit();	
         } catch (\Exception $e) {
             // 回滚事务
-
             DB::rollback();
         }
 
         if ($result) {
-            return $this->success('操作成功！','/mall/goods/index');
+            return $this->success('操作成功！','/mall/goods/imageCreate?id'.$result->id);
         } else {
             return $this->error('操作失败！');
         }
@@ -591,75 +598,63 @@ class GoodsController extends BuilderController
 
         $data = Goods::find($id)->toArray();
 
-        $logo = $data['logo'];
-        $coverIds = $data['cover_ids'];
-        $businessLicenseCoverId = $data['business_license_cover_id'];
-        $corporateIdcardCoverId = $data['corporate_idcard_cover_id'];
+        $categorys = GoodsCategory::where('status',1)
+        ->select('goods_categories.id','goods_categories.pid','goods_categories.title as label','goods_categories.id as value')
+        ->get()
+        ->toArray();
 
-        unset($data['logo']);
-        unset($data['cover_ids']);
-        unset($data['business_license_cover_id']);
-        unset($data['corporate_idcard_cover_id']);
+        $categoryTrees = Helper::listToTree($categorys,'id','pid','children',0);
 
-        $data['logo'][0]['id'] =$logo;
-        $data['logo'][0]['uid'] =$logo;
-        $data['logo'][0]['name'] = Helper::getPicture($logo,'name');
-        $data['logo'][0]['url'] = Helper::getPicture($logo);
+        $shops = Shop::where('status',1)
+        ->select('id','title')
+        ->get()
+        ->toArray();
 
-        $data['cover_ids'] = json_decode($coverIds,true);
+        $goodsUnits = GoodsUnit::where('status',1)
+        ->select('id','name')
+        ->get()
+        ->toArray();
 
-        $data['business_license_cover_id'][0]['id'] =$businessLicenseCoverId;
-        $data['business_license_cover_id'][0]['uid'] =$businessLicenseCoverId;
-        $data['business_license_cover_id'][0]['name'] = Helper::getPicture($businessLicenseCoverId,'name');
-        $data['business_license_cover_id'][0]['url'] = Helper::getPicture($businessLicenseCoverId);
+        $goodsBrands = GoodsBrand::where('status',1)
+        ->select('id','name')
+        ->get()
+        ->toArray();
 
-        $data['corporate_idcard_cover_id'][0]['id'] =$businessLicenseCoverId;
-        $data['corporate_idcard_cover_id'][0]['uid'] =$businessLicenseCoverId;
-        $data['corporate_idcard_cover_id'][0]['name'] = Helper::getPicture($businessLicenseCoverId,'name');
-        $data['corporate_idcard_cover_id'][0]['url'] = Helper::getPicture($businessLicenseCoverId);
+        $topLayouts = GoodsLayout::where('status',1)
+        ->where('position',1)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
 
-        $data['open_days'] = json_decode($data['open_days']);
-        $data['open_times'] = json_decode($data['open_times']);
+        $bottomLayouts = GoodsLayout::where('status',1)
+        ->where('position',2)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
 
-        $merchantInfo = Merchant::where('id',$data['mch_id'])->first();
-        $data['uid'] = $merchantInfo['uid'];
-        $data['bank_name'] = $merchantInfo['bank_name'];
-        $data['bank_payee'] = $merchantInfo['bank_payee'];
-        $data['bank_number'] = $merchantInfo['bank_number'];
+        $packingLayouts = GoodsLayout::where('status',1)
+        ->where('position',3)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
 
-        $position = [];
+        $serviceLayouts = GoodsLayout::where('status',1)
+        ->where('position',4)
+        ->select('id','layout_name')
+        ->get()
+        ->toArray();
 
-        if(in_array($data['position'], [1,3,5,7,9,15])) {
-            $position[] = 1;
-        }
+        // 模板数据
+        $data['categorys'] = $categoryTrees;
+        $data['shops'] = $shops;
+        $data['goodsUnits'] = $goodsUnits;
+        $data['goodsBrands'] = $goodsBrands;
+        $data['topLayouts'] = $topLayouts;
+        $data['bottomLayouts'] = $bottomLayouts;
+        $data['packingLayouts'] = $packingLayouts;
+        $data['serviceLayouts'] = $serviceLayouts;
 
-        if(in_array($data['position'], [2,3,6,7,9,10,14,15])) {
-            $position[] = 2;
-        }
-
-        if(in_array($data['position'], [4,5,6,7,12,13,14,15])) {
-            $position[] = 4;
-        }
-
-        if(in_array($data['position'], [8,9,10,11,12,13,14,15])) {
-            $position[] = 8;
-        }
-
-        $data['position'] = $position;
-        
-        if ($data['status'] == 1) {
-            $data['status'] = true;
-        } else {
-            $data['status'] = false;
-        }
-
-        $data = $this->form($data);
-
-        if(!empty($data)) {
-            return $this->success('操作成功！','',$data);
-        } else {
-            return $this->error('操作失败！');
-        }
+        return $this->success('获取成功！','',$data);
     }
 
     /**
