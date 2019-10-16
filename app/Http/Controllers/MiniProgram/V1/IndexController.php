@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Wechat;
+namespace App\Http\Controllers\MiniProgram\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -19,7 +19,6 @@ class IndexController extends Controller
             $jsApi = $app->jssdk->buildConfig(array('onMenuShareTimeline','onMenuShareAppMessage'), $debug = false, $beta = false, $json = true);    
         }
 
-        // 微信分享
         $data['jsApi'] = $jsApi;
         return view('wechat/index/index',$data);
     }

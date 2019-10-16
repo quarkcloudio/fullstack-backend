@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\ActionLog;
 use EasyWeChat\Factory;
 
-class WxMpLoginController extends Controller
+class WxLoginController extends Controller
 {
     /**
      * Where to redirect users after login / registration.
