@@ -32,6 +32,7 @@ use App\Builder\Tabs;
 use App\Builder\TabPane;
 use App\Models\Goods;
 use App\Models\GoodsCategory;
+use App\Models\GoodsCategoryRelationship;
 use App\Models\GoodsType;
 use App\Models\GoodsAttribute;
 use App\Models\GoodsAttributeValue;
@@ -42,6 +43,7 @@ use App\Models\GoodsBrand;
 use App\Models\GoodsUnit;
 use App\Models\GoodsLayout;
 use App\Models\GoodsSku;
+use App\Models\GoodsPhoto;
 use App\Models\Shop;
 use DB;
 
@@ -359,14 +361,21 @@ class GoodsController extends BuilderController
         $effectiveType             =   $request->json('effective_type'); // 当商品为电子卡券类型商品时，兑换生效期类型：1付款完成立即生效，2付款完成N小时后生效,3付款完成次日生效
         $effectiveHour             =   $request->json('effective_hour'); // 当商品为电子卡券类型商品时，兑换生效期类型为付款完成N小时后生效，例如：12，为12小时候生效
         $validPeriodType           =   $request->json('valid_period_type'); // 当商品为电子卡券类型商品时，使用有效期类型：1长期有效，2具有明确截止时间例如2019-01-01到2019-01-31，3自购买之日起，N小时内有效,4自购买之日起，N天内有效
-        $addTimeBegin              =   $request->json('add_time_begin'); // 当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，开始时间
-        $addTimeEnd                =   $request->json('add_time_end'); // 当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，结束时间
+        $addTime                   =   $request->json('add_time');
         $validPeriodHour           =   $request->json('valid_period_hour'); // 当商品为电子卡券类型商品时，使用有效期类型为3自购买之日起，N小时内有效
         $validPeriodDay            =   $request->json('valid_period_day'); // 当商品为电子卡券类型商品时，使用有效期类型为4自购买之日起，N天内有效
         $isExpiredRefund           =   $request->json('is_expired_refund'); // 当商品为电子卡券类型商品时，是否支持过期退款
         $stockMode                 =   $request->json('stock_mode'); // 库存计数：1拍下减库存，2付款减库存，3出库减库存 拍下减库存：买家拍下商品即减少库存，存在恶拍风险。热销商品如需避免超卖可选此方式
         $status                    =   $request->json('status'); // 1出售中，2审核中，3已下架，4商品违规下架
         
+        if($addTime) {
+            $addTimeBegin              =   $addTime[0]; // 当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，开始时间
+            $addTimeEnd                =   $addTime[1]; // 当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，结束时间
+        } else {
+            $addTimeBegin              =   null;
+            $addTimeEnd                =   null;
+        }
+
         if(empty($shopId)) {
             return $this->error('请选择所属商家！');
         }
@@ -492,6 +501,14 @@ class GoodsController extends BuilderController
 
             $result = Goods::create($data);
 
+            if(!empty($otherCategoryIds)) {
+                foreach($otherCategoryIds as $otherCategoryIdKey => $otherCategoryId) {
+                    $otherCategoryData['goods_id'] = $result->id;
+                    $otherCategoryData['goods_category_id'] = $otherCategoryId;
+                    GoodsCategoryRelationship::create($otherCategoryData);
+                }
+            }
+
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_spu_') !== false) {
                     // 平台系统属性
@@ -576,7 +593,7 @@ class GoodsController extends BuilderController
         }
 
         if ($result) {
-            return $this->success('操作成功！','/mall/goods/imageCreate?id'.$result->id);
+            return $this->success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
         } else {
             return $this->error('操作失败！');
         }
@@ -644,6 +661,99 @@ class GoodsController extends BuilderController
         ->get()
         ->toArray();
 
+
+        $categoryId  =   $data['goods_category_id'];
+        $shopId      =   $data['shop_id'];
+
+        $systemSpus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        ->where('goods_category_attributes.goods_category_id',$categoryId)
+        ->where('goods_category_attributes.type',1)
+        ->orderBy('goods_attributes.sort','asc')
+        ->select('goods_attributes.id','goods_attributes.name','goods_attributes.style')
+        ->get()
+        ->toArray();
+
+        foreach($systemSpus as $key => $systemSpu)
+        {
+            $systemSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$systemSpu['id'])
+            ->orderBy('sort','asc')
+            ->get()
+            ->toArray();
+
+            $systemSpus[$key]['vname'] = $systemSpuVnames;
+        }
+
+        $shopSpus = GoodsAttribute::where('type',1)
+        ->where('shop_id',$shopId)
+        ->orderBy('sort','asc')
+        ->get()
+        ->toArray();
+
+        foreach($shopSpus as $key => $shopSpu)
+        {
+            $shopSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$shopSpu['id'])
+            ->orderBy('sort','asc')
+            ->get()
+            ->toArray();
+
+            $shopSpus[$key]['vname'] = $shopSpuVnames;
+        }
+
+        $skus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        ->where('goods_category_attributes.type',2)
+        ->whereRaw('(goods_category_attributes.goods_category_id = ? or goods_attributes.shop_id = ?)', [$categoryId, $shopId])
+        ->orderBy('goods_attributes.sort','asc')
+        ->select('goods_attributes.id','goods_attributes.name','goods_attributes.style')
+        ->get()
+        ->toArray();
+
+
+        foreach($skus as $key => $sku)
+        {
+            $skuVnames = GoodsAttributeValue::where('goods_attribute_id',$sku['id'])
+            ->orderBy('sort','asc')
+            ->get()
+            ->toArray();
+
+            $skus[$key]['vname'] = $skuVnames;
+        }
+
+        // 模板数据
+        $data['systemSpus'] = $systemSpus;
+        $data['shopSpus'] = $shopSpus;
+        $data['skus'] = $skus;
+
+        $data['goods_category_id'] = $this->getParentCategory($data['goods_category_id'],[0 => $data['goods_category_id']]);
+        $data['other_category_ids'] = GoodsCategoryRelationship::where('goods_id',$id)->pluck('goods_category_id');
+
+        $coverId = $data['cover_id'];
+        unset($data['cover_id']);
+
+        $data['cover_id'][0]['id'] =$coverId;
+        $data['cover_id'][0]['uid'] =$coverId;
+        $data['cover_id'][0]['name'] = Helper::getPicture($coverId,'name');
+        $data['cover_id'][0]['url'] = Helper::getPicture($coverId);
+
+        $videoId = $data['video_id'];
+        unset($data['video_id']);
+
+        $data['video_id'][0]['id'] =$videoId;
+        $data['video_id'][0]['uid'] =$videoId;
+        $data['video_id'][0]['name'] = Helper::getFile($videoId,'name');
+        $data['video_id'][0]['url'] = Helper::getFile($videoId);
+
+        if ($data['is_expired_refund'] == 1) {
+            $data['is_expired_refund'] = true;
+        } else {
+            $data['is_expired_refund'] = false;
+        }
+
+        if ($data['status'] == 1) {
+            $data['status'] = true;
+        } else {
+            $data['status'] = false;
+        }
+
         // 模板数据
         $data['categorys'] = $categoryTrees;
         $data['shops'] = $shops;
@@ -655,6 +765,20 @@ class GoodsController extends BuilderController
         $data['serviceLayouts'] = $serviceLayouts;
 
         return $this->success('获取成功！','',$data);
+    }
+
+    protected function getParentCategory($id,$categorys)
+    {
+        $getCategory = GoodsCategory::where('status',1)
+        ->where('id',$id)
+        ->first();
+
+        $categorys[] = $getCategory->pid;
+        if($getCategory->pid) {
+            $this->getParentCategory($getCategory->pid,$categorys);
+        } else {
+            return $categorys;
+        }
     }
 
     /**
@@ -806,6 +930,71 @@ class GoodsController extends BuilderController
 
         if ($result) {
             return $this->success('操作成功！','/mall/shop/index');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 上传封面图
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function imageStore(Request $request)
+    {
+        $goodsId     =   $request->json('goods_id'); // 商品ID
+        $fileList    =   $request->json('file_list'); // 封面图
+ 
+        GoodsPhoto::where('goods_id',$goodsId)->delete();
+
+        if(!empty($fileList)) {
+            foreach($fileList as $key => $value) {
+                $data['goods_id'] = $goodsId;
+                $data['goods_sku_id'] = null;
+                $data['cover_id'] = $value['id'];
+                $data['sort'] = $key;
+                GoodsPhoto::create($data);
+            }
+        }
+
+        return $this->success('操作成功！','/mall/goods/complete?id='.$goodsId);
+    }
+
+    /**
+     * 编辑上传封面图
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function imageSave(Request $request)
+    {
+        $goodsId     =   $request->json('goods_id'); // 商品ID
+        $fileList    =   $request->json('file_list'); // 封面图
+
+        if ($result) {
+            return $this->success('操作成功！','/mall/goods/complete?id='.$goodsId);
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
+    /**
+     * 发布商品完成
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
+    public function complete(Request $request)
+    {
+        $goodsId = $request->get('id'); // 商品ID
+
+        $result['viewGoodsUrl'] = url('mall/goods/detail?id='.$goodsId);
+        $result['createGoodsUrl'] = '#/admin/mall/goods/create';
+        $result['goodsIndexUrl'] = '#/admin/mall/goods/index';
+
+        if ($result) {
+            return $this->success('操作成功！','',$result);
         } else {
             return $this->error('操作失败！');
         }
@@ -3136,7 +3325,7 @@ class GoodsController extends BuilderController
             $status = 2; //禁用
         }
 
-        $data['layout_name']           = $layoutName;
+        $data['layout_name']    = $layoutName;
         $data['position']       = $position;
         $data['content']        = $content;
         $data['status']         = $status;

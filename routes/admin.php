@@ -189,6 +189,11 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/goods/store', 'Admin\\GoodsController@store')->name('api/admin/goods/store');
     Route::get('admin/goods/edit', 'Admin\\GoodsController@edit')->name('api/admin/goods/edit');
     Route::post('admin/goods/save', 'Admin\\GoodsController@save')->name('api/admin/goods/save');
+    
+    Route::post('admin/goods/imageStore', 'Admin\\GoodsController@imageStore')->name('api/admin/goods/imageStore');
+    Route::post('admin/goods/imageSave', 'Admin\\GoodsController@imageSave')->name('api/admin/goods/imageSave');
+    Route::get('admin/goods/complete', 'Admin\\GoodsController@complete')->name('api/admin/goods/complete');
+
     Route::post('admin/goods/changeStatus', 'Admin\\GoodsController@changeStatus')->name('api/admin/goods/changeStatus');
     Route::get('admin/goods/attribute', 'Admin\\GoodsController@attribute')->name('api/admin/goods/attribute');
 
