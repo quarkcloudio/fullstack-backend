@@ -252,7 +252,7 @@ class GoodsController extends BuilderController
         $categoryId  =   $request->get('categoryId','');
         $shopId      =   $request->get('shopId','');
 
-        $systemSpus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        $systemGoodsAttributes = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
         ->where('goods_category_attributes.goods_category_id',$categoryId)
         ->where('goods_category_attributes.type',1)
         ->orderBy('goods_attributes.sort','asc')
@@ -260,33 +260,33 @@ class GoodsController extends BuilderController
         ->get()
         ->toArray();
 
-        foreach($systemSpus as $key => $systemSpu)
+        foreach($systemGoodsAttributes as $key => $systemGoodsAttribute)
         {
-            $systemSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$systemSpu['id'])
+            $systemGoodsAttributeVnames = GoodsAttributeValue::where('goods_attribute_id',$systemGoodsAttribute['id'])
             ->orderBy('sort','asc')
             ->get()
             ->toArray();
 
-            $systemSpus[$key]['vname'] = $systemSpuVnames;
+            $systemGoodsAttributes[$key]['vname'] = $systemGoodsAttributeVnames;
         }
 
-        $shopSpus = GoodsAttribute::where('type',1)
+        $shopGoodsAttributes = GoodsAttribute::where('type',1)
         ->where('shop_id',$shopId)
         ->orderBy('sort','asc')
         ->get()
         ->toArray();
 
-        foreach($shopSpus as $key => $shopSpu)
+        foreach($shopGoodsAttributes as $key => $shopGoodsAttribute)
         {
-            $shopSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$shopSpu['id'])
+            $shopGoodsAttributeVnames = GoodsAttributeValue::where('goods_attribute_id',$shopGoodsAttribute['id'])
             ->orderBy('sort','asc')
             ->get()
             ->toArray();
 
-            $shopSpus[$key]['vname'] = $shopSpuVnames;
+            $shopGoodsAttributes[$key]['vname'] = $shopGoodsAttributeVnames;
         }
 
-        $skus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        $goodsAttributes = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
         ->where('goods_category_attributes.type',2)
         ->whereRaw('(goods_category_attributes.goods_category_id = ? or goods_attributes.shop_id = ?)', [$categoryId, $shopId])
         ->orderBy('goods_attributes.sort','asc')
@@ -295,20 +295,20 @@ class GoodsController extends BuilderController
         ->toArray();
 
 
-        foreach($skus as $key => $sku)
+        foreach($goodsAttributes as $key => $goodsAttribute)
         {
-            $skuVnames = GoodsAttributeValue::where('goods_attribute_id',$sku['id'])
+            $goodsAttributeVnames = GoodsAttributeValue::where('goods_attribute_id',$goodsAttribute['id'])
             ->orderBy('sort','asc')
             ->get()
             ->toArray();
 
-            $skus[$key]['vname'] = $skuVnames;
+            $goodsAttributes[$key]['vname'] = $goodsAttributeVnames;
         }
 
         // 模板数据
-        $data['systemSpus'] = $systemSpus;
-        $data['shopSpus'] = $shopSpus;
-        $data['skus'] = $skus;
+        $data['systemGoodsAttributes'] = $systemGoodsAttributes;
+        $data['shopGoodsAttributes'] = $shopGoodsAttributes;
+        $data['goodsAttributes'] = $goodsAttributes;
 
         return $this->success('获取成功！','',$data);
     }
@@ -334,9 +334,9 @@ class GoodsController extends BuilderController
         $pricingMode               =   $request->json('pricing_mode'); // 计价方式
         $goodsUnitId               =   $request->json('goods_unit_id',''); // 商品单位
         $goodsBrandId              =   $request->json('goods_brand_id',''); // 商品品牌
-        $shopSpuNames              =   $request->json('shop_spu_names'); // 店铺自定义属性名称
-        $shopSpuValues             =   $request->json('shop_spu_values'); // 店铺自定义属性值
-        $skuValues                 =   $request->json('sku_values'); // 商品规格
+        $shopGoodsAttributeNames   =   $request->json('shop_goods_attribute_names'); // 店铺自定义属性名称
+        $shopGoodsAttributeValues  =   $request->json('shop_goods_attribute_values'); // 店铺自定义属性值
+        $goodsSkus                 =   $request->json('goods_skus'); // 商品规格
         $goodsMoq                  =   $request->json('goods_moq'); // 最小起订量
         $goodsPrice                =   $request->json('goods_price'); // 店铺价
         $marketPrice               =   $request->json('market_price'); // 市场价
@@ -388,7 +388,7 @@ class GoodsController extends BuilderController
             return $this->error('请填写商品名称！');
         }
 
-        if(empty($skuValues)) {
+        if(empty($goodsSkus)) {
             if(empty($goodsPrice)) {
                 return $this->error('请填写店铺价！');
             }
@@ -450,15 +450,15 @@ class GoodsController extends BuilderController
         $data['stock_mode'] = $stockMode;
         $data['status'] = $status;
 
-        if(!empty($skuValues)) {
+        if(!empty($goodsSkus)) {
             $data['is_sku'] = 1;
         } else {
             $data['is_sku'] = 0;
         }
 
         // 添加商品sku
-        if(!empty($skuValues)) {
-            foreach($skuValues as $key => $value) {
+        if(!empty($goodsSkus)) {
+            foreach($goodsSkus as $key => $value) {
 
                 if(empty($value['stock_num'])) {
                     return $this->error('请填写库存！');
@@ -472,14 +472,14 @@ class GoodsController extends BuilderController
 
         $result = false;
 
-        // 启动事务
-        DB::beginTransaction();
-        try {
+        // // 启动事务
+        // DB::beginTransaction();
+        // try {
 
             foreach($requestData as $key => $value) {
-                if(strpos($key,'system_spu_') !== false) {
+                if(strpos($key,'system_goods_attribute_') !== false) {
                     // 平台系统属性
-                    $attrId = str_replace("system_spu_","",$key);
+                    $attrId = str_replace("system_goods_attribute_","",$key);
                     $systemSpus[] = ['attr_id' => $attrId,'attr_vid' => $value];
                 }
             }
@@ -490,9 +490,9 @@ class GoodsController extends BuilderController
             $shopSpus = [];
 
             // "other_attr_name":"产地","other_attr_value":"唐山",
-            if(!empty($shopSpuNames)) {
-                foreach($shopSpuNames as $key => $shopSpuName) {
-                    $shopSpus[] = ['other_attr_name' => $shopSpuName,'other_attr_value' => $shopSpuValues[$key]];
+            if(!empty($shopGoodsAttributeNames)) {
+                foreach($shopGoodsAttributeNames as $key => $shopGoodsAttributeName) {
+                    $shopSpus[] = ['other_attr_name' => $shopGoodsAttributeName,'other_attr_value' => $shopGoodsAttributeValues[$key]];
                 }
             }
 
@@ -525,24 +525,24 @@ class GoodsController extends BuilderController
             }
 
             // 添加商品sku
-            if(!empty($skuValues)) {
+            if(!empty($goodsSkus)) {
                 $data2['goods_id'] = $result->id;
                 $data2['shop_id'] = $shopId;
 
                 $properties = '';
                 $propertyName = '';
 
-                foreach($skuValues as $key => $value) {
+                foreach($goodsSkus as $key => $value) {
 
                     foreach($value as $key1 => $value1) {
-                        if(strpos($key1,'sku_') !== false) {
+                        if(strpos($key1,'goodsAttribute_') !== false) {
 
                             $arr = explode(';',$value1);
-                            $skuName = explode(':',$arr[1])[1];
-                            $skuValueName = explode(':',$arr[3])[1];
+                            $goodsAttributeName = explode(':',$arr[1])[1];
+                            $goodsAttributeValueName = explode(':',$arr[3])[1];
 
-                            $properties = $properties.','.$skuValueName;
-                            $propertyName = $propertyName.','.$skuName;
+                            $properties = $properties.','.$goodsAttributeValueName;
+                            $propertyName = $propertyName.','.$goodsAttributeName;
                         }
                     }
 
@@ -565,7 +565,7 @@ class GoodsController extends BuilderController
                     $result2 = GoodsSku::create($data2);
 
                     foreach($value as $key1 => $value1) {
-                        if(strpos($key1,'sku_') !== false) {
+                        if(strpos($key1,'goodsAttribute_') !== false) {
 
                             $arr = explode(';',$value1);
                             $skuId = explode(':',$arr[0])[1];
@@ -585,12 +585,12 @@ class GoodsController extends BuilderController
                 }
             }
 
-             // 提交事务
-            DB::commit();	
-        } catch (\Exception $e) {
-            // 回滚事务
-            DB::rollback();
-        }
+        //      // 提交事务
+        //     DB::commit();	
+        // } catch (\Exception $e) {
+        //     // 回滚事务
+        //     DB::rollback();
+        // }
 
         if ($result) {
             return $this->success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
@@ -681,22 +681,21 @@ class GoodsController extends BuilderController
             ->toArray();
 
             $systemSpus[$key]['vname'] = $systemSpuVnames;
+
+            $goodsInfoAttributeValue = GoodsInfoAttributeValue::where('goods_id',$data['id'])
+            ->where('goods_attribute_id',$systemSpu['id'])
+            ->where('type',1)
+            ->first();
+
+            $systemSpus[$key]['goods_attribute_value_id'] = json_decode($goodsInfoAttributeValue['goods_attribute_value_id']);
         }
 
-        $shopSpus = GoodsAttribute::where('type',1)
-        ->where('shop_id',$shopId)
-        ->orderBy('sort','asc')
-        ->get()
-        ->toArray();
-
+        $shopSpus = json_decode($data['other_attrs']);
+        $data['shopSpus'] = $shopSpus;
+        $data['keys'] = [];
         foreach($shopSpus as $key => $shopSpu)
         {
-            $shopSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$shopSpu['id'])
-            ->orderBy('sort','asc')
-            ->get()
-            ->toArray();
-
-            $shopSpus[$key]['vname'] = $shopSpuVnames;
+            $data['keys'][] = $key;
         }
 
         $skus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
@@ -718,6 +717,28 @@ class GoodsController extends BuilderController
             $skus[$key]['vname'] = $skuVnames;
         }
 
+        $data['checkedSkus'] = GoodsInfoAttributeValue::where('goods_id',$data['id'])
+        ->where('type',2)
+        ->distinct()
+        ->pluck('goods_attribute_id');
+
+        foreach($data['checkedSkus'] as $key => $value) {
+
+            $goodsInfoAttributeValues = GoodsInfoAttributeValue::where('goods_attribute_id',$value)
+            ->where('type',2)
+            ->distinct()
+            ->pluck('goods_attribute_value_id');
+            
+            foreach($goodsInfoAttributeValues as $goodsInfoAttributeValueKey => $goodsInfoAttributeValue) {
+                $goodsInfoAttributeValues[$goodsInfoAttributeValueKey] = (int)($goodsInfoAttributeValue);
+            }
+
+            $getGoodsInfoAttributeData['value'] = $goodsInfoAttributeValues;
+            $getGoodsInfoAttributeData['id'] = $value;
+
+            $data['checkedSkuValues'][] = $getGoodsInfoAttributeData;
+        }
+        
         // 模板数据
         $data['systemSpus'] = $systemSpus;
         $data['shopSpus'] = $shopSpus;

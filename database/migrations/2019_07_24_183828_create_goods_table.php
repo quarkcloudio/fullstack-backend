@@ -27,8 +27,8 @@ class CreateGoodsTable extends Migration
             $table->tinyInteger('pricing_mode')->default('1')->comment('计价方式1：计件，2：计重');
             $table->tinyInteger('goods_unit_id')->nullable()->comment('商品单位：件，kg');
             $table->integer('goods_brand_id')->nullable()->comment('品牌ID');
-            $table->string('goods_attrs')->nullable()->comment('平台系统属性');
-            $table->string('other_attrs')->nullable()->comment('商家自定义属性');
+            $table->text('goods_attrs')->nullable()->comment('平台系统属性');
+            $table->text('other_attrs')->nullable()->comment('商家自定义属性');
             $table->integer('goods_moq')->nullable()->comment('最小起订量');
             $table->decimal('goods_price',10,2)->nullable()->comment('店铺价:价格必须是0.01~9999999之间的数字，且不能高于市场价');
             $table->decimal('market_price',10,2)->nullable()->comment('市场价:为0则商品详情页不显示，价格必须是0.00~9999999之间的数字，此价格仅为市场参考售价，请根据该实际情况认真填写');
