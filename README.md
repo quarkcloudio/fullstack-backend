@@ -12,19 +12,19 @@
 
 编辑.env文件，配置数据库信息
 
+运行 composer install 安装依赖库
+
 命令行下执行数据迁移
 
 第一步：php artisan migrate(您需要将php加入到环境变量)
 
 第二步：php artisan db:seed(注意: 如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。)
 
-第三步：运行 composer install
+第三步：php artisan key:generate &&  php artisan passport:install && php artisan storage:link
 
-第四步：php artisan key:generate &&  php artisan passport:install && php artisan storage:link
+第四步：php -S 127.0.0.1:8080 -t ./public
 
-第五步：php -S 127.0.0.1:8080 -t ./public
-
-第六步：http://127.0.0.1:8080/admin
+第五步：http://127.0.0.1:8080/admin
 
 
 

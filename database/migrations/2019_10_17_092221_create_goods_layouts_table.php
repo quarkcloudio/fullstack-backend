@@ -13,7 +13,7 @@ class CreateGoodsLayoutsTable extends Migration
      */
     public function up()
     {
-        Schema::table('goods_layouts', function (Blueprint $table) {
+        Schema::create('goods_layouts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('layout_name')->nullable()->comment('布局名称');
             $table->string('position')->nullable()->comment('模板位置：1详情顶部，2详情底部，3包装清单，4售后保障');
@@ -31,7 +31,7 @@ class CreateGoodsLayoutsTable extends Migration
     public function down()
     {
         Schema::table('goods_layouts', function (Blueprint $table) {
-            //
+            Schema::dropIfExists('goods_layouts');
         });
     }
 }

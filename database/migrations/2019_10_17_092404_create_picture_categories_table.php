@@ -13,7 +13,7 @@ class CreatePictureCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::table('picture_categories', function (Blueprint $table) {
+        Schema::create('picture_categories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('obj_type')->default('ADMINID')->comment('图片归属角色的类型（ADMINID/UID/SHOPID/MCHID等）');
             $table->integer('obj_id')->default(0)->nullable()->comment('图片归属角色id，用于将来多用户角色使用');
