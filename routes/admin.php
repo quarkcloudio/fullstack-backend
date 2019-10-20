@@ -211,19 +211,21 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/goods/typeSave', 'Admin\\GoodsController@typeSave')->name('api/admin/goods/typeSave');
     Route::post('admin/goods/typeChangeStatus', 'Admin\\GoodsController@typeChangeStatus')->name('api/admin/goods/typeChangeStatus');
 
-    Route::get('admin/goods/spuIndex', 'Admin\\GoodsController@spuIndex')->name('api/admin/goods/spuIndex');
-    Route::get('admin/goods/spuCreate', 'Admin\\GoodsController@spuCreate')->name('api/admin/goods/spuCreate');
-    Route::post('admin/goods/spuStore', 'Admin\\GoodsController@spuStore')->name('api/admin/goods/spuStore');
-    Route::get('admin/goods/spuEdit', 'Admin\\GoodsController@spuEdit')->name('api/admin/goods/spuEdit');
-    Route::post('admin/goods/spuSave', 'Admin\\GoodsController@spuSave')->name('api/admin/goods/spuSave');
-    Route::post('admin/goods/spuChangeStatus', 'Admin\\GoodsController@spuChangeStatus')->name('api/admin/goods/spuChangeStatus');
+    // 商品属性
+    Route::get('admin/goods/attributeIndex', 'Admin\\GoodsController@attributeIndex')->name('api/admin/goods/attributeIndex');
+    Route::get('admin/goods/attributeCreate', 'Admin\\GoodsController@attributeCreate')->name('api/admin/goods/attributeCreate');
+    Route::post('admin/goods/attributeStore', 'Admin\\GoodsController@attributeStore')->name('api/admin/goods/attributeStore');
+    Route::get('admin/goods/attributeEdit', 'Admin\\GoodsController@attributeEdit')->name('api/admin/goods/attributeEdit');
+    Route::post('admin/goods/attributeSave', 'Admin\\GoodsController@attributeSave')->name('api/admin/goods/attributeSave');
+    Route::post('admin/goods/attributeChangeStatus', 'Admin\\GoodsController@attributeChangeStatus')->name('api/admin/goods/attributeChangeStatus');
 
-    Route::get('admin/goods/skuIndex', 'Admin\\GoodsController@skuIndex')->name('api/admin/goods/skuIndex');
-    Route::get('admin/goods/skuCreate', 'Admin\\GoodsController@skuCreate')->name('api/admin/goods/skuCreate');
-    Route::post('admin/goods/skuStore', 'Admin\\GoodsController@skuStore')->name('api/admin/goods/skuStore');
-    Route::get('admin/goods/skuEdit', 'Admin\\GoodsController@skuEdit')->name('api/admin/goods/skuEdit');
-    Route::post('admin/goods/skuSave', 'Admin\\GoodsController@skuSave')->name('api/admin/goods/skuSave');
-    Route::post('admin/goods/skuChangeStatus', 'Admin\\GoodsController@skuChangeStatus')->name('api/admin/goods/skuChangeStatus');
+    // 商品规格
+    Route::get('admin/goods/specificationIndex', 'Admin\\GoodsController@specificationIndex')->name('api/admin/goods/specificationIndex');
+    Route::get('admin/goods/specificationCreate', 'Admin\\GoodsController@specificationCreate')->name('api/admin/goods/specificationCreate');
+    Route::post('admin/goods/specificationStore', 'Admin\\GoodsController@specificationStore')->name('api/admin/goods/specificationStore');
+    Route::get('admin/goods/specificationEdit', 'Admin\\GoodsController@specificationEdit')->name('api/admin/goods/specificationEdit');
+    Route::post('admin/goods/specificationSave', 'Admin\\GoodsController@specificationSave')->name('api/admin/goods/specificationSave');
+    Route::post('admin/goods/specificationChangeStatus', 'Admin\\GoodsController@specificationChangeStatus')->name('api/admin/goods/specificationChangeStatus');
 
     Route::get('admin/goods/unitIndex', 'Admin\\GoodsController@unitIndex')->name('api/admin/goods/unitIndex');
     Route::get('admin/goods/unitCreate', 'Admin\\GoodsController@unitCreate')->name('api/admin/goods/unitCreate');

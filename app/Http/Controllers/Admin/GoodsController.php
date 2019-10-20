@@ -480,24 +480,24 @@ class GoodsController extends BuilderController
                 if(strpos($key,'system_goods_attribute_') !== false) {
                     // 平台系统属性
                     $attrId = str_replace("system_goods_attribute_","",$key);
-                    $systemSpus[] = ['attr_id' => $attrId,'attr_vid' => $value];
+                    $systemAttrs[] = ['attr_id' => $attrId,'attr_vid' => $value];
                 }
             }
 
             // 平台系统属性
-            $data['goods_attrs'] = json_encode($systemSpus);
+            $data['goods_attrs'] = json_encode($systemAttrs);
 
-            $shopSpus = [];
+            $shopAttrs = [];
 
             // "other_attr_name":"产地","other_attr_value":"唐山",
             if(!empty($shopGoodsAttributeNames)) {
                 foreach($shopGoodsAttributeNames as $key => $shopGoodsAttributeName) {
-                    $shopSpus[] = ['other_attr_name' => $shopGoodsAttributeName,'other_attr_value' => $shopGoodsAttributeValues[$key]];
+                    $shopAttrs[] = ['other_attr_name' => $shopGoodsAttributeName,'other_attr_value' => $shopGoodsAttributeValues[$key]];
                 }
             }
 
             // 商家自定义属性
-            $data['other_attrs'] = json_encode($shopSpus);
+            $data['other_attrs'] = json_encode($shopAttrs);
 
             $result = Goods::create($data);
 
@@ -510,9 +510,9 @@ class GoodsController extends BuilderController
             }
 
             foreach($requestData as $key => $value) {
-                if(strpos($key,'system_spu_') !== false) {
+                if(strpos($key,'system_goods_attribute_') !== false) {
                     // 平台系统属性
-                    $attrId = str_replace("system_spu_","",$key);
+                    $attrId = str_replace("system_goods_attribute_","",$key);
 
                     // 添加平台系统属性spu
                     $data1['goods_id'] = $result->id;
@@ -665,7 +665,7 @@ class GoodsController extends BuilderController
         $categoryId  =   $data['goods_category_id'];
         $shopId      =   $data['shop_id'];
 
-        $systemSpus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        $systemGoodsAttributes = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
         ->where('goods_category_attributes.goods_category_id',$categoryId)
         ->where('goods_category_attributes.type',1)
         ->orderBy('goods_attributes.sort','asc')
@@ -673,32 +673,32 @@ class GoodsController extends BuilderController
         ->get()
         ->toArray();
 
-        foreach($systemSpus as $key => $systemSpu)
+        foreach($systemGoodsAttributes as $key => $systemGoodsAttribute)
         {
-            $systemSpuVnames = GoodsAttributeValue::where('goods_attribute_id',$systemSpu['id'])
+            $systemGoodsAttributeVnames = GoodsAttributeValue::where('goods_attribute_id',$systemGoodsAttribute['id'])
             ->orderBy('sort','asc')
             ->get()
             ->toArray();
 
-            $systemSpus[$key]['vname'] = $systemSpuVnames;
+            $systemGoodsAttributes[$key]['vname'] = $systemGoodsAttributeVnames;
 
             $goodsInfoAttributeValue = GoodsInfoAttributeValue::where('goods_id',$data['id'])
-            ->where('goods_attribute_id',$systemSpu['id'])
+            ->where('goods_attribute_id',$systemGoodsAttribute['id'])
             ->where('type',1)
             ->first();
 
-            $systemSpus[$key]['goods_attribute_value_id'] = json_decode($goodsInfoAttributeValue['goods_attribute_value_id']);
+            $systemGoodsAttributes[$key]['goods_attribute_value_id'] = json_decode($goodsInfoAttributeValue['goods_attribute_value_id']);
         }
 
-        $shopSpus = json_decode($data['other_attrs']);
-        $data['shopSpus'] = $shopSpus;
+        $shopGoodsAttributes = json_decode($data['other_attrs']);
+        $data['shopGoodsAttributes'] = $shopGoodsAttributes;
         $data['keys'] = [];
-        foreach($shopSpus as $key => $shopSpu)
+        foreach($shopGoodsAttributes as $key => $shopGoodsAttribute)
         {
             $data['keys'][] = $key;
         }
 
-        $skus = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
+        $goodsAttributes = GoodsAttribute::join('goods_category_attributes', 'goods_category_attributes.goods_attribute_id', '=', 'goods_attributes.id')
         ->where('goods_category_attributes.type',2)
         ->whereRaw('(goods_category_attributes.goods_category_id = ? or goods_attributes.shop_id = ?)', [$categoryId, $shopId])
         ->orderBy('goods_attributes.sort','asc')
@@ -707,22 +707,22 @@ class GoodsController extends BuilderController
         ->toArray();
 
 
-        foreach($skus as $key => $sku)
+        foreach($goodsAttributes as $key => $goodsAttribute)
         {
-            $skuVnames = GoodsAttributeValue::where('goods_attribute_id',$sku['id'])
+            $goodsAttributeVnames = GoodsAttributeValue::where('goods_attribute_id',$goodsAttribute['id'])
             ->orderBy('sort','asc')
             ->get()
             ->toArray();
 
-            $skus[$key]['vname'] = $skuVnames;
+            $goodsAttributes[$key]['vname'] = $goodsAttributeVnames;
         }
 
-        $data['checkedSkus'] = GoodsInfoAttributeValue::where('goods_id',$data['id'])
+        $data['checkedGoodsAttributes'] = GoodsInfoAttributeValue::where('goods_id',$data['id'])
         ->where('type',2)
         ->distinct()
         ->pluck('goods_attribute_id');
 
-        foreach($data['checkedSkus'] as $key => $value) {
+        foreach($data['checkedGoodsAttributes'] as $key => $value) {
 
             $goodsInfoAttributeValues = GoodsInfoAttributeValue::where('goods_attribute_id',$value)
             ->where('type',2)
@@ -736,13 +736,13 @@ class GoodsController extends BuilderController
             $getGoodsInfoAttributeData['value'] = $goodsInfoAttributeValues;
             $getGoodsInfoAttributeData['id'] = $value;
 
-            $data['checkedSkuValues'][] = $getGoodsInfoAttributeData;
+            $data['checkedGoodsAttributeValues'][] = $getGoodsInfoAttributeData;
         }
         
         // 模板数据
-        $data['systemSpus'] = $systemSpus;
-        $data['shopSpus'] = $shopSpus;
-        $data['skus'] = $skus;
+        $data['systemGoodsAttributes'] = $systemGoodsAttributes;
+        $data['shopGoodsAttributes'] = $shopGoodsAttributes;
+        $data['goodsAttributes'] = $goodsAttributes;
 
         $data['goods_category_id'] = $this->getParentCategory($data['goods_category_id'],[0 => $data['goods_category_id']]);
         $data['other_category_ids'] = GoodsCategoryRelationship::where('goods_id',$id)->pluck('goods_category_id');
@@ -1261,13 +1261,13 @@ class GoodsController extends BuilderController
         $status         =   $request->json('status');
         $brandIds       =   $request->json('brand_ids');
 
-        $attributeSpuIds          =   $request->json('attribute_spu_ids');
-        $attributeSpuSorts        =   $request->json('attribute_spu_sorts');
-        $attributeSpuGroups       =   $request->json('attribute_spu_groups');
+        $attributeIds          =   $request->json('attribute_ids');
+        $attributeSorts        =   $request->json('attribute_sorts');
+        $attributeGroups       =   $request->json('attribute_groups');
 
-        $attributeSkuIds          =   $request->json('attribute_sku_ids');
-        $attributeSkuSorts        =   $request->json('attribute_sku_sorts');
-        $attributeSkuGroups       =   $request->json('attribute_sku_groups');
+        $attributeSpecificationIds          =   $request->json('attribute_specification_ids');
+        $attributeSpecificationSorts        =   $request->json('attribute_specification_sorts');
+        $attributeSpecificationGroups       =   $request->json('attribute_specification_groups');
         
         if (empty($title)) {
             return $this->error('标题必须填写！');
@@ -1315,22 +1315,22 @@ class GoodsController extends BuilderController
         $result = GoodsCategory::create($data);
 
         if($result) {
-            if($attributeSpuIds) {
-                foreach ($attributeSpuIds as $key => $attributeSpuId) {
+            if($attributeIds) {
+                foreach ($attributeIds as $key => $attributeId) {
                     $data1['goods_category_id'] = $result->id;
-                    $data1['goods_attribute_id'] = $attributeSpuId;
-                    $data1['gorup_name'] = $attributeSpuGroups[$key];
-                    $data1['sort'] = $attributeSpuSorts[$key];
+                    $data1['goods_attribute_id'] = $attributeId;
+                    $data1['gorup_name'] = $attributeGroups[$key];
+                    $data1['sort'] = $attributeSorts[$key];
                     $data1['type'] = 1;
                     GoodsCategoryAttribute::create($data1);
                 }
             }
-            if($attributeSkuIds) {
-                foreach ($attributeSkuIds as $key => $attributeSkuId) {
+            if($attributeSpecificationIds) {
+                foreach ($attributeSpecificationIds as $key => $attributeSpecificationId) {
                     $data2['goods_category_id'] = $result->id;
-                    $data2['goods_attribute_id'] = $attributeSkuId;
-                    $data2['gorup_name'] = $attributeSkuGroups[$key];
-                    $data2['sort'] = $attributeSkuSorts[$key];
+                    $data2['goods_attribute_id'] = $attributeSpecificationId;
+                    $data2['gorup_name'] = $attributeSpecificationGroups[$key];
+                    $data2['sort'] = $attributeSpecificationSorts[$key];
                     $data2['type'] = 2;
                     GoodsCategoryAttribute::create($data2);
                 }
@@ -1403,51 +1403,51 @@ class GoodsController extends BuilderController
 
         $data['goodsTypes'] = $goodsTypes;
 
-        $spuSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
+        $attributeSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
         ->where('type',1)
         ->pluck('goods_attribute_id');
-        $data['spuSelectedIds'] = $spuSelectedIds;
+        $data['attributeSelectedIds'] = $attributeSelectedIds;
 
-        $skuSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
+        $specificationSelectedIds = GoodsCategoryAttribute::where('goods_category_id',$id)
         ->where('type',2)
         ->pluck('goods_attribute_id');
-        $data['skuSelectedIds'] = $skuSelectedIds;
+        $data['specificationSelectedIds'] = $specificationSelectedIds;
 
         // 定义对象
-        $spuSelectedDatas = GoodsAttribute::whereIn('id', $spuSelectedIds)
+        $attributeSelectedDatas = GoodsAttribute::whereIn('id', $attributeSelectedIds)
         ->where('status', '>', 0)
         ->where('type', 1)
         ->orderBy('id', 'desc')
         ->get()
         ->toArray();
 
-        $data['spuSelectedKeys'] = [];
+        $data['attributeSelectedKeys'] = [];
 
-        foreach ($spuSelectedDatas as $key => $spuSelectedData) {
-            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$spuSelectedData['id'])->pluck('vname')->toArray();
-            $spuSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
-            $data['spuSelectedKeys'][] = $key;
+        foreach ($attributeSelectedDatas as $key => $attributeSelectedData) {
+            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$attributeSelectedData['id'])->pluck('vname')->toArray();
+            $attributeSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
+            $data['attributeSelectedKeys'][] = $key;
         }
 
-        $data['spuSelectedData'] = $spuSelectedDatas;
+        $data['attributeSelectedData'] = $attributeSelectedDatas;
 
         // 定义对象
-        $skuSelectedDatas = GoodsAttribute::whereIn('id', $skuSelectedIds)
+        $specificationSelectedDatas = GoodsAttribute::whereIn('id', $specificationSelectedIds)
         ->where('status', '>', 0)
         ->where('type', 2)
         ->orderBy('id', 'desc')
         ->get()
         ->toArray();
 
-        $data['skuSelectedKeys'] = [];
+        $data['specificationSelectedKeys'] = [];
 
-        foreach ($skuSelectedDatas as $key => $skuSelectedData) {
-            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$skuSelectedData['id'])->pluck('vname')->toArray();
-            $skuSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
-            $data['skuSelectedKeys'][] = $key;
+        foreach ($specificationSelectedDatas as $key => $specificationSelectedData) {
+            $goodsAttributeValues = GoodsAttributeValue::where('goods_attribute_id',$specificationSelectedData['id'])->pluck('vname')->toArray();
+            $specificationSelectedDatas[$key]['goods_attribute_values'] = implode(',',$goodsAttributeValues);
+            $data['specificationSelectedKeys'][] = $key;
         }
 
-        $data['skuSelectedData'] = $skuSelectedDatas;
+        $data['specificationSelectedData'] = $specificationSelectedDatas;
 
         if ($data['status'] == 1) {
             $data['status'] = true;
@@ -1484,13 +1484,13 @@ class GoodsController extends BuilderController
         $status         =   $request->json('status');
         $brandIds       =   $request->json('brand_ids');
 
-        $attributeSpuIds          =   $request->json('attribute_spu_ids');
-        $attributeSpuSorts        =   $request->json('attribute_spu_sorts');
-        $attributeSpuGroups       =   $request->json('attribute_spu_groups');
+        $attributeIds          =   $request->json('attribute_ids');
+        $attributeSorts        =   $request->json('attribute_sorts');
+        $attributeGroups       =   $request->json('attribute_groups');
 
-        $attributeSkuIds          =   $request->json('attribute_sku_ids');
-        $attributeSkuSorts        =   $request->json('attribute_sku_sorts');
-        $attributeSkuGroups       =   $request->json('attribute_sku_groups');
+        $attributeSpecificationIds          =   $request->json('attribute_specification_ids');
+        $attributeSpecificationSorts        =   $request->json('attribute_specification_sorts');
+        $attributeSpecificationGroups       =   $request->json('attribute_specification_groups');
         
         if (empty($title)) {
             return $this->error('标题必须填写！');
@@ -1539,22 +1539,22 @@ class GoodsController extends BuilderController
 
         if($result !== false) {
             GoodsCategoryAttribute::where('goods_category_id',$id)->delete();
-            if($attributeSpuIds) {
-                foreach ($attributeSpuIds as $key => $attributeSpuId) {
+            if($attributeIds) {
+                foreach ($attributeIds as $key => $attributeId) {
                     $data1['goods_category_id'] = $id;
-                    $data1['goods_attribute_id'] = $attributeSpuId;
-                    $data1['gorup_name'] = $attributeSpuGroups[$key];
-                    $data1['sort'] = $attributeSpuSorts[$key];
+                    $data1['goods_attribute_id'] = $attributeId;
+                    $data1['gorup_name'] = $attributeGroups[$key];
+                    $data1['sort'] = $attributeSorts[$key];
                     $data1['type'] = 1;
                     GoodsCategoryAttribute::create($data1);
                 }
             }
-            if($attributeSkuIds) {
-                foreach ($attributeSkuIds as $key => $attributeSkuId) {
+            if($attributeSpecificationIds) {
+                foreach ($attributeSpecificationIds as $key => $attributeSpecificationId) {
                     $data2['goods_category_id'] = $id;
-                    $data2['goods_attribute_id'] = $attributeSkuId;
-                    $data2['gorup_name'] = $attributeSkuGroups[$key];
-                    $data2['sort'] = $attributeSkuSorts[$key];
+                    $data2['goods_attribute_id'] = $attributeSpecificationId;
+                    $data2['gorup_name'] = $attributeSpecificationGroups[$key];
+                    $data2['sort'] = $attributeSpecificationSorts[$key];
                     $data2['type'] = 2;
                     GoodsCategoryAttribute::create($data2);
                 }
@@ -1718,10 +1718,10 @@ class GoodsController extends BuilderController
         ];
 
         $actions = [
-            Button::make('添加属性')->type('link')->href('admin/mall/goods/spuCreate')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Button::make('添加规格')->type('link')->href('admin/mall/goods/skuCreate')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Button::make('属性列表')->type('link')->href('admin/mall/goods/spuIndex')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Button::make('规格列表')->type('link')->href('admin/mall/goods/skuIndex')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('添加属性')->type('link')->href('admin/mall/goods/attributeCreate')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('添加规格')->type('link')->href('admin/mall/goods/specificationCreate')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('属性列表')->type('link')->href('admin/mall/goods/attributeIndex')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('规格列表')->type('link')->href('admin/mall/goods/specificationIndex')->style(['paddingLeft'=>5,'paddingRight'=>5]),
             Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/typeChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
             Button::make('编辑')->type('link')->href('admin/mall/goods/typeEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
             Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/typeChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
@@ -1927,14 +1927,14 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function spuIndex(Request $request)
+    public function attributeIndex(Request $request)
     {
         $this->pageTitle = '商品属性';
         // 获取参数
         $current            = intval($request->get('current',1));
         $pageSize           = intval($request->get('pageSize',10));
         $search             = $request->get('search');
-        $spuSelectedIds     = $request->get('spuSelectedIds');
+        $attributeSelectedIds     = $request->get('attributeSelectedIds');
             
         // 定义对象
         $query = GoodsAttribute::query();
@@ -1964,8 +1964,8 @@ class GoodsController extends BuilderController
             }
         }
 
-        if(isset($spuSelectedIds)) {
-            $query->whereNotIn('goods_attributes.id', $spuSelectedIds);
+        if(isset($attributeSelectedIds)) {
+            $query->whereNotIn('goods_attributes.id', $attributeSelectedIds);
         }
 
         // 查询数量
@@ -2058,7 +2058,7 @@ class GoodsController extends BuilderController
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('属性名称','name')->withA('admin/mall/'.$this->controllerName().'/spuEdit'),
+            Column::make('属性名称','name')->withA('admin/mall/'.$this->controllerName().'/attributeEdit'),
             Column::make('属性类型','goods_type_name'),
             Column::make('样式','style'),
             Column::make('属性值','goods_attribute_values'),
@@ -2067,19 +2067,19 @@ class GoodsController extends BuilderController
         ];
 
         $headerButtons = [
-            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/goods/spuCreate'),
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/goods/attributeCreate'),
         ];
 
         $toolbarButtons = [
-            Button::make('启用')->type('primary')->onClick('multiChangeStatus','1','admin/'.$this->controllerName().'/spuChangeStatus'),
-            Button::make('禁用')->onClick('multiChangeStatus','2','admin/'.$this->controllerName().'/spuChangeStatus'),
-            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/spuChangeStatus'),
+            Button::make('启用')->type('primary')->onClick('multiChangeStatus','1','admin/'.$this->controllerName().'/attributeChangeStatus'),
+            Button::make('禁用')->onClick('multiChangeStatus','2','admin/'.$this->controllerName().'/attributeChangeStatus'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/attributeChangeStatus'),
         ];
 
         $actions = [
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/spuChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Button::make('编辑')->type('link')->href('admin/mall/goods/spuEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/spuChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/attributeChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('编辑')->type('link')->href('admin/mall/goods/attributeEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/attributeChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
         ];
 
         $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
@@ -2093,7 +2093,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function spuCreate(Request $request)
+    public function attributeCreate(Request $request)
     {
         $id   =   $request->json('id');
 
@@ -2112,7 +2112,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function spuStore(Request $request)
+    public function attributeStore(Request $request)
     {
         $goodsTypeId            =   $request->json('goods_type_id');
         $name                   =   $request->json('name');
@@ -2157,7 +2157,7 @@ class GoodsController extends BuilderController
         }
 
         if($result) {
-            return $this->success('操作成功！','spuIndex');
+            return $this->success('操作成功！','attributeIndex');
         } else {
             return $this->error('操作失败！');
         }
@@ -2169,7 +2169,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function spuEdit(Request $request)
+    public function attributeEdit(Request $request)
     {
         $id = $request->get('id');
 
@@ -2203,7 +2203,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function spuSave(Request $request)
+    public function attributeSave(Request $request)
     {
         $id                     =   $request->json('id');
         $goodsTypeId            =   $request->json('goods_type_id');
@@ -2283,7 +2283,7 @@ class GoodsController extends BuilderController
         }
 
         if ($result!==false) {
-            return $this->success('操作成功！','spuIndex');
+            return $this->success('操作成功！','attributeIndex');
         } else {
             return $this->error('操作失败！');
         }
@@ -2295,7 +2295,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function spuChangeStatus(Request $request)
+    public function attributeChangeStatus(Request $request)
     {
         $id = $request->json('id');
         $status = $request->json('status');
@@ -2328,14 +2328,14 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function skuIndex(Request $request)
+    public function specificationIndex(Request $request)
     {
         $this->pageTitle = '商品规格';
         // 获取参数
         $current            = intval($request->get('current',1));
         $pageSize           = intval($request->get('pageSize',10));
         $search             = $request->get('search');
-        $skuSelectedIds     = $request->get('skuSelectedIds');
+        $specificationSelectedIds     = $request->get('specificationSelectedIds');
             
         // 定义对象
         $query = GoodsAttribute::query();
@@ -2365,8 +2365,8 @@ class GoodsController extends BuilderController
             }
         }
 
-        if(isset($skuSelectedIds)) {
-            $query->whereNotIn('goods_attributes.id', $skuSelectedIds);
+        if(isset($specificationSelectedIds)) {
+            $query->whereNotIn('goods_attributes.id', $specificationSelectedIds);
         }
 
         // 查询数量
@@ -2459,7 +2459,7 @@ class GoodsController extends BuilderController
 
         $columns = [
             Column::make('ID','id'),
-            Column::make('规格名称','name')->withA('admin/mall/'.$this->controllerName().'/skuEdit'),
+            Column::make('规格名称','name')->withA('admin/mall/'.$this->controllerName().'/specificationEdit'),
             Column::make('规格类型','goods_type_name'),
             Column::make('样式','style'),
             Column::make('规格值','goods_attribute_values'),
@@ -2468,19 +2468,19 @@ class GoodsController extends BuilderController
         ];
 
         $headerButtons = [
-            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/goods/skuCreate'),
+            Button::make('新增'.$this->pageTitle)->icon('plus-circle')->type('primary')->href('admin/mall/goods/specificationCreate'),
         ];
 
         $toolbarButtons = [
-            Button::make('启用')->type('primary')->onClick('multiChangeStatus','1','admin/'.$this->controllerName().'/skuChangeStatus'),
-            Button::make('禁用')->onClick('multiChangeStatus','2','admin/'.$this->controllerName().'/skuChangeStatus'),
-            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/skuChangeStatus'),
+            Button::make('启用')->type('primary')->onClick('multiChangeStatus','1','admin/'.$this->controllerName().'/specificationChangeStatus'),
+            Button::make('禁用')->onClick('multiChangeStatus','2','admin/'.$this->controllerName().'/specificationChangeStatus'),
+            Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/specificationChangeStatus'),
         ];
 
         $actions = [
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/skuChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Button::make('编辑')->type('link')->href('admin/mall/goods/skuEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/skuChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/specificationChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Button::make('编辑')->type('link')->href('admin/mall/goods/specificationEdit')->style(['paddingLeft'=>5,'paddingRight'=>5]),
+            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/specificationChangeStatus')->style(['paddingLeft'=>5,'paddingRight'=>5]),
         ];
 
         $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
@@ -2494,7 +2494,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function skuCreate(Request $request)
+    public function specificationCreate(Request $request)
     {
         $id   =   $request->json('id');
 
@@ -2513,7 +2513,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function skuStore(Request $request)
+    public function specificationStore(Request $request)
     {
         $goodsTypeId            =   $request->json('goods_type_id');
         $name                   =   $request->json('name');
@@ -2558,7 +2558,7 @@ class GoodsController extends BuilderController
         }
 
         if($result) {
-            return $this->success('操作成功！','skuIndex');
+            return $this->success('操作成功！','specificationIndex');
         } else {
             return $this->error('操作失败！');
         }
@@ -2570,7 +2570,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function skuEdit(Request $request)
+    public function specificationEdit(Request $request)
     {
         $id = $request->get('id');
 
@@ -2604,7 +2604,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function skuSave(Request $request)
+    public function specificationSave(Request $request)
     {
         $id                     =   $request->json('id');
         $goodsTypeId            =   $request->json('goods_type_id');
@@ -2684,7 +2684,7 @@ class GoodsController extends BuilderController
         }
 
         if ($result!==false) {
-            return $this->success('操作成功！','skuIndex');
+            return $this->success('操作成功！','specificationIndex');
         } else {
             return $this->error('操作失败！');
         }
@@ -2696,7 +2696,7 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function skuChangeStatus(Request $request)
+    public function specificationChangeStatus(Request $request)
     {
         $id = $request->json('id');
         $status = $request->json('status');
