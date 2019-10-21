@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例四十一:内容关联后顺序打印</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示内容关联后按顺序打印：</font></h2>
+<p>&nbsp;&nbsp;&nbsp; 利用<font color="#0000FF">SET_PRINT_STYLEA</font>的类型<font color="#0000FF">“LinkedItem”</font>可以把多个独立的内容关联起来，让它们顺序打印,</p>                           
+<p>一个内容关联别人后，其Top值不再是上边距，而是与被关联者的间隙距离,Left值也变为左边距相对偏离量。</p>                        
+<p>多个对象顺序关联后形成“关联串”，这个“串”分页时在每页高度以第一个对象为准，整个过程可有多个串。</p>                        
+<h2><font color="#009999">演示：</font></h2>  
+<p>1：打印完下面的表格后，紧跟表格末尾加上“制表日期”和“制表人”,其程序代码如下：</p>  
+<p>注意LinkedItem后面的1是“被关联对象”的序号。</p>    
+<textarea rows="8" id="code1" cols="94">
+LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_打印关联内容一");
+LODOP.ADD_PRINT_TABLE(10,5,500,"90%",document.getElementById("tablediv").innerHTML);
+LODOP.ADD_PRINT_TEXT(15,50,200,25,"制表日期:"+LODOP.FORMAT("TIME:YYYY年MM月DD日","DATE"));
+LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);
+LODOP.ADD_PRINT_TEXT(15,300,200,25,"制表人:guest");
+LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);   
+</textarea> 
+<br>
+用以上代码执行<a href="javascript:myPeview01();">预览打印1</a>或<a href="javascript:myDesign01();">打印设计1</a>
+
+ 　<p>2：如下程序代码把该表格连续打印三遍后,再紧接打印“制表日期”和“制表人”。</p>
+<p>注意LinkedItem值为负数代表“前移几位”的对象,所以-1就是上一个。这个语句可以实现连续关联。</p>
+<p>LinkNewPage设置第三个表格输出时“从新页开始”，当然如果空间足够，也会与前面的同页完成。</p>
+ <textarea rows="12" id="code2" cols="94">
+LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_打印关联内容二");
+LODOP.ADD_PRINT_TEXT(10,60,500,40,"第一页有标题,后页没标题但位置提上来");
+LODOP.ADD_PRINT_TABLE(50,5,500,480,document.getElementById("tablediv").innerHTML);
+LODOP.SET_PRINT_STYLEA(0,"Offset2Top",-40); //设置次页偏移把区域向上扩 
+LODOP.ADD_PRINT_TABLE(10,0,500,280,document.getElementById("tablediv").innerHTML);
+LODOP.SET_PRINT_STYLEA(0,"LinkedItem",-1);
+LODOP.ADD_PRINT_TABLE(10,0,500,280,document.getElementById("tablediv").innerHTML);
+LODOP.SET_PRINT_STYLEA(0,"LinkedItem",-1);
+LODOP.SET_PRINT_STYLEA(0,"LinkNewPage",true);
+LODOP.ADD_PRINT_TEXT(15,50,200,25,"制表日期:"+LODOP.FORMAT("TIME:YYYY年MM月DD日","DATE"));
+LODOP.SET_PRINT_STYLEA(0,"LinkedItem",-1);
+LODOP.ADD_PRINT_TEXT(15,300,200,25,"制表人:guest");
+LODOP.SET_PRINT_STYLEA(0,"LinkedItem",-2); 
+</textarea> 
+
+<p>
+用以上代码执行<a href="javascript:myPeview02();">预览打印2</a>或<a href="javascript:myDesign02();">打印设计2</a>。</p>
+
+<div id="tablediv">
+<style> table,td,th {border:1px solid black;border-collapse: collapse}</style>
+
+<table border=1 width="452" height="579">
+
+<thead>
+<tr><th width="218" height="16">设备编号(表头)</th>
+<th width="218" height="16">设备名称(表头)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td width="218" height="8">001</td>        
+<td width="218" height="8">电脑</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">002</td>
+<td width="218" height="16"><span dataFld=TITLE>腹腔镜器械</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">003</td>
+<td width="218" height="16">工作手件</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">004</td>
+<td width="218" height="16"><span dataFld=TITLE>陈列柜</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">005</td>
+<td width="218" height="16"><span dataFld=TITLE>不锈钢紫外线消毒车</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">006</td>
+<td width="218" height="16"><span dataFld=TITLE>刻录机</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">007</td>
+<td width="218" height="16">抓钳</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="12">008</td>
+<td width="218" height="12">冷光源灯</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">009</td>
+<td width="218" height="16"><span dataFld=TITLE>手术床</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">010</td>
+<td width="218" height="16"><span dataFld=TITLE>手术无影灯</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">011</td>
+<td width="218" height="16"><span dataFld=TITLE>手术无影灯</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">012</td>
+<td width="218" height="16">纤维导光头灯</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">013</td>
+<td width="218" height="16"><span dataFld=TITLE>电切镜</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">014</td>
+<td width="218" height="16"><span dataFld=TITLE>电切镜</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">015</td>
+<td width="218" height="16"><span dataFld=TITLE>鼻窦镜</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">016</td>
+<td width="218" height="16"><span dataFld=TITLE>腹腔镜</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">017</td>
+<td width="218" height="16"><span dataFld=TITLE>关节镜光学视管</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">018</td>
+<td width="218" height="16">经皮肾镜</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">019</td>
+<td width="218" height="16">输尿管镜</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">020</td>
+<td width="218" height="16"><span dataFld=TITLE>纤维导光关节镜</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">021</td>
+<td width="218" height="16"><span dataFld=TITLE>纤维导光关节镜</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">022</td>
+<td width="218" height="16"><span dataFld=TITLE>可见分光光度计</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">023</td>
+<td width="218" height="16"><span dataFld=TITLE>酸度计</span></td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">024</td>
+<td width="218" height="16">电热三用水箱</td>
+</tr></tbody>
+<tbody>
+<tr>
+<td width="218" height="16">025</td>
+<td width="218" height="16"><span dataFld=TITLE>TDP治疗机</span></td>
+</tr></tbody>
+
+<tfoot>
+<tr><th width="218" height="13">设备号(表尾)</th><th width="218" height="13">设备名(表尾)</th></tr>
+</tfoot>
+
+</table>
+
+</div>
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>
+</p>
+<script language="javascript" type="text/javascript"> 
+	var LODOP; //声明为全局变量
+	function myDesign01() {
+		LODOP=getLodop(); 		
+		eval(document.getElementById('code1').value); 
+		document.getElementById('code1').value=LODOP.PRINT_DESIGN();		
+
+	};	
+	function myPeview01() {		
+		LODOP=getLodop(); 		
+		eval(document.getElementById('code1').value); 
+		LODOP.PREVIEW();
+	};
+	function myDesign02() {
+		LODOP=getLodop(); 		
+		eval(document.getElementById('code2').value); 
+		document.getElementById('code2').value=LODOP.PRINT_DESIGN();		
+
+	};	
+	function myPeview02() {		
+		LODOP=getLodop(); 		
+		eval(document.getElementById('code2').value); 
+		LODOP.PREVIEW();
+	};		
+	
+	
+</script>
+</body>
+</html>

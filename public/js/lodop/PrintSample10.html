@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<SCRIPT type=text/javascript src="PrintSample10.js"></SCRIPT>
+<title>WEB打印控件LODOP的样例十:控制打印样式</title>
+<style id="style1">
+table {
+	border-width: 5px;
+	border-style: solid;
+	border-color: #0000FF;
+}
+td {
+	border-width: 1px;
+	border-style: solid;
+}
+</style>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body id="body01">
+
+<h2><font color="#009999">演示如何控制打印样式(STYLE)：</font>
+</h2>
+
+<P>在对页面内容直接裁剪输出时，有时候显示样式不一定</P>
+<P>适合打印，LODOP可以实现按需要控制打印样式。</P>
+<P>下面的表格由页面样式(STYLE)控制加了蓝色粗边框：</P>
+<div id="form1">
+<form>
+<table border="1" width="300">
+  <tr>
+    <td width="50%">101</td>
+    <td width="50%" class="hiddentd">201</td>
+  </tr>
+  <tr>
+    <td width="50%">102</td>
+    <td width="50%" class="hiddentd">202</td>
+  </tr>
+  <tr>
+    <td width="50%">103</td>
+    <td width="50%" class="hiddentd">203</td>
+  </tr>
+  <tr>
+    <td width="50%">104</td>
+    <td width="50%" class="hiddentd">204</td>
+  </tr>
+</table>
+</form>
+</div>
+<p>1、输出时可与显示样式一致：<a href="javascript:myPreview1()">预览同样式打印1</a></p>
+<p>2、可以无样式(缺省表格线)输出：<a href="javascript:myPreview2()">预览无样式打印2</a></p>
+<p>3、用另外样式(表格线合并为单一细线)输出：<a href="javascript:myPreview3()">预览细线样式打印3</a></p>
+<p>4、打印本页并隐藏一些内容<input type="button" value="打印预览4(隐藏本按钮和表格第2列)" onclick="myPreview4()" >，后面内容紧跟上。</p>
+<p>5、用外链样式表控制样式：<a href="javascript:myPreview5()">预览双线边框的打印5</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<SCRIPT type=text/javascript> test_script();</SCRIPT>
+<p>6、<a href="javascript:myPreview6()">打印预览本页完整内容6</a>
+<p> 
+本例进一步说明控件接收超文本控制，反过来说，你不控制就无动作，
+<DIV style="WIDTH:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+自然也包括样式STYLE等等内容(后面演示省略号)</DIV>
+</p>
+<h3><font size="3"><font color="#009999">本样例关键点：将</font><font size="3" color="#FF00FF">STYLE</font>
+
+<font color="#009999">的内容传给控件。</font></font></h3>   
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a></p>
+
+<script language="javascript" type="text/javascript"> 
+        var LODOP; //声明为全局变量
+	function myPreview1(){	
+		LODOP=getLodop();  	
+		var strBodyStyle="<style>"+document.getElementById("style1").innerHTML+"</style>";
+		var strFormHtml=strBodyStyle+"<body>"+document.getElementById("form1").innerHTML+"</body>";
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_样式风格");	
+		LODOP.ADD_PRINT_TEXT(50,50,260,39,"打印与显示样式一致：");
+		LODOP.ADD_PRINT_HTM(88,50,300,200,strFormHtml);
+		LODOP.PREVIEW();
+	};	
+	function myPreview2(){
+		LODOP=getLodop();  
+   		var strFormHtml=document.getElementById("form1").innerHTML;
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_样式风格");		
+		LODOP.ADD_PRINT_TEXT(50,50,260,39,"无样式打印：");
+		LODOP.ADD_PRINT_HTM(88,50,300,200,strFormHtml);
+		LODOP.PREVIEW();
+	};	
+	function myPreview3(){
+		LODOP=getLodop();  
+		var strBodyStyle="<style>table,td { border: 1 solid #000000;border-collapse:collapse }</style>";
+		var strFormHtml=strBodyStyle+"<body>"+document.getElementById("form1").innerHTML+"</body>";
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_样式风格");
+		LODOP.ADD_PRINT_TEXT(50,50,260,39,"细线样式打印：");
+		LODOP.ADD_PRINT_HTM(88,50,300,200,strFormHtml);
+		LODOP.PREVIEW();
+	};	
+	function myPreview4(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_全页排除按钮");
+		var strBodyStyle="<style>input {display: none;}.hiddentd {display: none;}</style>";
+		strBodyStyle=strBodyStyle+"<style>"+document.getElementById("style1").innerHTML+"</style>";
+		var strBodyHtml=strBodyStyle+"<body>"+document.getElementById("body01").innerHTML+"</body>";
+		LODOP.ADD_PRINT_HTM(20,40,700,900,strBodyHtml);
+		LODOP.PREVIEW();	
+	};
+	function myPreview5(){
+		LODOP=getLodop();  
+		var strStyleCSS="<link href='PrintSample10.css' type='text/css' rel='stylesheet'>";
+		var strFormHtml=strStyleCSS+"<body>"+document.getElementById("form1").innerHTML+"</body>";
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_外链样式风格");
+		LODOP.ADD_PRINT_TEXT(50,50,260,39,"外链样式双线边框：");
+		LODOP.ADD_PRINT_HTM(88,50,300,200,strFormHtml);
+		LODOP.PREVIEW();
+	};	
+	function myPreview6(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_完整全页");
+		LODOP.ADD_PRINT_HTM(10,10,"100%","100%","<!DOCTYPE html>"+document.getElementsByTagName("html")[0].innerHTML);
+		LODOP.PREVIEW();	
+	};
+</script> 
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例十四:按页面地址(URL)打印</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示按页面地址(URL)打印：</font></h2>
+<p>按URL打印的函数如下：</p>  
+<p><font color="#0000FF">ADD_PRINT_URL(intTop,intLeft,intWidth,intHeight,strURL);</font></p>  
+<h4>一、打印绝对路径URL下的内容:</h4>
+<p>1、在百度上搜“Lodop”的URL：<br>
+<input type="text" id="T1" size="54" value="http://www.baidu.com/s?bs=web%B4%F2%D3%A1%BF%D8%BC%FElodop&f=8&wd=web%B4%F2%D3%A1%BF%D8%BC%FElodop">
+<a href="javascript:PrintOneURL('T1');">预览打印</a>其结果<p>2、一个学习JavaScript的优秀网站：<br>  
+<input type="text" id="T2" size="54" value="http://www.w3school.com.cn/index.html">
+<a href="javascript:PrintOneURL('T2');">预览打印</a>其结果<p>3、在A3纸上同时输出这俩结果,横向打印出来：<a href="javascript:PrintTwoURL();">预览打印</a>  
+<h4>二、打印相对路径URL下的内容:</h4>
+<p>本样例清单中第三个样例URL：<br>
+<input type="text" id="T3" size="54" value="PrintSample3.html">
+<a href="javascript:PrintOneURL('T3');">预览打印</a>其结果</p> 
+<h4>三、打印iframe内容:</h4>
+下面iframe包含样例2的内容，可以用URL方式，见<a href="javascript:PrintIframeByURL();">URL打印预览</a><br>
+如果不跨域还可以用HTML代码方式，见<a href="javascript:PrintIframeByHTML();">HTM打印预览</a>
+<div id="f1" style="position:relative; width:1024px;">
+<iframe name="myiframe" src="PrintSample2.html"  width=60% height=200> </iframe>
+<div>
+<h4>四、按ID摘取部分内容输出:</h4>
+<p>用<font color="#0000FF">IDTagForPick</font>属性摘取样例二中如下ID值（或标签名）的内容：<br>
+<input type="text" id="T4" size="54" value="form2">
+<a href="javascript:PrintByTagID(document.getElementById('T4').value);">预览打印</a>摘取的结果。</p> 
+
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a></p>
+
+
+<script language="javascript" type="text/javascript"> 
+        var LODOP; //声明为全局变量      
+	function PrintOneURL(strID){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_按网址打印");
+		LODOP.ADD_PRINT_URL(30,20,746,"95%",document.getElementById(strID).value);
+		LODOP.SET_PRINT_STYLEA(0,"HOrient",3);
+		LODOP.SET_PRINT_STYLEA(0,"VOrient",3);
+//		LODOP.SET_SHOW_MODE("MESSAGE_GETING_URL",""); //该语句隐藏进度条或修改提示信息
+//		LODOP.SET_SHOW_MODE("MESSAGE_PARSING_URL","");//该语句隐藏进度条或修改提示信息
+		LODOP.PREVIEW();			
+	};	
+	function PrintTwoURL(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_同时打印俩网址");
+		LODOP.SET_PRINT_PAGESIZE(2,0,0,"A3");
+		LODOP.ADD_PRINT_URL(39,5,786,531,document.getElementById("T1").value);
+		LODOP.ADD_PRINT_URL(407,779,771,500,document.getElementById("T2").value);	
+		LODOP.SET_PREVIEW_WINDOW(2,0,0,0,0,""); //按适宽模式显示
+		LODOP.PREVIEW();			
+	};	
+	function PrintIframeByURL(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_打印Iframe");
+		LODOP.ADD_PRINT_URL(0,0,"100%","100%",document.getElementsByTagName("iframe")[0].getAttribute("src"));	
+		LODOP.PREVIEW();			
+	};
+	function PrintIframeByHTML(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_打印Iframe");
+		strHtml=document.getElementsByTagName("iframe")[0].contentWindow.document.documentElement.innerHTML;
+		LODOP.ADD_PRINT_HTM(0,0,"100%","100%",strHtml);	
+		LODOP.PREVIEW();			
+	};
+	function PrintByTagID(strID_Tag){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_按ID摘取内容输出");
+		LODOP.ADD_PRINT_URL(10,10,600,600,"PrintSample2.html");
+	 	LODOP.SET_PRINT_STYLEA(0,"IDTagForPick",strID_Tag);
+		LODOP.PREVIEW();			
+	};
+	
+</script>
+
+</body>
+</html>

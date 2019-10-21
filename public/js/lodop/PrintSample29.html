@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例二十九:各种长度单位的使用</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示使用各种长度单位：</font></h2>
+<table cellpadding="0" cellspacing="0" border="0" class="numberedList" width="572">
+  <tr id="eCE2" vAlignment="top" class>
+    <td Alignment="right" class="dropCapQ" nowrap width="6"></td>
+    <td width="812">
+      <table name="tiba" class="tiba" width="769">
+        <tr>
+          <td>Lodop很多函数的参数可声明使用<font color="#0000FF">in(英寸)、cm(厘米)、mm(毫米)、pt(磅)</font><font color="#0000FF">、px(1/96英寸)</font>等长度单位，</td>
+        </tr>
+        <tr>
+          <td>
+
+          注意这里的<font color="#0000FF">px</font>不是像素，是绝对长度单位，<font color="#0000FF">1px</font>等于<font color="#0000FF">1/96</font>英寸，与正常<font color="#0000FF">DPI</font>显示设置的像素值相等。如果
+
+          </td>
+        </tr>
+        <tr>
+          <td>
+
+          采用该单位，那么正常显示的屏幕内容与实际打印输出的内容大小相当，这个长度单位可以实现感觉上
+
+          </td>
+        </tr>
+        <tr style="padding:0px 0px 7px 0px;border:inset 1px #f00;">
+          <td  style="vertical-Alignment: top" width="739">
+          的“所见等于所打”，<font color="#0000FF">px</font>是缺省长度单位，如此以来，单位换算关系为：
+          </td>
+        </tr>
+        <tr style="padding:0px 0px 7px 0px;border:inset 1px #f00;">
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF">1in = 2.54cm = 25.4mm = 72pt = 96px</font>   
+          </td>
+        </tr>
+        <tr style="padding:0px 0px 7px 0px;border:inset 1px #f00;">
+          <td  style="vertical-Alignment: top" width="739">
+          &nbsp;
+          </td>
+        </tr>
+        <tr style="padding:0px 0px 7px 0px;border:inset 1px #f00;">
+          <td  style="vertical-Alignment: top" width="739">
+          如下是相关函数清单(红色参数部分):
+          </td>
+        </tr>
+        <tr style="padding:0px 0px 7px 0px;border:inset 1px #f00;">
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">PRINT_INITA(</font><font color="#FF0000" size="2">Top,Left,Width,Height</font><font color="#0000FF" size="2">,strPrintTaskName);</font></td>
+        </tr>
+        <tr style="padding:0px 0px 7px 0px;border:inset 1px #f00;">
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_TEXT(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strContent:);</font></td>                         
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739"><font color="#0000FF" size="2">ADD_PRINT_HTM(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strHtml);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739"><font color="#0000FF" size="2">ADD_PRINT_TABLE(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strHtml);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_URL(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strURL);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_IMAGE(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strHtml);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739"><font color="#0000FF" size="2">ADD_PRINT_TBURL(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strURL);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739"><font color="#0000FF" size="2">ADD_PRINT_HTML(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strHtml);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739"><font color="#0000FF" size="2">ADD_PRINT_LINE(</font><font color="#FF0000" size="2">Top1,Left1,Top2,Left2,</font><font color="#0000FF" size="2">intLineStyle,intLineWidth);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_RECT(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">intLineStyle,intLineWidth);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_ELLIPSE(</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">intLineStyle,intLineWidth);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_SHAPE(intShapeType,</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">intLineStyle,intLineWidth);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_TEXTA(strItemName,</font><font color="#FF0000" size="2">Top,Left,Width,Height,</font><font color="#0000FF" size="2">strContent);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">SET_PREVIEW_WINDOW(intDispMode,intToolMode,blDirectPrint,</font><font color="#FF0000" size="2">Width,Height,</font><font color="#0000FF" size="2">strPButtonCaptoin);</font>
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          &nbsp;
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          例如画100mm×12.4mm矩形框，如下几行代码都可以实现：</td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_RECT(26,37,378,47,0,1);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_RECT("72pt","27.8pt","283.5pt","35.2pt",0,1);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_RECT("43.9mm","9.8mm","100mm","12.4mm",0,1);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_RECT("6.24cm",".98cm","10cm","1.24cm",0,1);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">
+          <font color="#0000FF" size="2">ADD_PRINT_RECT("3.177in",".385in","3.938in",".49in",0,1);</font></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739">用以上代码进入<a href="javascript:myDesign()"><b>打印设计</b></a>看看！</td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="739"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a></p>
+
+<script language="javascript" type="text/javascript"> 
+	var LODOP; //声明为全局变量 
+	function myDesign() {	
+		LODOP=getLodop();  	
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_计量单位演示");
+		LODOP.ADD_PRINT_RECT(26,37,378,47,0,1);
+		LODOP.ADD_PRINT_RECT("72pt","27.8pt","283.5pt","35.2pt",0,1);
+		LODOP.ADD_PRINT_RECT("43.9mm","9.8mm","100mm","12.4mm",0,1);
+		LODOP.ADD_PRINT_RECT("6.24cm",".98cm","10cm","1.24cm",0,1);
+		LODOP.ADD_PRINT_RECT("3.177in",".385in","3.938in",".49in",0,1);
+		LODOP.PRINT_DESIGN();		
+	};			
+</script>
+</body>
+</html>

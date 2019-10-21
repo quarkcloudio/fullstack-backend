@@ -1,0 +1,532 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例四十三:演示综合表格分页打印</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示综合表格分页打印：</font></h2>
+<p>如下是几个div包裹的超文本内容，现在演示用这些内容组合起来打印输出<b>两个发货单</b>，点<a href="javascript:PreviewMytable();">打印预览</a>看一下。</p>
+
+<p>为了避免本文档太长，每个发货单都用div2当主体表格，该表格因超出纸高被自动分页，其它带颜色的div分别作为它们的页眉页脚。</p>
+
+<p>本例用<font color="#0000FF">NewPageA</font>对两个发货单进行了分页，眉脚对象与主体表格进行了关联。</p>
+
+<p>----------------------div1:------------------------------------------------------------------------------------</p>
+<div id="div1">
+<DIV style="LINE-HEIGHT: 30px" class=size16 align=center><STRONG><font color="#0000FF">销售发货单-01</font></STRONG></DIV>        
+<TABLE border=0 cellSpacing=0 cellPadding=0 width="100%">
+  <TBODY>
+  <TR>
+    <TD width="43%"><font color="#0000FF">所在店铺：<SPAN 
+      id=rpt_Pro_Order_List_ctl00_lbl_eShop_Name>雅瑞专卖店</SPAN></font></TD>
+    <TD width="33%"><font color="#0000FF">发货单号：<SPAN >2011050810372</SPAN></font></TD>
+    <TD><font color="#0000FF">快递单号：</font></TD></TR>
+  <TR>
+    <TD><font color="#0000FF">收 件 人：<SPAN >王斌</SPAN></font></TD> 
+    <TD><font color="#0000FF">网店单号：<SPAN>74235823905643</SPAN></font><font color="#0000FF"></font></TD>
+    <TD><font color="#0000FF">发货日期：2011-5-10</font></TD></TR>
+  <TR>
+    <TD><font color="#0000FF">电话号码：<SPAN>13935429860　</SPAN></font></TD>
+    <TD><font color="#0000FF">收件人ID：<SPAN>云星王斌</SPAN></font></TD>
+    <TD><font color="#0000FF">&nbsp;</font></TD></TR></TBODY></TABLE>
+</div>
+<p>----------------------div2:------------------------------------------------------------------------------------</p>
+<div id="div2">
+
+<TABLE border=1 cellSpacing=0 cellPadding=1 width="100%" style="border-collapse:collapse" bordercolor="#333333">
+<thead>
+  <TR>
+    <TD width="10%">
+      <DIV align=center><b>表格页眉</b></DIV></TD>
+    <TD width="25%">
+      <DIV align=center><b>品名</b></DIV></TD>
+    <TD width="10%">
+      <DIV align=center><b>颜色</b></DIV></TD>
+    <TD width="10%">
+      <DIV align=center><b>规格</b></DIV></TD>
+    <TD width="10%">
+      <DIV align=center><b>数量</b></DIV></TD>
+    <TD width="15%">
+      <DIV align=center><b>单价</b></DIV></TD>
+    <TD width="20%">
+      <DIV align=center><b>金额</b></DIV></TD></TR>
+</thead>      
+  <TBODY>      
+  <TR>
+    <TD >&nbsp;TB_AMJ006</TD>
+    <TD >名称01</TD>
+    <TD >浅灰色</TD>
+    <TD >185/10</TD>
+    <TD >1</TD>
+    <TD >248.00</TD>
+    <TD>248.00</TD></TR>
+  <TR>
+    <TD >&nbsp;</TD>
+    <TD >名称02</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >2</TD>
+    <TD >50</TD>
+    <TD>100</TD></TR>
+ 
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称03</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称04</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称05</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称06</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称07</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称08</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称09</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称10</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称11</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称12</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称13</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称14</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称15</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称16</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称17</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称18</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称19</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称20</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称21</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称22</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称23</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称24</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称25</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称26</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称27</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称28</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称29</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称30</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称31</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称32</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称33</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称34</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称35</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD></TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称36</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称37</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD></TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称38</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称39</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称40</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称41</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称42</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >123</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称43</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD>&nbsp;</TD>
+  </tr>
+  <tr>
+    <TD >&nbsp;</TD>
+    <TD >名称44</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >&nbsp;</TD>
+    <TD >10</TD>
+  </tr> 
+  <tfoot>
+  <tr>
+    <TD ><b>表格页脚</b></TD>
+    <TD ><b>本页动态合计</b></TD>
+    <TD ><b>&nbsp;</b></TD>
+	<TD tdata="pageNO" format="#" align="left">
+  	<p align="center"><b>第<font color="#0000FF">#</font>页</b></p>
+	</TD>
+	<TD tdata="pageCount" format="#" align="left">
+  	<p align="center"><b>总<font color="#0000FF">##</font>页</b></TD>    
+	<TD width="14%" align="right">　</TD>
+	<TD width="19%" tdata="subSum" format="#,##0.00" align="right"><font color="#0000FF">###元</font></TD>    
+ </tr>
+  </tfoot>
+</TABLE>
+</div>
+<p>----------------------div3:------------------------------------------------------------------------------------</p>
+<div id="div3">
+  <DIV style="LINE-HEIGHT: 30px" 
+align=center><font color="#0000FF">感谢您对我们雅瑞专卖店的支持，(发货单01的表格外“页脚”，紧跟表格)</font></DIV>
+</div>
+<p>----------------------div4:------------------------------------------------------------------------------------</p>
+<div id="div4">
+<DIV style="LINE-HEIGHT: 30px" class=size16 align=center><STRONG><font color="#FF0000">销售发货单-02</font></STRONG></DIV>         
+<TABLE border=0 cellSpacing=0 cellPadding=0 width="100%">
+  <TBODY>
+  <TR>
+    <TD width="43%"><font color="#FF0000">店铺名称：<SPAN 
+      id=rpt_Pro_Order_List_ctl00_lbl_eShop_Name><b>黄阁专卖店</b></SPAN></font></TD>
+    <TD width="33%"><font color="#FF0000">物流单号：<SPAN >2011050810373</SPAN></font></TD>
+  </TR>
+  <TR>
+    <TD><font color="#FF0000">收 货 人：<SPAN >刘波</SPAN></font></TD>                                                  
+    <TD><font color="#FF0000">网店订单：<SPAN>74235823905644</SPAN></font></TD>
+  </TR>
+  </TBODY></TABLE>
+</div>
+<p>---------------------------------------------------------------------------------------------------------------</p>
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>
+</p>
+<script> 
+	function PreviewMytable(){
+		var LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_分页打印综合表格");
+		var strStyle="<style> table,td,th {border-width: 1px;border-style: solid;border-collapse: collapse}</style>"
+		LODOP.ADD_PRINT_TABLE(128,"5%","90%",314,strStyle+document.getElementById("div2").innerHTML);
+		LODOP.SET_PRINT_STYLEA(0,"Vorient",3);		
+		LODOP.ADD_PRINT_HTM(26,"5%","90%",109,document.getElementById("div1").innerHTML);
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+		LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);	
+	    	LODOP.ADD_PRINT_HTM(444,"5%","90%",54,document.getElementById("div3").innerHTML);
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+		LODOP.SET_PRINT_STYLEA(0,"LinkedItem",1);	
+		LODOP.NewPageA();
+    		LODOP.ADD_PRINT_TABLE(128,"5%","90%",328,strStyle+document.getElementById("div2").innerHTML);
+		LODOP.SET_PRINT_STYLEA(0,"Vorient",3);	
+		LODOP.ADD_PRINT_HTM(26,"5%","90%",80,document.getElementById("div4").innerHTML);
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+		LODOP.SET_PRINT_STYLEA(0,"LinkedItem",4);	
+		LODOP.ADD_PRINT_TEXT(460,96,"76.25%",20,"真诚祝您好远，欢迎下次再来！(发货单02的表格外“页脚”，紧跟表格)");
+		LODOP.SET_PRINT_STYLEA(0,"LinkedItem",4);
+		LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+		LODOP.SET_PRINT_STYLEA(0,"FontColor","#FF0000");
+		LODOP.SET_PRINT_STYLEA(0,"Alignment",2);
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+		LODOP.SET_PRINT_STYLEA(0,"Horient",3);	
+		LODOP.ADD_PRINT_HTM(1,600,300,100,"总页号：<font color='#0000ff' format='ChineseNum'><span tdata='pageNO'>第##页</span>/<span tdata='pageCount'>共##页</span></font>");
+
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);
+
+		LODOP.SET_PRINT_STYLEA(0,"Horient",1);	
+		LODOP.ADD_PRINT_TEXT(3,34,196,20,"总页眉：《两个发货单的演示》");
+		LODOP.SET_PRINT_STYLEA(0,"ItemType",1);		
+		LODOP.PREVIEW();	
+	};	
+</script>
+		
+
+</body>

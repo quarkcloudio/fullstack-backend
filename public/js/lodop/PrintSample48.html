@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>WEB打印控件LODOP的样例四十八:用Lodop进行文字朗读</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示如何用LODOP实现文字朗读：</font></h2>
+<p>用函数<font color="#0000ff">FORMAT</font>可以把文字转换(朗读)成声音或WAVE文件，两个语句举例如下：</p>
+
+<p><font color="#0000ff">LODOP.FORMAT(&quot;VOICE:0;50&quot;,&quot;Hello,您好！&quot;);</font></p>
+
+<p><font color="#0000ff">LODOP.FORMAT(&quot;FILE:WAVE,c:/lodoptest.wav&quot;,&quot;Hello,您好！&quot;);</font></p>
+<p>参数说明:</p>
+<p>其中“<font color="#0000ff">VOICE:”</font>和“<font color="#0000ff">FILE:WAVE,</font>”是关键字，分别控制朗读和生成wav文件。</p>     
+<p>紧跟<font color="#0000ff">VOICE:</font>的<font color="#0000ff">0</font>和<font color="#0000ff">50</font>是“语速(范围-10~10)”和“音量(范围0~100)”的值，二者用分号隔开。</p>     
+<p>紧跟<font color="#0000ff">FILE:WAVE,</font>的是Wave文件路径和名称，第二个参数里是要朗读的文字内容。</p>    
+<p><font color="#009999" size="3">演示：</font>  
+<font size="2"><input type="button" value="朗读以下内容" onClick="Speak()"></font>       
+<font size="2"><input type="button" value="转换成Wave文件" onClick="SpeaktoFile()"></font>  
+<font size="2"><input type="button" value="转换成功后播放该文件" onClick="PlayFile()"></font>       
+</p>  
+
+<p><textarea rows="5" id="doc1" cols="102">Hello,您好，欢迎使用Lodop！
+本功能给高级注册用户使用，便于在各种浏览器中，都能进行语音合成，
+利用它可以让某些提醒业务，变地有声有色。
+</textarea></p>
+
+<p><i>注：客户端操作系统最好是Win7以上版本，或者<a href="http://ishare.iask.sina.com.cn/f/14124032.html?from=like" target="_blank">下载安装微软TTS语音引擎</a>。</i>(<a href="http://www.microsoft.com/en-us/download/details.aspx?id=27224"  target="_blank">微软官方下载地址</a>)</p>
+
+<a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>  
+<script language="javascript" type="text/javascript">    
+	function Speak() {	   
+		var LODOP=getLodop();     
+		LODOP.FORMAT("VOICE:0;50",document.getElementById("doc1").value);   
+	};	   
+	function SpeaktoFile() {	   
+		var LODOP=getLodop();     
+		var blResult=LODOP.FORMAT("FILE:WAVE,c:/lodoptest.wav",document.getElementById("doc1").value);
+		if (blResult) {alert("生成文件成功！");} else {alert("生成失败！");}
+	};	
+	function PlayFile() {	   
+		var LODOP=getLodop();     
+		LODOP.FORMAT("VOICE:0;50","c:/lodoptest.wav");   
+	};   
+</script>   
+</body>   
+</html>

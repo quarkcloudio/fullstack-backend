@@ -1,0 +1,272 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例二十二:构建自己的纯WEB打印预览</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+<h2><font color="#009999">演示构建自己的纯WEB打印预览：</font></h2>
+
+<div id="splist" style="OVERFLOW-Y: scroll; WIDTH: 100%; POSITION: HEIGHT: 200px">
+  <table class="tableframe2" style="WORD-BREAK: break-all" width="97%" align="center" height="87">
+    <tbody>
+      <tr id="id1" style="BACKGROUND-COLOR: #dae2ed">
+        <td  align="center" width="15%" height="21" bgcolor="#C0C0C0">
+          <p align="center"><b>商品编号</b></p>
+        </td>
+        <td  align="center" width="31%" bgcolor="#C0C0C0" height="21"><b>商品名称</b></td>
+        <td  align="center" width="14%" bgcolor="#C0C0C0" height="21"><b>数量</b></td>
+        <td  align="center" width="15%" bgcolor="#C0C0C0" height="21"><b>单价(元)</b></td>
+      </tr>
+      <tr    style="BACKGROUND-COLOR: #dae2ed">
+        <td   width="15%" height="11"><input type="text" id="BH1" value="001" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td> 
+        <td  align="center" width="31%" height="11"><input type="text" id="MC1" value="商品A" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+        <td  align="center" width="14%" height="11"><input type="text" id="SL1" value="10.00" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+        <td  align="center" width="15%" height="11"><input type="text" id="DJ1" value="500.00" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+      </tr>
+      <tr style="BACKGROUND-COLOR: #dae2ed">
+        <td   width="15%" height="1"><input type="text" id="BH2" value="002" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td> 
+        <td  align="center" width="31%" height="1"><input type="text" id="MC2" value="商品B" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+        <td  align="center" width="14%" height="1"><input type="text" id="SL2" value="15.00" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+        <td  align="center" width="15%" height="1"><input type="text" id="DJ2" value="20.00" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+      </tr>  
+      <tr style="BACKGROUND-COLOR: #dae2ed">
+        <td   width="15%" height="1"><input type="text"    id="BH3" value="003" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td> 
+        <td  align="center" width="31%" height="1"><input type="text"  id="MC3" value="商品C" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+        <td  align="center" width="14%" height="1"><input type="text"  id="SL3" value="6.00" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+        <td  align="center" width="15%" height="1"><input type="text"  id="DJ3" value="400.00" style="text-align:center;border:0px;background-color:#dae2ed" readonly=true></td>
+      </tr>        
+    </tbody>
+  </table>
+</div>
+<p>下面结合样例十六和十九的功能，设计出自己的预览界面（打印上面的商品卡片）：  
+</p>
+<table border="1" width="100%">
+  <tr>
+    <td width="6%" align="center"><a href="javascript:myAction1()">适高显示</a></td>
+    <td width="6%" align="center"><a href="javascript:myAction2()">正常显示</a></td>
+    <td width="6%" align="center"><a href="javascript:myAction3()">适宽显示</a></td>
+    <td width="6%" align="center"><a href="javascript:myAction4()">拉近显示+</a></td>
+    <td width="6%" align="center"><a href="javascript:myAction5()">推远显示-</a></td>
+    <td width="6%" align="center">缩放打印
+	<select size="1" id="percent" onchange="myAction6()">
+    	   <option value="0">30%</option>
+	   <option value="1">50%</option>
+    	   <option value="2">60%</option>
+	   <option value="3">70%</option>
+    	   <option value="4">80%</option>
+	   <option value="5">85%</option>
+    	   <option value="6">90%</option>
+	   <option value="7">95%</option>
+    	   <option value="8">100%</option>
+	   <option value="9">125%</option>
+	   <option value="10">150%</option>
+    	   <option value="11">200%</option>
+	   <option value="12">按整宽</option>
+    	   <option value="13">按整高</option>
+	   <option value="14" selected>按整页</option>
+	   <option value="15">整宽不变形</option>
+	   <option value="16">整高不变形</option>
+	   <option value="17">其它比例</option>
+	</select>
+    </td>
+    <td width="5%" align="center"><a href="javascript:myAction7()">首页</a></td>
+    <td width="6%" align="center"><a href="javascript:myAction8()">上一页</a></td>
+    <td width="6%" align="center"><a href="javascript:myAction9()">下一页</a></td>
+    <td width="5%" align="center"><a href="javascript:myAction10()">尾页</a></td>
+    <td width="6%" align="center">到:<input size=1 id="inputpage" value="1" oninput="myAction11()" onpropertychange="myAction11()"></input>页</td>
+    <td width="7%" align="center"><a href="javascript:myAction12()">打印设置</a></td>
+    <td width="7%" align="center"><a href="javascript:myAction13()">打印全部</a></td>
+    <td width="7%" align="center"><a href="javascript:myAction14()">打印本页</a></td>
+    <td width="9%" align="center"><a href="javascript:myAction15()">旋转(横打时)</a></td>
+    <td width="9%" align="center"><a href="javascript:myAction16()">关闭</a></td>
+  </tr>
+  <tr>
+    <td width="100%" colspan="16"> 
+	<object id="LODOP_X" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=100% height=500> 
+	        <param name="Color" value="#ADD8E6"> 
+		<embed id="LODOP_EM" TYPE="application/x-print-lodop" width=100% height=500 color="#ADD8E6"  PLUGINSPAGE="install_lodop32.exe"></embed>
+	</object> 
+    </td>
+  </tr>
+</table>
+说实在的，我以上设计的预览界面很是一般，但你可以发挥超文本优势，构建出与众不同的预览界面。下面这些数据或许有用：
+<p> 
+<input type="button" value="获得纸张宽度(0.1mm):" onclick="document.getElementById('S1').value=LODOP.GET_VALUE('PRINTSETUP_PAGE_WIDTH',0)">     
+  <input type="text" id="S1" size="20">         
+</p>
+<p> 
+<input type="button" value="获得纸张高度(0.1mm):" onclick="document.getElementById('S2').value=LODOP.GET_VALUE('PRINTSETUP_PAGE_HEIGHT',0)">     
+  <input type="text" id="S2" size="20">         
+</p>
+<p> 
+<input type="button" value="可打印宽度(0.1mm):" onclick="document.getElementById('S3').value=LODOP.GET_VALUE('PRINTSETUP_SIZE_WIDTH',0)">     
+  <input type="text" id="S3" size="20">         
+</p>
+<p> 
+<input type="button" value="可打印高度(0.1mm):" onclick="document.getElementById('S4').value=LODOP.GET_VALUE('PRINTSETUP_SIZE_HEIGHT',0)">     
+  <input type="text" id="S4" size="20">         
+</p>
+<p> 
+<input type="button" value="不可打上边距(0.1mm):" onclick="document.getElementById('S5').value=LODOP.GET_VALUE('PRINTSETUP_topmargin',0)">     
+  <input type="text" id="S5" size="20">         
+</p>
+<p> 
+<input type="button" value="不可打左边距(0.1mm):" onclick="document.getElementById('S6').value=LODOP.GET_VALUE('PRINTSETUP_LEFTMARGIN',0)">     
+  <input type="text" id="S6" size="20">         
+</p>
+<p> 
+<input type="button" value="纸张(表单)名:" onclick="document.getElementById('S7').value=LODOP.GET_VALUE('PRINTSETUP_PAGESIZE_NAME',0)">     
+  <input type="text" id="S7" size="20"></input>   
+</p>
+<p> 
+<input type="button" value="所选打印机名:" onclick="document.getElementById('S8').value=LODOP.GET_VALUE('PRINTSETUP_PRINTER_NAME',0)">     
+  <input type="text" id="S8" size="50"></input>（用PRINTSETUP_PRINTER_INDEX获得打印机序号）
+</p>
+<p> 
+<input type="button" value="打印方向:" onclick="document.getElementById('S9').value=LODOP.GET_VALUE('PRINTSETUP_ORIENT',0)">     
+  <input type="text" id="S9" size="5"></input>0:纵向打印   1:横向打印
+</p>
+<p> 
+<input type="button" value="已打印的次数:" onclick="document.getElementById('T1').value=LODOP.GET_VALUE('PRINTED_TIMES',0)">     
+  <input type="text" id="T1" size="6"></input>      
+</p>
+<p> 
+<input type="button" value="设置每次打印的份数:" onclick="document.getElementById('S10').value=LODOP.GET_VALUE('PRINTSETUP_COPIES',0)">     
+  <input type="text" id="S10" size="5"></input>   
+</p> 
+<p>  
+<input type="button" value="每份的总页数:" onclick="document.getElementById('S11').value=LODOP.GET_VALUE('PRINTSETUP_PAGE_COUNT',0)">     
+  <input type="text" id="S11" size="20">（执行打印或预览指令后才正确）         
+</p>
+<p> 
+<input type="button" value="起始页号:" onclick="document.getElementById('S12').value=LODOP.GET_VALUE('PRINTSETUP_FIRST_PAGE',0)">     
+  <input type="text" id="S12" size="5"></input> （执行打印或预览指令后才正确）   
+</p>
+<p> 
+<input type="button" value="结束页号:" onclick="document.getElementById('S13').value=LODOP.GET_VALUE('PRINTSETUP_LAST_PAGE',0)">     
+  <input type="text" id="S13" size="5"></input> （执行打印或预览指令后才正确）   
+</p>
+<p> 
+<input type="button" value="缩放打印的比例:" onclick="document.getElementById('S14').value=LODOP.GET_VALUE('PRINTSETUP_PERCENT',0)">     
+  <input type="text" id="S14" size="5"></input><br>  
+0:30% 1:50% 2:60% 3:70% 4:80% 5:85% 6:90% 7:95% 8:100% 9:125% 10:150% 11:200% 12:按整宽 13:按整高 14:按整页 15:整宽不变形 16:整高不变形 17:自定比例        
+</p>
+<p> 
+<input type="button" value="当前页号（预览时才能读）:" onclick="document.getElementById('Y1').value=LODOP.GET_VALUE('PREVIEW_PAGE_NUMBER',0)">     
+  <input type="text" id="Y1" size="20">         
+</p>
+<p> 
+<input type="button" value="缩放显示的比例（预览时才能读）:" onclick="document.getElementById('Y2').value=LODOP.GET_VALUE('PREVIEW_ZOOM_STATE',0)">     
+  <input type="text" id="Y2" size="5"></input>
+0:适高  1:适宽  2:缩25%  3:缩50%  4:缩75%  5:正常  6:放150%  7:放200%  8:放300%  9:放500%     
+</p>
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>
+</p>
+<script language="javascript" type="text/javascript"> 
+	var LODOP; //声明为全局变量
+	var blPreviewOpen=false;
+	function myAction1(){	
+		if (!blPreviewOpen) OpenPreview();		
+		LODOP.DO_ACTION("PREVIEW_ZOOM_HIGHT",0);	
+	};
+	function myAction2(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_ZOOM_NORMAL",0);	
+	};
+	function myAction3(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_ZOOM_WIDTH",0);	
+	};
+	function myAction4(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_ZOOM_IN",0);	
+	};
+	function myAction5(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_ZOOM_OUT",0);	
+	};
+	function myAction6(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_PERCENT",document.getElementById('percent').value);	
+	};
+	function myAction7(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_GOFIRST",0);	
+	};
+	function myAction8(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_GOPRIOR",0);	
+	};
+	function myAction9(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_GONEXT",0);	
+	};
+	function myAction10(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_GOLAST",0);	
+	};
+	function myAction11(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_GOTO",document.getElementById('inputpage').value);//PREVIEW_GOSKIP	
+	};
+	function myAction12(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_SETUP",0);
+	};
+	function myAction13(){	
+		if (!blPreviewOpen) OpenPreview();
+		var iPageCount=LODOP.GET_VALUE("PREVIEW_PAGE_COUNT",0);//获得页数
+		LODOP.SET_PRINT_MODE("PRINT_START_PAGE",1);
+		LODOP.SET_PRINT_MODE("PRINT_END_PAGE",iPageCount);	
+		LODOP.DO_ACTION("PREVIEW_PRINT",0);	
+	};
+	function myAction14(){	
+		if (!blPreviewOpen) OpenPreview();
+		var iThisNumber=LODOP.GET_VALUE("PREVIEW_PAGE_NUMBER",0);//获得当前页号
+		LODOP.SET_PRINT_MODE("PRINT_START_PAGE",iThisNumber);
+		LODOP.SET_PRINT_MODE("PRINT_END_PAGE",iThisNumber);	
+		LODOP.DO_ACTION("PREVIEW_PRINT",0);	
+	};
+	function myAction15(){	
+		if (!blPreviewOpen) OpenPreview();	
+		LODOP.DO_ACTION("PREVIEW_ROTATE",0);	
+	};
+	function myAction16(){	
+		if (!blPreviewOpen) return;	
+		LODOP.DO_ACTION("PREVIEW_CLOSE",0);
+		blPreviewOpen=false;	
+	};
+	function OpenPreview() {
+	        LODOP=getLodop(document.getElementById('LODOP_X'),document.getElementById('LODOP_EM')); 
+		LODOP.PRINT_INIT("打印控件Lodop功能演示_自己设计预览界面");
+		LODOP.SET_PRINT_STYLE("FontSize",21);
+		for(i=1;i<4;i++){
+	        	var strBH=document.getElementById("BH"+i).value;
+		   	var strMC=document.getElementById("MC"+i).value;
+			var strSL=document.getElementById("SL"+i).value;
+			var strDJ=document.getElementById("DJ"+i).value;
+			LODOP.NEWPAGEA();
+			LODOP.ADD_PRINT_RECT(10,18,324,392,0,1);
+			LODOP.ADD_PRINT_TEXT(61,58,258,54,"商品编号："+strBH);
+			LODOP.ADD_PRINT_TEXT(145,58,258,54,"商品名称："+strMC);
+			LODOP.ADD_PRINT_TEXT(229,58,258,54,"商品数量："+strSL);
+			LODOP.ADD_PRINT_TEXT(312,58,258,54,"商品单价："+strDJ);
+		}	
+		//LODOP.SET_PRINT_PAGESIZE(0,1380,2450,"A4");
+		LODOP.SET_PRINT_MODE("PRINT_PAGE_PERCENT","Full-Page");//按整页缩放
+		LODOP.SET_SHOW_MODE("HIDE_PAPER_BOARD",true);//隐藏走纸板
+		LODOP.SET_PREVIEW_WINDOW(0,3,0,0,0,""); //隐藏工具条，设置适高显示
+		LODOP.SET_SHOW_MODE("PREVIEW_IN_BROWSE",true); //预览界面内嵌到页面内
+		LODOP.PREVIEW();
+		blPreviewOpen=true;			
+	};
+	window.onload = function(){  
+	    OpenPreview();
+	};		
+</script>
+
+</body>
+</html>

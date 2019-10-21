@@ -1,0 +1,36 @@
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0>
+  <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="./install_lodop32.exe"></embed>
+</object>
+
+<button>打印</button>
+<script language="javascript" src="./LodopFuncs.js"></script>
+<script>
+  var LODOP; //声明为全局变量
+  LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));    
+  LODOP.PRINT_INIT('title');  //打印初始化 必须，否则图片不能更新
+  var url = "http://nianhuodaji.qa114.com/common/qrcode/index?text=http://nianhuodaji.qa114.com/mobile/coupons/exchange?sign=";
+  var strFormHtml="<img width=100 height=100 src='"+url+"'></body>";
+  LODOP.SET_PRINT_PAGESIZE(1,400,500,'签到标签');
+  LODOP.ADD_PRINT_TEXT("0.74cm","4cm","4cm",20,'有效期至');
+  LODOP.SET_PRINT_STYLEA(0,"FontSize",9);
+  LODOP.SET_PRINT_STYLEA(0,"Alignment",2);
+  LODOP.SET_PRINT_STYLEA(0,"FontName","微软雅黑");
+  LODOP.SET_PRINT_STYLEA(0,"Angle",180);
+  LODOP.ADD_PRINT_TEXT("1.35cm","4cm","4cm","0.53cm",'有效期至');
+  LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
+  LODOP.SET_PRINT_STYLEA(0,"Alignment",2);
+  LODOP.SET_PRINT_STYLEA(0,"Bold",1);
+  LODOP.SET_PRINT_STYLEA(0,"FontName","微软雅黑");
+  LODOP.SET_PRINT_STYLEA(0,"Angle",180);
+  LODOP.ADD_PRINT_TEXT("2.01cm","4cm","4cm",20,'有效期至');
+  LODOP.SET_PRINT_STYLEA(0,"Alignment",2);
+  LODOP.SET_PRINT_STYLEA(0,"Bold",1);
+  LODOP.SET_PRINT_STYLEA(0,"FontSize",14);					
+  LODOP.SET_PRINT_STYLEA(0,"FontName","微软雅黑");
+  LODOP.SET_PRINT_STYLEA(0,"Angle",180);
+  LODOP.ADD_PRINT_IMAGE(75,26,100,100,strFormHtml);
+  LODOP.SET_PRINT_STYLEA(0,"Alignment",2);
+  LODOP.SET_PRINT_STYLEA(0,"AngleOfPageInside",180);
+  LODOP.PRINT_DESIGN();
+  LODOP.PRINT();
+</script>

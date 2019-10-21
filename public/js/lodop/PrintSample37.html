@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例三十七:打印公章效果图</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示打印公章效果图：</font></h2>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 传统方式打印公章都是把图片的z-index设为负值，这其实是把公章图以背景形式输出，</p>    
+<p>但实际上公章应该在字的上面，也就是“先字后章”才对，Lodop通过设置transcolor属性实现了该效果，</p>
+
+<p>进入如下的<a href="javascript:myPreview1()">打印预览</a>看看，注意左右两个公章图在预览时与文字的层次差别。</p>
+
+<div id="div1">  
+<table border="1" width="611" style="border-collapse: collapse" bordercolor="#000000">
+  <tr><td width="100%" colspan="2" style="border:1px solid"><div align="center">证明函</div></td></tr>
+  <tr>
+    <td width="100%" height="35" colspan="2" style="border:1px solid">&nbsp; 事宜：兹证明郭德强先生在本部门的所有借款全部还清。2011年1月6日。</td>    
+  </tr> 
+  <tr> 
+    <td width="45%" height="156" style="border:1px solid">&nbsp;&nbsp; 
+      <p>财务部门名称（盖章）：</p> 
+      <p>集团公司金融投资管理部</p> 
+      <p>　</p> 
+    </td> 
+    <td width="55%" height="156" style="border:1px solid">　 
+      <p>所在单位名称（盖章）：</p> 
+      <p>集团公司第二销售分公司</p>   
+      <p>　</p></td> 
+  </tr> 
+</table> 
+<img border="0" src="http://static15.photo.sina.com.cn/middle/4fe4ba17t993d651b55ce&690"  
+style="z-index: -1; position: absolute; left:100px; top:230px;" />   
+<img border="0" transcolor="#FFFFFF" src="http://static15.photo.sina.com.cn/middle/4fe4ba17t993d651b55ce&690"          
+style="z-index: -1; position: absolute; left:350px; top:230px;" />  
+</div> 
+ 
+<p>要实现右边的“后盖章”效果,需要图片本身透色部分要纯正(白则“纯”白)。</p>
+
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a></p>
+
+<script language="javascript" type="text/javascript"> 
+	var LODOP; //声明为全局变量 
+	function myPreview1() {		
+		LODOP=getLodop(); 		
+		LODOP.PRINT_INIT("打印插件功能演示_Lodop功能_打印公章");
+		LODOP.ADD_PRINT_HTM(0,0,"100%","100%",document.documentElement.innerHTML);
+		LODOP.PREVIEW();	
+	};				
+</script> 
+
+
+
+</body>
+</html>

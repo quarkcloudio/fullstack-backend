@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例三十一:打印Table的分页小计和合计</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示打印Table的分页小计和合计：</font></h2>
+ 
+利用<font size="3" color="blue"><span LANG="ZH">ADD_PRINT_TABLE</span></font>专用超文本元素属性可以轻松实现分页小计、累计、分类统计、页数及总合计等功能，<br>
+这四个属性是：<font color="blue">tdata、format、tclass、tindex</font> 它们可以用在table内任何元素上，详细解释和演示如下：<br><br>
+<b>一、属性“<font color="blue">tdata</font>”：</b>设置统计类型，属性值及对应含义如下:
+<table border=0 width="939" >
+  <tr>
+    <td width="128"><font size="2" color="blue">SubCount</font><font size="2">(本页行数)</font></td>
+    <td width="215"><font size="2"><font color="blue">SubDistinctCount</font>(本页非重复行数) </font>
+    </td>
+    <td width="122"><font size="2"><font color="blue">SubSum</font>(本页合计)<font color="blue"> </font></font>
+    </td>
+    <td width="153"><font size="2"><font color="blue">SubAverage</font>(本页平均数) </font>
+    </td>
+    <td width="155"><font size="2"><font color="blue">SubMax</font>(本页最大值)</font></td>
+    <td width="133"><font size="2"><font color="blue">SubMin</font>(本页最小值)</font></td>
+  </tr>
+  <tr>
+    <td width="128"><font size="2">
+<font color="blue">Count</font>(目前累计行数)</font></td>
+    <td width="215"><font size="2"><font color="blue">DistinctCount</font>(目前累计非重复行数) </font>
+    </td>
+    <td width="122"><font size="2"><font color="blue">Sum</font>(目前累计数) </font>
+    </td>
+    <td width="153"><font size="2"><font color="blue">Average</font>(目前累计平均数) </font>
+    </td>
+    <td width="155"><font size="2"><font color="blue">Max</font>(目前最大值) </font>
+    </td>
+    <td width="133"><font size="2"><font color="blue">&nbsp;Min</font>(目前最小值)</font></td>
+  </tr>
+  <tr>
+    <td width="128"><font size="2">
+    <font color="blue">AllCount</font>(全表总行数)</font></td>
+    <td width="215"><font color="blue" size="2">AllDistinctCount</font><font size="2">(全表非重复行数) </font>
+    </td>
+    <td width="122"><font size="2"><font color="blue">AllSum</font>(全表总合计) </font>
+    </td>
+    <td width="153"><font size="2"><font color="blue">AllAverage</font>(全表总平均)</font></td>
+    <td width="155"><font size="2"><font color="blue">AllMax</font>(全表最大值) </font>
+    </td>
+    <td width="133"><font size="2"><font color="blue">AllMin</font>(全表最小值)</font></td>
+  </tr>
+  <tr>
+    <td width="128"><font size="2">
+    <font color="blue">PageNO</font>(页号)</font></td>
+    <td width="215"><font size="2">
+    <font color="blue">PageCount</font>(页数)</font></td>
+    <td width="563" colspan="4">&nbsp;</td>
+  </tr>
+</table>
+<font size="2">以上属性值还可以组合成表达式, 甚至以复杂四则运算形式统计运算, 表达式内除了"<font color="blue">加+减-乘*除/</font>"和"<font color="blue">括号( )</font>"外，还支持数学函数：<br>
+<font color="blue">Trunc Round Sqrt Int Sqr Abs Sin Cos Tan Arcsin Arccos Arctin Logo10 Log2 Round1-6</font>等, 
+表格内单元格原始(或统计结果)数据可用其id值参与运算。<br />
+<br>
+</font><b>二、属性“<font color="blue">format</font>”：</b>设置数据格式，属性值样式如下：<br>
+&nbsp;&nbsp; “<font color="blue">0</font>” “<font color="blue">0.00</font>” “<font color="blue">#.##</font>”                         
+“<font color="blue">#,##0.00</font>”“<font color="blue">0.000E+00</font>”“<font color="blue">#.###E-0 
+</font> ”“<font color="blue">UpperMoney</font>(大写金额)”“<font color="blue">ChineseNum</font>(中文数字)”等等...<br>
+<br />
+<b>三、属性“<font color="blue">tclass</font>”：</b>设置统计分组(也就是分类统计)，属性值任意，参见本演示的“A型”“B型”个数统计。<br>
+<br />
+<b>四、属性“<font color="blue">tindex</font>”：</b>设置统计的目标列，默认情况下是同列统计，也就是统计结果与目标列一致，如果无法一致
+时，<br>
+&nbsp;&nbsp;&nbsp;&nbsp; 可以用其指定具体列，属性值是数字型的列序号，从1起始。<br>        
+<br />
+<b>五、占位符：</b>统计结果的占位符是任意个“<font color="blue">#</font>”组成的字符串，当结果值较大时，注意占位符要足够多,除非周围有空白区。<br><br>
+<b>六、演示：</b>点<a href="javascript:PrintMytable();"><b>预览打印</b></a>如下表格，观察表格的分页小计、累计、分类统计、页数以及总合计等。
+
+<div id="div1">
+
+<table border=1 width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse" bordercolor="#000000">
+<caption><b>报表统计演示</b></caption>
+<thead>
+<tr>
+<th width="100%" colspan="5" tindex="1">
+  当前是第<font tdata="PageNO" format="ChineseNum" color="blue">##</font>页</span>/共<font tdata="PageCount" format="ChineseNum" color="blue">##</font></span>页，
+  本页从第<font color="blue" format="00" tdata="Count-SubCount+1">##</font>行到第<font color="blue" tdata="Count">##</font>行</th>
+</tr>
+<tr>
+<th width="20%">型号</th>
+<th width="26%">数量</th>
+<th width="28%" colspan="2">金额</th>
+<th width="26%">单价</th>
+</tr>
+</thead>
+
+<tr>
+<td width="20%" tclass="a">A1</td>        
+<td width="26%">10</td>        
+<td width="28%" colspan="2"><input value=15.00></td>
+<td width="26%">1.5</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="a">A2</td>
+<td width="26%">20.5</td>
+<td width="28%" colspan="2"><textarea rows="1" style="border-width: 0px">41.00</textarea></td>
+<td width="26%">2.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="a">A3</td>
+<td width="26%">10</td>
+<td width="28%" colspan="2">20.00</td>
+<td width="26%">2.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="a">A4</td>
+<td width="26%">30</td>
+<td width="28%" colspan="2">30.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="a">A5</td>
+<td width="26%">25</td>
+<td width="28%" colspan="2">50.00</td>
+<td width="26%">2.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="a">A6</td>
+<td width="26%">20</td>
+<td width="28%" colspan="2">20.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" rowspan="3" tclass="b">Bx</td>
+<td width="26%">45</td>
+<td width="28%" colspan="2">90.00</td>
+<td width="26%">2.0</td>
+</tr>
+
+<tr>
+<td width="26%">100</td>
+<td width="28%" colspan="2">150.00</td>
+<td width="26%">1.5</td>
+</tr>
+
+<tr>
+<td width="26%">10,000</td>
+<td width="28%" colspan="2">11,000.00</td>
+<td width="26%">11</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B0</td>
+<td width="26%">15</td>
+<td width="28%" colspan="2">15.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B0</td>
+<td width="26%">24</td>
+<td width="28%" colspan="2">48.00</td>
+<td width="26%">2.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B1</td>
+<td width="26%">1</td>
+<td width="28%" colspan="2">5.60</td>
+<td width="26%">5.6</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B2</td>
+<td width="26%">180</td>
+<td width="28%" colspan="2">180.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B12</td>
+<td width="26%">0</td>
+<td width="28%"colspan="2">50.00</td>
+<td width="26%">　</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B13</td>
+<td width="26%">30</td>
+<td width="28%" colspan="2">300.00</td>
+<td width="26%">10.0</td>
+</tr>
+
+
+<tr>
+<td width="481" colspan="2">本表截止当前行累积金额：
+</td>
+<td width="657" colspan="3"><font color="blue" tdata="Sum" format="#,##0.00" tindex="3" >######</font>
+</td>
+</tr>
+
+
+<tr>
+<td width="20%" ><font color="blue" tdata="SubCount" format="#" >显示行号：本页第######行</font></td>
+<td width="26%">20</td>
+<td width="28%" colspan="2">400.00</td>
+<td width="26%">20.0</td>
+</tr>
+
+<tr>
+<td width="20%" ><font color="blue" tdata="SubCount" format="#" >显示行号：本页第######行</font></td>
+<td width="26%">25</td>
+<td width="28%" colspan="2">50.00</td>
+<td width="26%">2.0</td>
+</tr>
+<tr>
+<td width="20%" tclass="b">B17</td>
+<td width="26%">90</td>
+<td width="28%" colspan="2">90.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B18</td>
+<td width="26%">0</td>
+<td width="28%" colspan="2">24.00</td>
+
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B19</td>
+<td width="26%">33</td>
+<td width="28%" colspan="2">66.00</td>
+<td width="26%">2.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B20</td>
+<td width="26%">100</td>
+<td width="28%" colspan="2">560.00</td>
+<td width="26%">5.6</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B21</td>
+<td width="26%">120</td>
+<td width="28%" colspan="2">120.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="b">B22</td>
+<td width="26%">150</td>
+<td width="28%" colspan="2">150.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="c">C23</td>
+<td width="26%">70</td>
+<td width="28%" colspan="2">70.00</td>
+<td width="26%">1.0</td>
+</tr>
+
+<tr>
+<td width="20%" tclass="c">C24</td>
+<td width="26%">800</td>
+<td width="28%" colspan="2">80.00</td>
+<td width="26%">0.1</td>
+</tr>
+
+<tr>
+<td width="374" colspan="2">截止表尾累积金额
+</td>
+<td width="202"><font color="blue" tdata="Sum" format="#,##0.00" tindex="3" >######</font>
+</td>
+<td width="363" colspan="2"><font color="blue" tdata="Sum" format="UpperMoney" tindex="3" >######</font>
+</td>
+</tr>
+
+<tfoot>
+<tr>
+<th width="20%" align="left" >
+本页本列行数:<font  tdata="SubCount" format="#" color="blue">###</font></th>
+<th align="left" width="26%" tdata="SubSum" format="#.##">
+本页数量小计：<font color="blue">######</font></th>
+<th width="14%" align="right" >本页金额小计</th>
+<th width="19%" tdata="SubSum" format="#,##0.00" align="right" ><font color="blue" id="id01">###元</font></th>
+<th width="21%"  align="left"tdata="SubAverage" format="#.00" >
+本页均价：<font color="blue">######</font></th>
+</tr>
+<tr>
+<th width="20%" align="left">本页非重复行:<font tdata="SubDistinctCount" format="#" color="blue">##</font></th>
+<th width="26%" tdata="Sum" format="#.##" align="left">
+数量累计：<font color="blue">######</font></th>
+<th width="14%" align="right">金额累计</th>
+<th width="19%" tdata="Sum" format="#,##0.00" align="right"><font color="blue">￥###</font></th>
+<th width="21%" tdata="Average" format="#.00" align="left">累计均价：<font color="blue">######</font></th>
+</tr>
+<tr>
+<th width="20%" align="left">全表总的行数:<font color="blue" tdata="AllCount" format="0">###</font></th>
+<th width="26%" tdata="AllSum" format="#.##" align="left">
+全表数量总计：<font color="blue">######</font></th>
+<th width="14%" align="right">全表金额总计</th>
+<th width="19%" tdata="AllSum" format="#,##0.00" align="right"><font color="blue" id="id02">￥###</font></th>
+<th width="21%" tdata="AllAverage" format="#.00" align="left">全表均价：<font color="blue">######</font></th>
+</tr>
+<tr>
+<th width="22%" tdata="SubCount" format="0" align="left" >
+  本页A型：<font color="blue" tclass="a">##</font>行<br>
+  本页B型：<font color="blue" tclass="b" tindex="1">##</font>行
+</th>
+<th width="22%" align="left" >
+  本页数量最大值：<font color="blue">
+  <span tdata="SubMax">######</span></font><br>
+  本页数量最小值：<font color="blue">
+  <span tdata="SubMin">######</span></font><br>
+</th>
+<th width="22%" align="left" colspan="3">
+用公式 <font color="#009999">(id01/id02)*100</font> 计算本页金额占比:
+<font color="blue" tdata="(id01/id02)*100" format="#.00">#####%<br>
+</font>（这俩id对应"金额小计"和"金额总计"）</th>
+</tr>
+</tfoot>
+</table>
+</div>
+
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a></p>
+<script language="javascript" type="text/javascript"> 
+	var LODOP; //声明为全局变量
+	function PrintMytable(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_打印表格");
+		LODOP.ADD_PRINT_TABLE(100,1,"99.8%",250,document.getElementById("div1").innerHTML);
+		LODOP.PREVIEW();			
+	};		
+</script>
+</body>

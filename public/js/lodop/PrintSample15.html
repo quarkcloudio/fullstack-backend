@@ -1,0 +1,347 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例十五:打印有页头页尾的表格</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示打印有页头页尾的表格：</font></h2>
+<p>打印表格的方式有两种，函数如下：</p>  
+<p><font color="#0000FF">ADD_PRINT_TABLE(intTop,intLeft,intWidth,intheight,strHTML);</font>用超文本打印<font color="#0000FF"><br>
+ADD_PRINT_TBURL(intTop,intLeft,intWidth,intheight,strURL);</font>按URL地址打印</p>  
+<p>控件将页面元素<b><font color="#0000FF">thead</font></b>的内容做页头，将元素<font color="#0000FF"><b>tfoot</b></font>的内容做页尾</p>  
+<h2><font color="#009999">演示：</font></h2>  
+<p><b>一、<a href="javascript:PrintOneURL();">预览打印</a>如下URL的表格</b>：<br>
+<input type="text" id="T1" size="78" value="http://www.w3school.com.cn/tiy/loadtext.asp?f=xmle_cd_catalog_island_thead">
+</p>  
+<p><br>
+<b>二、控制表格在每页的输出高度：</b>
+</p>  
+<p>在纸张的一个小区域(宽<font size="2">500px×高280px</font>)内输出如下表格，因打不完而分页，分页后每页都输出页头页尾。
+</p>  
+<p>注意如下粗体内容在thead和tfoot标签内，被当做页头页尾。每页的高度<font color="#0000FF">280px</font>是否包含页头页尾是可选的：</p>
+<p><input type="radio" value="0" name="Radio1" onclick="check(this.value)">不包含            
+  <input type="radio" value="1" checked name="Radio1" onclick="check(this.value)">包含头和尾(默认)            
+  <input type="radio" value="2" name="Radio1" onclick="check(this.value)">只包含页头           
+  <input type="radio" value="3" name="Radio1" onclick="check(this.value)">只包含页尾</p>
+<p>看一下<a href="javascript:PreviewMytable();">预览打印</a>或<a href="javascript:DesignMytable();">打印设计</a></p>
+
+<p><b>三、在横向的A4纸张内“满页”<a href="javascript:PrintInFullPage();">预览打印</a>如下表格</b>：</p>
+
+<div id="div1">
+
+<style>td{border:1px solid #000;}</style>
+
+<table border=1 width="100%" style="border:solid 1px black;border-collapse:collapse">
+
+<thead>
+<tr><td width="33%" rowspan="2"><b><font face="宋体" size="2">作者<font color="#000000">(<i>Artist</i>)</font></font></b></td>
+<td width="33%"><b><font face="宋体" size="2">歌曲题目</font></b>
+</td>
+<td width="33%" rowspan="2"><b><font face="宋体" size="2">国籍<font color="#000000"><i>(Country)</i></font></font></b></td></tr>
+<tr>
+<td width="34%"><b><font color="#000000" face="宋体" size="2"><i>CD Title</i></font></b>  
+</td>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td width="33%">Bob Dylan</td>        
+<td width="33%">Empire Burlesque</td>
+<td width="34%">USA</td>
+</tr>
+<tr>
+<td width="33%">Bonnie Tyler</td>
+<td width="33%">Hide your heart</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Dolly Parton</td>
+<td width="33%">Greatest Hits</td>
+<td width="34%">USA</td>
+</tr>
+<tr>
+<td width="33%">Gary Moore</td>
+<td width="33%">Still got the blues</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Eros Ramazzotti</td>
+<td width="33%">Eros</td>
+<td width="34%">EU</td>
+</tr>
+<tr>
+<td width="33%">Bee Gees</td>
+<td width="33%">One night only</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Dr.Hook</td>
+<td width="33%">Sylvias Mother</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Rod Stewart</td>
+<td width="33%">Maggie May</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Andrea Bocelli</td>
+<td width="33%">Romanza</td>
+<td width="34%">EU</td>
+</tr>
+<tr>
+<td width="33%">Percy Sledge</td>
+<td width="33%">When a man loves a woman</td>
+<td width="34%">USA</td>
+</tr>
+<tr>
+<td width="33%">Savage Rose</td>
+<td width="33%">Black angel</td>
+<td width="34%">EU</td>
+</tr>
+<tr>
+<td width="33%">Many</td>
+<td width="33%">1999 Grammy Nominees</td>
+<td width="34%">USA</td>
+</tr>
+<tr>
+<td width="33%">Kenny Rogers</td>
+<td width="33%">For the good times</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Will Smith</td>
+<td width="33%">Big Willie style</td>
+<td width="34%">USA</td>
+</tr>
+<tr>
+<td width="33%">Van Morrison</td>
+<td width="33%">Tupelo Honey</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Cat Stevens</td>
+<td width="33%">the very best of</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Sam Brown</td>
+<td width="33%">Stop</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">T'Pau</td>
+<td width="33%">Bridge of Spies</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Tina Turner</td>
+<td width="33%">Private Dancer</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Kim Larsen</td>
+<td width="33%">Midt om natten</td>
+<td width="34%">EU</td>
+</tr>
+<tr>
+<td width="33%">Luciano Pavarotti</td>
+<td width="33%">Pavarotti Gala Concert</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Otis Redding</td>
+<td width="33%">the dock of the bay</td>
+<td width="34%">USA</td>
+</tr>
+<tr>
+<td width="33%">Simply Red</td>
+<td width="33%">Picture book</td>
+<td width="34%">EU</td>
+</tr>
+<tr>
+<td width="33%">the Communards</td>
+<td width="33%">Red</td>
+<td width="34%">UK</td>
+</tr>
+<tr>
+<td width="33%">Joe Cocker</td>
+<td width="33%">Unchain my heart</td>
+<td width="34%">USA</td>
+</tr>
+</tbody>
+<tfoot>
+<tr><th colspan=3 width="426"><b><font face="宋体" size="2">我的CD清单<font color="#000000"><i>(CD                
+    list gungho999@sina.com)</i></font></font></b></th></tr>            
+</tfoot>
+
+</table>
+
+</div>
+<p><b>四、表头表尾无边框演示：</b>
+</p>
+<p>利用表格style可以控制thead和tfoot部分没有边框,下表更接近实用表格，<a href="javascript:PrintNoBorderTable();">预览打印</a>看看：
+</p>
+
+<div id="div2">
+
+<style>table,th{border:none;height:18px} td{border: 1px solid #000;height:18px}</style>
+
+<table border=0 cellSpacing=0 cellPadding=0  width="100%" height="200" bordercolor="#000000" style="border-collapse:collapse">
+<caption><b><font face="黑体" size="4">产品入库汇总清单</font></b><br>(Caption内容只在首页)</caption>
+<thead>
+  <tr>
+    <th width="33%">日期：</th>
+    <th width="67%" colspan="2">部门名称:</th>
+  </tr>
+  <tr>
+    <td width="33%"><b>入库单编号</b></td>
+    <td width="33%"><b>产品名称</b></td>
+    <td width="32%"><b>数量</b></td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td width="33%">1</td>
+    <td width="33%">产品A</td>
+    <td width="34%">100</td>
+  </tr>
+  <tr>
+    <td width="33%">2</td>
+    <td width="33%">产品B</td>
+    <td width="34%">200</td>
+  </tr>
+  <tr>
+    <td width="33%">3</td>
+    <td width="33%">产品C</td>
+    <td width="34%">300</td>
+  </tr>
+    <tr>
+    <td width="33%">4</td>
+    <td width="33%">产品D</td>
+    <td width="34%">400　</td>
+  </tr>
+  <tr>
+    <td width="33%">5</td>
+    <td width="33%">产品E</td>
+    <td width="34%">500</td>
+  </tr>
+    <tr>
+    <td width="33%">6</td>
+    <td width="33%">产品F</td>
+    <td width="34%">600</td>
+  </tr>
+  <tr>
+    <td width="33%">7</td>
+    <td width="33%">产品J</td>
+    <td width="34%">700</td>
+  </tr>
+    <tr>
+    <td width="33%">8</td>
+    <td width="33%">产品H</td>
+    <td width="34%">800</td>
+  </tr>
+  <tr>
+    <td width="33%">9</td>
+    <td width="33%">产品I</td>
+    <td width="34%">900</td>
+  </tr>
+    <tr>
+    <td width="33%">10</td>
+    <td width="33%">产品J</td>
+    <td width="34%">110</td>
+  </tr>
+  <tr>
+    <td width="33%">11</td>
+    <td width="33%">产品K</td>
+    <td width="34%">120</td>
+  </tr>
+    <tr>
+    <td width="33%">12</td>
+    <td width="33%">产品L</td>
+    <td width="34%">130</td>
+  </tr>
+  <tr>
+    <td width="33%">13</td>
+    <td width="33%">产品M</td>
+    <td width="34%">140</td>
+  </tr>
+  <tr>
+    <td width="33%">14</td>
+    <td width="33%">产品N</td>
+    <td width="34%">150</td>
+  </tr>
+</tbody>
+<tfoot>
+  <tr>
+    <th width="100%" colspan="3"><b>经办人：</b></th>
+  </tr>
+  <tr>
+    <th width="100%" colspan="3">　</th>
+  </tr>
+  <tr>
+    <td width="100%" colspan="3"><b>带格线的每页备注：</b></td>
+  </tr>
+</tfoot>
+</table>
+</div>
+<p>　
+</p>
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>
+</p>
+<script language="javascript" type="text/javascript"> 
+	var LODOP; //声明为全局变量
+        var iRadioValue=1;
+	function PrintOneURL(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_按网址打印表格");
+		LODOP.ADD_PRINT_TBURL(46,90,800,300,document.getElementById("T1").value);
+		LODOP.SET_PRINT_STYLEA(0,"HOrient",3);
+		LODOP.SET_PRINT_STYLEA(0,"VOrient",3);
+		LODOP.PREVIEW();			
+	};	
+	function PreviewMytable(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_预览打印表格");
+		LODOP.ADD_PRINT_TABLE(100,5,500,280,document.getElementById("div1").innerHTML);
+		LODOP.SET_PRINT_STYLEA(0,"TableHeightScope",iRadioValue);		
+		LODOP.PREVIEW();
+	};	
+	function DesignMytable(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_打印设计表格");
+		LODOP.ADD_PRINT_TABLE(100,5,500,280,document.getElementById("div1").innerHTML);
+		LODOP.SET_PRINT_STYLEA(0,"TableHeightScope",iRadioValue);		
+		LODOP.PRINT_DESIGN();
+	};		
+	function PrintInFullPage(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_整页表格");
+		LODOP.SET_PRINT_PAGESIZE(2,0,0,"A4");	
+		LODOP.ADD_PRINT_TABLE("2%","1%","96%","98%",document.getElementById("div1").innerHTML);
+		LODOP.SET_PREVIEW_WINDOW(0,0,0,800,600,"");
+		LODOP.PREVIEW();				
+	};	
+	function PrintNoBorderTable(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_无边线表格");
+		LODOP.ADD_PRINT_TABLE(50,10,"50%",220,document.getElementById("div2").innerHTML);
+		//LODOP.SET_PRINT_STYLEA(0,"Top2Offset",-40); //这句可让次页起点向上移
+		LODOP.ADD_PRINT_HTM(2,0,"50%",200,"<body style='margin-top:0'>表格后面用<font color=blue>ADD_PRINT_HTM</font>附加其它备注</body>");
+		
+LODOP.SET_PRINT_STYLEA(0,"LinkedItem",-1);
+		LODOP.PREVIEW();
+	};		
+	function check(thisValue){
+	  iRadioValue=thisValue;
+	}
+</script>
+		
+
+</body>
+</html>

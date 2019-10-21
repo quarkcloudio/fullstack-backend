@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例二十四:如何选择界面皮肤</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><font color="#009999">演示如何选择界面皮肤：</font>
+</h2>
+<p><b>打印预览</b>与<b>设计维护</b>等界面可以另选底色(皮肤)，甚至自定颜色,函数如下：</p>  
+<p><font color="#0000FF">SET_SHOW_MODE(&quot;SKIN_TYPE&quot;,皮肤编号);</font></p>  
+<p><font color="#0000FF">SET_SHOW_MODE(&quot;SKIN_CUSTOM_COLOR&quot;,皮肤底色值);</font></p>  
+<h4>一、按编号选择皮肤</h4>  
+<table border="1" width="73%">
+  <tr>
+    <td width="37%">
+    <input type="radio" id="R0" name="RX">0号皮肤(缺省色,传统银灰色)<br>
+    <input type="radio" id="R1" name="RX" checked>1号皮肤(经典蓝)<br>
+    <input type="radio" id="R2" name="RX">2号皮肤(薰衣草紫)<br>
+    <input type="radio" id="R3" name="RX">3号皮肤(淡钢青)<br>
+    <input type="radio" id="R4" name="RX">4号皮肤（茶色棕）<br>
+    <input type="radio" id="R5" name="RX">5号皮肤(轻质板色)<br>
+    <input type="radio" id="R6" name="RX">6号皮肤(麦色)
+    </td>
+    <td width="28%">
+    <input type="radio" id="R7" name="RX">7号皮肤(紫罗兰)<br>
+    <input type="radio" id="R8" name="RX">8号皮肤(天蓝)<br>
+    <input type="radio" id="R9" name="RX">9号皮肤(镀银)<br>
+    <input type="radio" id="R10" name="RX">10号皮肤(沙滩棕)<br>
+    <input type="radio" id="R11" name="RX">11号皮肤(鲜肉色)<br>
+    <input type="radio" id="R12" name="RX">12号皮肤(粉末蓝)<br>
+    <input type="radio" id="R13" name="RX">13号皮肤(钒矿色)
+    </td>
+    <td width="35%">
+    <input type="radio" id="R14" name="RX">14号皮肤(浅绿)<br>
+    <input type="radio" id="R15" name="RX">15号皮肤(浅蓝)<br>
+    <input type="radio" id="R16" name="RX">16号皮肤(卡其布)<br>
+    <input type="radio" id="R17" name="RX">17号皮肤(秋麒麟)<br>
+    <input type="radio" id="R18" name="RX">18号皮肤(深海绿)<br>
+    <input type="radio" id="R19" name="RX">19号皮肤(深卡其)<br>
+    <input type="radio" id="R20" name="RX">20号皮肤(番茄桔)
+    </td>
+  </tr>
+</table>
+<p>演示按以上所选皮肤进入<a href="javascript:myPreview1()">打印预览</a>或<a href="javascript:myDesign1()">打印设计</a>看看。</p>  
+<h4>二、直接设置底色</h4>
+<p>演示以颜色值<input type="text" id="T1" size="13" value="#ADFF2F">为底色进入<a href="javascript:myPreview2()">打印预览</a>或<a href="javascript:mySetup2()">打印维护</a>看看。</p>
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>
+</p>
+<script language="javascript" type="text/javascript"> 
+	var LODOP; //声明为全局变量
+	function myPreview1() {	
+		CreatePage();
+		LODOP.SET_PREVIEW_WINDOW(0,0,0,760,540,"");
+		LODOP.SET_SHOW_MODE("SKIN_TYPE",getSkinType());	
+		LODOP.PREVIEW();	
+	};
+	function myDesign1() {		
+		CreatePage();
+		LODOP.SET_SHOW_MODE("SKIN_TYPE",getSkinType());	
+		LODOP.PRINT_DESIGN();	
+	};
+	function myPreview2() {	
+		CreatePage();
+		LODOP.SET_PREVIEW_WINDOW(0,0,0,760,540,"");
+		LODOP.SET_SHOW_MODE("SKIN_CUSTOM_COLOR",document.getElementById("T1").value);	
+		LODOP.PREVIEW();	
+	};
+	function mySetup2() {		
+		CreatePage();
+		LODOP.SET_SHOW_MODE("SKIN_CUSTOM_COLOR",document.getElementById("T1").value);	
+		LODOP.PRINT_SETUP();	
+	};	
+	function CreatePage(){
+		LODOP=getLodop();  
+		LODOP.PRINT_INITA(12,14,690,450,"打印控件功能演示_Lodop功能_皮肤");
+		LODOP.ADD_PRINT_TEXT(59,272,280,80,"不同皮肤展示");
+		LODOP.SET_PRINT_STYLEA(0,"FontSize",30);
+		LODOP.SET_PRINT_STYLEA(1,"Horient",2);
+	};	
+	function getSkinType(){
+		iSkinType=0;
+		for (i = 0; i < 21; i++) {
+			if (document.getElementById("R"+i).checked) {
+  				iSkinType=i;
+  				break;
+			} 
+		}
+	   return iSkinType;
+	}	
+</script>
+
+</body>
+</html>

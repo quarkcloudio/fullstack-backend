@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例四十六:设置右边距和下边距</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<table name="tiba" class="tiba" width="100%" height="98%">
+        <tr>
+          <td width="932" height="26"><h2><font color="#009999">演示设置右边距和下边距：</font></h2></td>         
+        </tr>
+        <tr>
+          <td width="932" height="22">&nbsp;&nbsp;&nbsp;&nbsp;由于Lodop可以指定在纸张的某个区域输出一个或多个内容，故对全页来说没有传统意义上的边距概念。</td>                 
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">但对于单个内容来说是有边距概念的，特别当无法确定某内容在每页内的宽度或高度时，用边距就显得方便和好理解。</td>
+        </tr>
+        <tr>
+          <td width="932" height="22">
+
+          设置右边距和下边距的方法有好几个，最简单的办法是用ADD类语句参数的转义关键字,例如下面的语句:
+
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">
+          <font color="#0000FF">ADD_PRINT_HTM(&quot;5mm&quot;,34,&quot;RightMargin:0.9cm&quot;,&quot;BottomMargin:9mm&quot;,&quot;内容值&quot;);</font>
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">
+          <b>参数说明：</b>
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">
+          <font size="3">1:其中前两个参数设置<b><font color="#0000FF">上边距</font></b>和<b><font color="#0000FF">左边距</font></b>分别为5mm和34px(1px=1/96英寸）；</font> 
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="29">
+          <font size="3">2:关键字<font color="#0000FF">RightMargin</font>和<font color="#0000FF">BottomMargin</font>使后俩参数不再直接设置宽度和高度，</font><font size="3">而是设置<b><font color="#0000FF">右边距</font></b>和<b><font color="#0000FF">下边距</font></b></font>(变相控制宽高)；&nbsp;
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">
+          3:计量单位可混合使用，可以是百分比，但注意控件内部是以px为基本单位，换算会有细微误差；
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="18"><b>下面演示：</b></td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">&nbsp;&nbsp;&nbsp;  
+            用以上语句<a href="javascript:myPreview1()">打印预览1</a>本页看看，观察边距；如果仅<a href="javascript:myPreview2()">打印预览2</a>如下表格会感觉更明显。</td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">
+
+
+          <font size="2">(注意超文本中body元素的margin也要设为0才能让表格线贴近以上设置的边缘)</font>
+
+
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="100%" height="80%">
+<div id="table02" height="100%" style="height: 412" >
+<table border="1" width="100%" height="100%" style="border:solid 1px black;border-collapse:collapse">
+  <tr>
+    <td width="11%" align="center" style="border:solid 1px black">A1</td>
+    <td width="9%" align="center" style="border:solid 1px black">B1</td>
+    <td width="11%" align="center" style="border:solid 1px black">C1</td>
+    <td width="9%" align="center" style="border:solid 1px black">D1</td>
+    <td width="10%" align="center" style="border:solid 1px black">E1</td>
+  </tr>
+  <tr>
+    <td width="11%" align="center" style="border:solid 1px black">A2</td>
+    <td width="9%" align="center" style="border:solid 1px black">B2</td>
+    <td width="11%" align="center" style="border:solid 1px black">C2</td>
+    <td width="9%" align="center" style="border:solid 1px black">D2</td>
+    <td width="10%" align="center" style="border:solid 1px black">E2</td>
+  </tr>
+  <tr>
+    <td width="11%" align="center" style="border:solid 1px black">A3</td>
+    <td width="9%" align="center" style="border:solid 1px black">B3</td>
+    <td width="11%" align="center" style="border:solid 1px black">C3</td>
+    <td width="9%" align="center" style="border:solid 1px black">D3</td>
+    <td width="10%" align="center" style="border:solid 1px black">E3</td>
+  </tr>
+</table>
+</div>          
+          </td>
+        </tr>
+        <tr>
+          <td  style="vertical-Alignment: top" width="932" height="22">
+          <a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>
+          </td>
+        </tr>
+</table>
+<p></p>
+
+<script language="javascript" type="text/javascript"> 
+	function myPreview1() {		
+		var LODOP=getLodop(); 		
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_右边距下边距设置1");
+		LODOP.ADD_PRINT_HTM("5mm",34,"RightMargin:0.9cm","BottomMargin:9mm",document.documentElement.innerHTML);
+		LODOP.PREVIEW();		
+	};	
+	function myPreview2() {		
+		var LODOP=getLodop(); 		
+		LODOP.PRINT_INIT("打印控件功能演示_Lodop功能_右边距下边距设置2");
+		var strHTML="<body style='margin:0;background-color: white'>"+document.getElementById("table02").innerHTML+"</body>";
+		LODOP.ADD_PRINT_HTM("5mm",34,"RightMargin:0.9cm","BottomMargin:9mm",strHTML);
+		LODOP.PREVIEW();			
+	};			
+</script>
+</body>
+</html>

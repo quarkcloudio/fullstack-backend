@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>WEB打印控件LODOP的样例十二:读写本地文件</title>
+
+<script language="javascript" src="LodopFuncs.js"></script>
+</head>
+<body>
+
+<h2><b><font color="#009999">演示通过控件读写本地文件:</font></b></h2>
+<p style="line-height: 150%">&nbsp; Lodop提供了一组通用文件访问函数，页面JS程序利用它们<br>     
+可以在用户允许情况下方便地读写本地任意文件：<font color="#0000FF"><br>
+◆ LODOP.GET_FILE_TEXT(strFileName)</font>获得文件内容<font color="#0000FF"><br>  
+◆ LODOP.WRITE_FILE_TEXT(intWriteMode,strFileName,strText)</font>写入文件<br>
+&nbsp;&nbsp; 其中：intWriteMode:0或其它-覆盖模式 1-追加模式 2-插入模式)<font color="#0000FF"><br>         
+</font>        
+以上函数调用后控件会启动安全提示，等待用户确认<font color="#0000FF"> 
+<br>
+◆ LODOP.IS_FILE_EXIST(strFileName)</font>         
+判断文件是否存在<font color="#0000FF"><br>                   
+◆ LODOP.GET_FILE_TIME(strFileName)</font>获得文件最后修改时间(格式：yyyy-mm-dd         
+hh:mm:ss)<br>
+<font color="#0000FF">◆ LODOP.GET_PRINT_INIFFNAME(strPrintTaskName)</font>获得“打印维护”的配置文件名</p>                              
+<h3><font color="#009999">功能演示如下：</font></h3>                                
+<p>●<input type="button" value="读文件:" id="B3"  onclick="document.getElementById('doc1').value=readfile(document.getElementById('T1').value)"><input type="text" id="T1" size="20" value="C:\test.xml">的内容如下：</p>
+<p><textarea rows="4" id="doc1" cols="52" ></textarea></p>
+
+<p>●以上内容<input type="button" value="写入文件A：" id="B3"  onclick="writefile(0,document.getElementById('T2').value,document.getElementById('doc1').value)">
+<input type="text" id="T2" size="18" value="C:\test.xml">
+<input type="button" value="<<把以上内容追加到文件" id="B4"  onclick="writefile(1,document.getElementById('T2').value,document.getElementById('doc1').value)">
+</p> 
+<p>●以上内容用
+<select size="1" id="encode">
+  <option value="UTF-8">UTF-8</option>
+  <option value="ANSI">ANSI</option>  
+  <option value="UTF-16">UTF-16</option>  
+  <option value="UTF-16BE">UTF-16BE</option>  
+  <option value="UTF-7">UTF-7</option>
+  <option value="Unicode">Unicode</option> 
+  <option value="BIG5">BIG5</option> 
+  <option value="GBK">GBK</option> 
+  <option value="EUC-JP">EUC-JP</option> 
+</select>编码
+<input type="button" value="写入文件B：" id="B5"  onclick="writefileByUTF8(document.getElementById('encode').value,document.getElementById('T2A').value,document.getElementById('doc1').value)">
+<input type="text" id="T2A" size="18" value="C:\test_encode.xml">
+</p> 
+<p>●本页面所有内容<input type="button" value="写入Word文档：" id="B51"  onclick="writefile('UTF-8',document.getElementById('T2B').value,document.documentElement.innerHTML)">
+<input type="text" id="T2B" size="18" value="C:\test.doc">
+<input type="button" value="或写入Excel文件：" id="B52"  onclick="writefile('UTF-8',document.getElementById('T2C').value,document.documentElement.innerHTML)">
+<input type="text" id="T2C" size="18" value="C:\test.xls">
+</p> 
+<p>●<input type="button" value="判断该文件A是否存在" id="B6"  onclick="isfileExist(document.getElementById('T2').value)"><input type="button" value="查看该文件的最后时间:" id="B5"  onclick="document.getElementById('T3').value=readfileTime(document.getElementById('T2').value)"><input type="text" id="T3" size="48">  
+</p> 
+
+<p>●<input type="button" value="打印维护的配置文件名:" id="B7"  onclick="document.getElementById('T4').value=readINIfile('打印任务名')"><input type="text" id="T4" size="76">     
+</p>
+
+<p><a href="PrintSampIndex.html">&lt;&lt;回样例目录</a>
+</p>
+
+<script language="javascript" type="text/javascript"> 
+        var LODOP; //声明为全局变量  
+	function readfile(strFilename) {
+		LODOP=getLodop();  
+		return LODOP.GET_FILE_TEXT(strFilename);
+	};	
+	function writefile(intWriteMode,strFilename,strText) {
+		LODOP=getLodop();  
+	 	var strResult=LODOP.WRITE_FILE_TEXT(intWriteMode,strFilename,strText);
+		if (strResult=="ok") alert("写入成功！");else alert(strResult);
+	};
+	function writefileByUTF8(WriteEncode,strFilename,strText) {
+		LODOP=getLodop();  
+	 	var strResult=LODOP.WRITE_FILE_TEXT(WriteEncode,strFilename,strText);
+		if (strResult=="ok") alert("写入成功！");else alert(strResult);
+	};	
+	function isfileExist(strFilename) {
+		LODOP=getLodop();  
+		if (LODOP.IS_FILE_EXIST(strFilename)) alert("文件存在！");else alert("文件不存在！");
+	};
+	function readfileTime(strFilename) {
+		LODOP=getLodop();  
+		return LODOP.GET_FILE_TIME(strFilename);
+	};
+	function readINIfile(strPrintTaskName) {
+		LODOP=getLodop();  
+		return LODOP.GET_PRINT_INIFFNAME(strPrintTaskName);
+	};			
+</script> 
+</body>
+</html>
