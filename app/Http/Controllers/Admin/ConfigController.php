@@ -29,6 +29,7 @@ use App\Models\Config;
 use App\Services\Helper;
 use DB;
 use Cache;
+use Str;
 
 class ConfigController extends BuilderController
 {
@@ -611,7 +612,7 @@ class ConfigController extends BuilderController
         
         $contentArray->transform(function ($item) use ($data){
             foreach ($data as $key => $value){
-                if(str_contains($item, $key)){
+                if(Str::contains($item, $key)){
                     return $key . '=' . $value;
                 }
             }

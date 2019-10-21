@@ -264,6 +264,12 @@ class PictureController extends Controller
         $md5 = md5_file($file->getRealPath());
         $name = $file->getClientOriginalName();
 
+        $entension = $file->getClientOriginalExtension();
+
+        if (!in_array($entension, ['jpg', 'png', 'gif'])) {
+            return $this->error('只能上传jpg、png、gif格式的图片！');
+        }
+
         $hasPicture = Picture::where('md5',$md5)->where('name',$name)->first();
 
         // 不存在文件，则插入数据库
@@ -318,6 +324,12 @@ class PictureController extends Controller
     protected function ossUpload($request)
     {
         $file = $request->file('file');
+
+        $entension = $file->getClientOriginalExtension();
+        
+        if (!in_array($entension, ['jpg', 'png', 'gif'])) {
+            return $this->error('只能上传jpg、png、gif格式的图片！');
+        }
 
         $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
         $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');

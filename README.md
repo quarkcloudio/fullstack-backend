@@ -20,12 +20,11 @@
 
 第二步：php artisan db:seed(注意: 如果在执行迁移时发生「class not found」错误，试着先执行 composer dump-autoload 命令后再进行一次。)
 
-第三步：php artisan key:generate &&  php artisan passport:install && php artisan storage:link
+第三步：php artisan key:generate && php artisan passport:install && php artisan storage:link
 
 第四步：php -S 127.0.0.1:8080 -t ./public
 
 第五步：http://127.0.0.1:8080/admin
-
 
 
 默认用户名：administrator 密码：123456

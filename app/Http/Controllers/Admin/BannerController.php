@@ -194,8 +194,8 @@ class BannerController extends BuilderController
         $controls = [
             ID::make('ID','id'),
             Input::make('标题','title')->style(['width'=>200]),
-            Select::make('分类','category_id')->option($list),
-            Input::make('链接','url')->style(['width'=>200]),
+            Select::make('分类','category_id')->option($list)->style(['width'=>400]),
+            Input::make('链接','url')->style(['width'=>200])->style(['width'=>400]),
             Image::make('封面图','cover_id'),
             InputNumber::make('排序','sort')->style(['width'=>200])->value(0),
             DatePicker::make('截止时间','deadline')->format("YYYY-MM-DD HH:mm:ss")->value(null),

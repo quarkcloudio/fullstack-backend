@@ -735,11 +735,6 @@ class Helper
     */
 	static function getPicture($id,$key=0,$field='path')
     {
-        // 本身为图片地址，直接返回
-        if(strpos($id,'http') !== false) {
-            return $id;
-        }
-
         // 获取文件url，用于外部访问
         if(count(explode('[',$id))>1) {
             $ids = json_decode($id, true);
@@ -751,6 +746,11 @@ class Helper
             } else {
                 return '//'.$_SERVER['HTTP_HOST'].'/images/default.png';
             }
+        }
+
+        // 本身为图片地址，直接返回
+        if(strpos($id,'http') !== false) {
+            return $id;
         }
 
         $picture = Picture::where('id',$id)->first();

@@ -332,6 +332,8 @@ class ArticleController extends BuilderController
 
         if($fileId) {
             $fileId = $fileId[0]['id'];
+        } else {
+            $fileId = 0;
         }
 
         if ($commentStatus == true) {

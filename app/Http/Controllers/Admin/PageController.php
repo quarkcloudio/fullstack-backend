@@ -47,7 +47,7 @@ class PageController extends BuilderController
     {
         // 获取参数
         $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',10));
+        $pageSize  = intval($request->get('pageSize',50));
         $search     = $request->get('search');
             
         // 定义对象
@@ -151,7 +151,6 @@ class PageController extends BuilderController
             Column::make('ID','id'),
             Column::make('标题','title')->withA('admin/page/edit'),
             Column::make('作者','author'),
-            Column::make('分类','category_title'),
             Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
             Column::make('发布时间','created_at'),
         ];
@@ -201,8 +200,10 @@ class PageController extends BuilderController
             TextArea::make('描述','description')->style(['width'=>400]),
             Input::make('标签','tags')->style(['width'=>400]),
             Image::make('封面图','cover_ids')->mode('multiple'),
+            InputNumber::make('排序','level')->extra('越大越靠前')->max(10000)->value(1),
             Select::make('父节点','pid')->style(['width'=>200])->option($getCategorys),
             Editor::make('内容','content'),
+            Input::make('单页模板','page_tpl')->style(['width'=>200]),
             DatePicker::make('创建时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
             SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
             Button::make('提交')
@@ -241,6 +242,7 @@ class PageController extends BuilderController
         $categoryId     =   $request->json('category_id',0);
         $pid            =   $request->json('pid',0);
         $tags           =   $request->json('tags','');
+        $pageTpl        =   $request->json('page_tpl');
         $commentStatus  =   $request->json('comment_status');
         $content        =   $request->json('content','');
         $createdAt      =   $request->json('created_at');
@@ -279,6 +281,7 @@ class PageController extends BuilderController
         $data['category_id'] = $categoryId;
         $data['pid'] = $pid;
         $data['tags'] = $tags;
+        $data['page_tpl'] = $pageTpl;
         $data['comment_status'] = $commentStatus;
         $data['content'] = $content;
         $data['created_at'] = $createdAt;
@@ -352,6 +355,7 @@ class PageController extends BuilderController
         $categoryId     =   $request->json('category_id',0);
         $pid            =   $request->json('pid',0);
         $tags           =   $request->json('tags','');
+        $pageTpl        =   $request->json('page_tpl');
         $commentStatus  =   $request->json('comment_status');
         $content        =   $request->json('content','');
         $createdAt      =   $request->json('created_at');
@@ -390,6 +394,7 @@ class PageController extends BuilderController
         $data['category_id'] = $categoryId;
         $data['pid'] = $pid;
         $data['tags'] = $tags;
+        $data['page_tpl'] = $pageTpl;
         $data['comment_status'] = $commentStatus;
         $data['content'] = $content;
         $data['created_at'] = $createdAt;

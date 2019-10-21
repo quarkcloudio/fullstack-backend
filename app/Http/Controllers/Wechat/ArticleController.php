@@ -27,7 +27,7 @@ class ArticleController extends Controller
         }
 
         if(empty($category)) {
-            return view('wechat/common/404_two');
+            abort(404, 'Not Found');
         }
 
         $articles = Post::where('type', 'ARTICLE')
@@ -61,7 +61,7 @@ class ArticleController extends Controller
         }
 
         if(empty($category)) {
-            return view('wechat/common/404_two');
+            abort(404, 'Not Found');
         }
 
         $articles = Post::where('type', 'ARTICLE')
@@ -93,7 +93,7 @@ class ArticleController extends Controller
         } elseif(!empty($name)) {
             $article = Post::where('name', $name)->where('status', 1)->first();
         } else {
-            return view('wechat/common/404_two');
+            abort(404, 'Not Found');
         }
 
         $category = Category::where('id', $article->category_id)->first();
@@ -102,7 +102,7 @@ class ArticleController extends Controller
         Post::where('id', $id)->increment('view');
 
         if (empty($article)) {
-            return view('wechat/common/404_one');
+            abort(404, 'Not Found');
         }
 
         // 上一个

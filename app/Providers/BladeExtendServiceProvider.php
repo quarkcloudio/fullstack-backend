@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Http\Request;
 use App\Services\Helper;
 use Db;
@@ -11,11 +11,21 @@ use Db;
 class BladeExtendServiceProvider extends ServiceProvider
 {
     /**
-     * Blade模板扩展
+     * Register services.
      *
      * @return void
      */
-    public function boot(Request $request)
+    public function register()
+    {
+        //
+    }
+
+    /**
+     * Bootstrap services.
+     *
+     * @return void
+     */
+    public function boot()
     {
         // 导航模板标签开始 参数：循环对象，父id
         Blade::directive('navs', function ($expression) {
@@ -596,15 +606,5 @@ class BladeExtendServiceProvider extends ServiceProvider
         Blade::directive('endcomments', function () {
             return "<?php } ?>";
         });
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
     }
 }

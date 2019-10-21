@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\PC\Content;
+namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -26,14 +26,14 @@ class PageController extends Controller
         } elseif(!empty($name)) {
             $page = Post::where('name', $name)->where('type', 'PAGE')->first();
         } else {
-            return view('common/404_two');
+            abort(404, 'Not Found');
         }
 
         // 浏览量自增
         Post::where('id', $id)->increment('view');
 
         if (empty($page)) {
-            return view('common/404_two');
+            abort(404, 'Not Found');
         }
         return view('home/'.$page->page_tpl,compact('page'));
     }

@@ -26,14 +26,14 @@ class PageController extends Controller
         } elseif(!empty($name)) {
             $page = Post::where('name', $name)->where('type', 'PAGE')->first();
         } else {
-            return view('wechat/common/404_two');
+            abort(404, 'Not Found');
         }
 
         // 浏览量自增
         Post::where('id', $id)->increment('view');
 
         if (empty($page)) {
-            return view('wechat/common/404_two');
+            abort(404, 'Not Found');
         }
 
         return view('wechat/'.$page->page_tpl,compact('page'));
