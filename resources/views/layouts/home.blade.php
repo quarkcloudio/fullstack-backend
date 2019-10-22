@@ -4,28 +4,46 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="{{$helper::getConfig('WEB_SITE_DESCRIPTION')}} - @yield('description')">
-    <meta name="keyword" content="{{$helper::getConfig('WEB_SITE_KEYWORDS')}} - @yield('keyword')">
-    <meta name="author" content="tangtanglove">
-    <link rel="icon" href="/favicon.ico">
-
-    <title>{{$helper::getConfig('WEB_SITE_NAME')}} - @yield('title')</title>
+    <meta name="description" content="{{$helper::config('WEB_SITE_DESCRIPTION')}} - @yield('description')">
+    <meta name="keyword" content="{{$helper::config('WEB_SITE_KEYWORDS')}} - @yield('keyword')">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="tangtanglove">
+    <title>{{$helper::config('WEB_SITE_NAME')}} - @yield('title')</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/static/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/app.css" rel="stylesheet">
 
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    
+    </style>
     <!-- Custom styles for this template -->
-    <link href="/pc/css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/css/style.css" rel="stylesheet">
   </head>
-
   <body>
+<div class="container">
     @section('header')
+    <header class="blog-header py-3">
         <nav class="navbar navbar-expand-md fixed-top bg-white border-bottom box-shadow">
-            <a class="navbar-brand text-dark" href="#">{{$helper::getConfig('WEB_SITE_NAME')}}</a>
+            <a class="navbar-brand text-dark" href="#">{{$helper::config('WEB_SITE_NAME')}}</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
                     @navs($nav,0)
@@ -40,8 +58,8 @@
                             </div>
                         </li>
                         @else
-                        <li class="nav-item {{ $helper::active($nav['url'],'active') }}">
-                            <a class="nav-link text-dark" href="{{ $nav['url'] }}">{!! $nav['title'] !!} <span class="sr-only">{{ $helper::active($nav['url'],'(current)') }}</span></a>
+                        <li class="nav-item {{ $helper::urlSelected($nav['url'],'active') }}">
+                            <a class="nav-link text-dark" href="{{ $nav['url'] }}">{!! $nav['title'] !!} <span class="sr-only">{{ $helper::urlSelected($nav['url'],'(current)') }}</span></a>
                         </li>
                         @endif
                     @endnavs
@@ -51,19 +69,7 @@
                     <input class="form-control mr-sm-2" type="hidden" name="module" value="article" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">搜索</button>
                 </form>
-
                 <ul class="navbar-nav" style="margin-left:20px;">
-                <li class="nav-item dropdown" style="width:130px;">
-                    <a class="nav-link dropdown-toggle menu-cart-dropdown text-dark" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">我的购物车</a>
-                    <div class="dropdown-menu">
-                        <div class="menu-cart-list"></div>
-                        <div class="dropdown-divider"></div>
-                        <div style="width:360px;">
-                            <span style="float:left;margin-left:10px;font-size:12px;">合计：￥<span id="menu-cart-total-money"></span></span><a style="float:right;margin-right:10px;font-size:12px;" href="/pc/cart/index">去购物车</a>
-                        </div>
-                    </div>
-                </li>
-
                 @if(USERNAME)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-dark" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{USERNAME}}</a>
@@ -73,7 +79,6 @@
                             <a class="dropdown-item text-dark" href="/logout">退出</a>
                         </div>
                     </li>
-
                     <li class="nav-item">
                         <a class="nav-link text-dark" href="/pc/page/index?name=help">我的订单</a>
                     </li>
@@ -85,142 +90,22 @@
                         <a class="nav-link text-dark" href="javascript:registerJump();">免费注册</a>
                     </li>
                 @endif
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="/pc/page/index?name=help">帮助中心</a>
-                    </li>
                 </ul>
             </div>
         </nav>
+    </header>
     @show
     <main role="main">
         @yield('content')
     </main>
     @section('footer')
-        <footer class="container">
-            <p>{{$helper::getConfig('WEB_SITE_COPYRIGHT')}}</p>
-            {!!$helper::getConfig('WEB_SITE_SCRIPT')!!}
-        </footer>
+    <footer class="blog-footer">
+        <p>{{$helper::config('WEB_SITE_COPYRIGHT')}} {!!$helper::config('WEB_SITE_SCRIPT')!!}</p>
+    </footer>
     @show
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/libs/jquery/jquery.min.js"></script>
-    <script src="/static/libs/popper/popper.min.js"></script>
-    <script src="/static/libs/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/static/libs/layer/layer.js"></script>
-    <script>
-
-    // 登录跳转
-    function loginJump(alertbox = 'no') {
-        if(alertbox == 'yes') {
-            layer.open({
-                title: '登录',
-                type: 2,
-                area: ['360px', '500px'],
-                skin: 'layui-layer-rim', //
-                content: ['/loginBox', 'no']
-            });
-        } else {
-            window.location.href="/login?returnUrl="+window.location.href;
-        }
-    }
-
-    // 注册跳转
-    function registerJump(alertbox = 'no') {
-        if(alertbox == 'yes') {
-            layer.open({
-                title: '注册',
-                type: 2,
-                area: ['360px', '500px'],
-                skin: 'layui-layer-rim', //
-                content: ['/registerBox', 'no']
-            });
-        } else {
-            window.location.href="/register?returnUrl="+window.location.href;
-        }
-    }
-
-    $('.menu-cart-list').on('click','.menu-cart-item',function(event){
-        event.stopPropagation();
-    });
-
-    $('.menu-cart-list').on('click','.menu-cart-delete',function(event){
-        event.stopPropagation();
-    });
-
-    function cartDelete(id) {
-        // ajax请求
-        $.post("{{ route('pc/cart/destroy') }}",{id:id},function(result) {
-            if(result.status=='success') {
-                getCartList();
-                layer.msg(result.msg);
-            } else {
-                layer.msg(result.msg);
-            }
-        });
-
-        return false;
-    }
-
-    $('.menu-cart-dropdown').click(function() {
-        getCartList()
-    })
-
-    // 获取购物车列表
-    function getCartList() {
-        // ajax请求
-        $.ajax({
-            url:'{{ route('pc/cart/index') }}',
-            type:'POST', //GET
-            async:true,    //或false,是否异步
-            timeout:5000,    //超时时间
-            dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
-            success:function(result,textStatus,jqXHR){
-                if(result.status=='success') {
-
-                    html = '';
-                    html1 = '<div class=\"menu-cart-box\"><a href=\"';
-                    html2 = '\"><img class=\"menu-cart-img\" src=\"';
-                    html3 = '\" /><span class=\"menu-cart-item menu-cart-title\">';
-                    html4 = '</span></a><span class=\"menu-cart-item\">￥';
-                    html5 = '</span><span class=\"menu-cart-item\">×</span>\<span class=\"menu-cart-item\">';
-                    html6 = '</span><a class=\"menu-cart-delete\" id=\"';
-                    html7 = '\" href=\"javascript:cartDelete(';
-                    html8 = ');\">删除</a></div>';
-
-                    if(result.data.shoppingCarts != '') {
-                        jQuery.each(result.data.shoppingCarts, function(i, val) {
-                            url = '/pc/goods/detail?id='+val.info.id;
-                            img = val.info.cover_path;
-                            title = val.info.title;
-                            price = val.sku.now_price;
-                            num = val.num;
-
-                            html = html + html1 + url + html2 + img + html3 + title + html4 + price + html5 + num + html6 +val.id + html7 +val.id + html8;
-                        });
-                    } else {
-                        html = '<div class=\"menu-cart-box\"><span class=\"menu-cart-empty\">购物车，啥也没有！</span></div>';
-                    }
-
-                    $('.menu-cart-list').html(html);
-
-                    $('#menu-cart-total-money').html(result.data.totalMoney);
-                } else {
-                    layer.msg(result.msg);
-                }
-            },
-            error:function(xhr,textStatus){
-                html = '';
-                if(xhr.status == 401) {
-                    html = '<div class=\"menu-cart-box\"><span class=\"menu-cart-empty\">您还未登录，请先登录！</span></div>';
-                }
-                $('.menu-cart-list').html(html);
-                $('#menu-cart-total-money').html(0.00);
-            }
-        })
-    }
-
-    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     @section('script')
 
     @show

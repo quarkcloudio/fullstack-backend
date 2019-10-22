@@ -57,7 +57,7 @@ class PostsTableSeeder extends Seeder
                 'pid' => 0,
                 'level' => 0,
                 'type' => 'ARTICLE',
-                'position' => 0,
+                'position' => 1,
                 'link' => '',
                 'content' => 'https://www.kancloud.cn/tangtanglove/easyadmin/435582',
                 'comment' => 0,

@@ -39,8 +39,11 @@ class VideoController extends Controller
         foreach ($videos as $key => $value) {
             $videos[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
+        
+        $data['videos'] = $videos;
+        $data['category'] = $category;
 
-        return view('home/'.$category->index_tpl,compact('videos','category'));
+        return view('home/'.$category->index_tpl,$data);
     }
 
 	/**
@@ -89,28 +92,28 @@ class VideoController extends Controller
         $name    = $request->input('name');
 
         if (!empty($id)) {
-            $article = Video::where('id', $id)->where('status', 1)->first();
+            $video = Video::where('id', $id)->where('status', 1)->first();
         } elseif(!empty($name)) {
-            $article = Video::where('name', $name)->where('status', 1)->first();
+            $video = Video::where('name', $name)->where('status', 1)->first();
         } else {
             abort(404, 'Not Found');
         }
 
-        $category = Category::where('id', $article->category_id)->first();
+        $category = Category::where('id', $video->category_id)->first();
 
         // 浏览量自增
         Video::where('id', $id)->increment('view',3);
 
-        if (empty($article)) {
+        if (empty($video)) {
             abort(404, 'Not Found');
         }
 
         // 上一个
-        $prev = Video::where('id','<', $id)->where('category_id',$article->category_id)->limit(1)->where('status', 1)->first();
+        $prev = Video::where('id','<', $id)->where('category_id',$video->category_id)->limit(1)->where('status', 1)->first();
         // 下一个
-        $next = Video::where('id','>', $id)->where('category_id',$article->category_id)->limit(1)->where('status', 1)->first();
+        $next = Video::where('id','>', $id)->where('category_id',$video->category_id)->limit(1)->where('status', 1)->first();
 
-        $tags = explode(',',$article->tags);
+        $tags = explode(',',$video->tags);
 
         $ids = [];
         foreach ($tags as $key => $value) {
@@ -138,6 +141,11 @@ class VideoController extends Controller
             ->toArray();
         }
 
-        return view('home/'.$category['detail_tpl'],compact('article','category','prev','next'));
+        $data['video'] = $video;
+        $data['category'] = $category;
+        $data['prev'] = $prev;
+        $data['next'] = $next;
+
+        return view('home/'.$category['detail_tpl'],$data);
     }
 }

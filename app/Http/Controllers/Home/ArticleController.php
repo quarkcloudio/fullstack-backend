@@ -32,6 +32,7 @@ class ArticleController extends Controller
 
         $articles = Post::where('type', 'ARTICLE')
         ->where('category_id', $category->id)
+        ->where('status', 1)
         ->orderBy('level', 'desc')
         ->orderBy('id', 'desc')
         ->paginate($category->page_num);
@@ -41,7 +42,10 @@ class ArticleController extends Controller
             $articles[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
 
-        return view('home/'.$category->index_tpl,compact('articles','category'));
+        $data['category'] = $category;
+        $data['articles'] = $articles;
+
+        return view('home/'.$category->index_tpl,$data);
     }
 
 	/**
@@ -74,7 +78,11 @@ class ArticleController extends Controller
         foreach ($articles as $key => $value) {
             $articles[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
-        return view('home/'.$category->lists_tpl,compact('articles','category'));
+
+        $data['category'] = $category;
+        $data['articles'] = $articles;
+
+        return view('home/'.$category->lists_tpl,$data);
     }
 
 	/**
@@ -135,6 +143,12 @@ class ArticleController extends Controller
             ->get()
             ->toArray();
         }
-        return view('home/'.$category['detail_tpl'],compact('article','category','prev','next'));
+
+        $data['category'] = $category;
+        $data['article'] = $article;
+        $data['prev'] = $prev;
+        $data['next'] = $next;
+
+        return view('home/'.$category['detail_tpl'],$data);
     }
 }

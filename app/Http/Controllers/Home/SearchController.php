@@ -25,6 +25,7 @@ class SearchController extends Controller
             case 'article':
                     $lists = DB::table('posts')
                     ->where('posts.type', 'ARTICLE')
+                    ->where('posts.status', 1)
                     ->where('posts.title', 'like', '%'.mb_convert_encoding($query,'UTF-8','auto').'%')
                     ->orderBy('id', 'desc')
                     ->paginate(8);
@@ -32,6 +33,7 @@ class SearchController extends Controller
             case 'page':
                     $lists = DB::table('posts')
                     ->where('posts.type', 'PAGE')
+                    ->where('posts.status', 1)
                     ->where('posts.title', 'like', '%'.mb_convert_encoding($query,'UTF-8','auto').'%')
                     ->orderBy('id', 'desc')
                     ->paginate(8);
@@ -39,6 +41,7 @@ class SearchController extends Controller
             default:
                     $lists = DB::table('posts')
                     ->where('posts.type', 'ARTICLE')
+                    ->where('posts.status', 1)
                     ->where('posts.title', 'like', '%'.mb_convert_encoding($query,'UTF-8','auto').'%')
                     ->orderBy('id', 'desc')
                     ->paginate(8);
@@ -48,7 +51,11 @@ class SearchController extends Controller
         foreach ($lists as $key => $value) {
             $lists[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
-        return view('home/search',compact('lists','query'));
+
+        $data['lists'] = $lists;
+        $data['query'] = $query;
+
+        return view('home/search',$data);
     }
 
 }

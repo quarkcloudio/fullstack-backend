@@ -22,19 +22,28 @@ class PageController extends Controller
         $name    = $request->input('name');
 
         if (!empty($id)) {
-            $page = Post::where('id', $id)->where('type', 'PAGE')->first();
+            $page = Post::where('id', $id)
+            ->where('status', 1)
+            ->where('type', 'PAGE')
+            ->first();
         } elseif(!empty($name)) {
-            $page = Post::where('name', $name)->where('type', 'PAGE')->first();
+            $page = Post::where('name', $name)
+            ->where('status', 1)
+            ->where('type', 'PAGE')
+            ->first();
         } else {
+            abort(404, 'Not Found');
+        }
+
+        if (empty($page)) {
             abort(404, 'Not Found');
         }
 
         // 浏览量自增
         Post::where('id', $id)->increment('view');
 
-        if (empty($page)) {
-            abort(404, 'Not Found');
-        }
-        return view('home/'.$page->page_tpl,compact('page'));
+        $data['page'] = $page;
+
+        return view('home/'.$page->page_tpl,$data);
     }
 }

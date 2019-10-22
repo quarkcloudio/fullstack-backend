@@ -606,5 +606,32 @@ class BladeExtendServiceProvider extends ServiceProvider
         Blade::directive('endcomments', function () {
             return "<?php } ?>";
         });
+
+        // 评论标签开始 参数：循环对象，table
+        Blade::directive('archives', function ($expression) {
+            $expressions = explode(',',$expression);
+
+            // 循环对象
+            isset($expressions[0]) ? $obj = $expressions[0] : $obj = '';
+
+            // table
+            isset($expressions[1]) ? $table = $expressions[1] : $table = '';
+
+            // 解析字符串
+            $parseStr  = $parseStr   = '<?php ';
+            $parseStr .= '$__OBJECTS__ = DB::table('.$table.')->where(\'status\',1)
+                ->distinct()
+                ->get(DB::raw("DATE_FORMAT(created_at,\'%Y-%m\') as created_date"))
+                ->toArray();';
+
+            $parseStr .= ' foreach(array_map(\'get_object_vars\', $__OBJECTS__) as $key=>'.$obj.') { ?>';
+
+            return $parseStr;
+        });
+
+        // 评论标签结束
+        Blade::directive('endarchives', function () {
+            return "<?php } ?>";
+        });
     }
 }
