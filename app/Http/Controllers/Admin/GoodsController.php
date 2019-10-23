@@ -549,6 +549,7 @@ class GoodsController extends BuilderController
                     $data2['properties'] = $properties;
                     $data2['property_name'] = $propertyName;
                     $data2['stock_num'] = $value['stock_num'];
+                    $data2['cost_price'] = $value['cost_price'];
                     $data2['goods_price'] = $value['goods_price'];
                     $data2['market_price'] = $value['market_price'];
                     $data2['goods_sn'] = $value['goods_sn'];
@@ -739,10 +740,29 @@ class GoodsController extends BuilderController
             $data['checkedGoodsAttributeValues'][] = $getGoodsInfoAttributeData;
         }
         
+        //////
+        $goodsSkus = GoodsSku::where('goods_id',$data['id'])->get()->toArray();
+
+        foreach($goodsSkus as $goodsSkuKey => $goodsSku) {
+            $goodsSkus[$goodsSkuKey]['goods_attributes'] = GoodsInfoAttributeValue::where('goods_id',$data['id'])
+            ->where('type',2)
+            ->where('goods_sku_id',$goodsSku['id'])
+            ->select('goods_attribute_id','goods_attribute_value_id')
+            ->get()
+            ->toArray();
+            $goods_attribute_info = null;
+            foreach($goodsSkus[$goodsSkuKey]['goods_attributes'] as $mykey => $myValue) {
+                $goods_attribute_info[] = $myValue['goods_attribute_value_id'];
+            }
+
+            $goodsSkus[$goodsSkuKey]['goods_attribute_info'] = $goods_attribute_info;
+        }
+
         // 模板数据
         $data['systemGoodsAttributes'] = $systemGoodsAttributes;
         $data['shopGoodsAttributes'] = $shopGoodsAttributes;
         $data['goodsAttributes'] = $goodsAttributes;
+        $data['goodsSkus'] = $goodsSkus;
 
         $data['goods_category_id'] = $this->getParentCategory($data['goods_category_id'],[0 => $data['goods_category_id']]);
         $data['other_category_ids'] = GoodsCategoryRelationship::where('goods_id',$id)->pluck('goods_category_id');

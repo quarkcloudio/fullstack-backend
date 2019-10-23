@@ -174,6 +174,13 @@ class ConfigController extends BuilderController
         $requestJson    =   $request->getContent();
         $requestData    =   json_decode($requestJson,true);
 
+
+        $envPath = base_path() . DIRECTORY_SEPARATOR . '.env';
+
+        if(!is_writable($envPath)) {
+            return $this->error('操作失败，请检查.env文件是否具有写入权限');
+        }
+
         $result = true;
         // 遍历插入数据
         foreach ($requestData as $key => $value) {

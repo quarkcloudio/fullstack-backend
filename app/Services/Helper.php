@@ -738,7 +738,8 @@ class Helper
         // 获取文件url，用于外部访问
         if(count(explode('[',$id))>1) {
             $ids = json_decode($id, true);
-            if(isset($ids[$key])) {
+            if(isset($ids[$key]) && isset($ids[$key][$field])) {
+
                 if($field == 'path') {
                     $field = 'url';
                 }

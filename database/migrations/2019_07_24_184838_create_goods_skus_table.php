@@ -22,6 +22,7 @@ class CreateGoodsSkusTable extends Migration
             $table->longText('property_name')->nullable();
             $table->integer('stock_num')->nullable(); 
             $table->integer('warn_num')->nullable(); 
+            $table->decimal('cost_price',10,2)->nullable();
             $table->decimal('goods_price',10,2)->nullable();
             $table->decimal('market_price',10,2)->nullable();
             $table->string('goods_sn')->nullable();
