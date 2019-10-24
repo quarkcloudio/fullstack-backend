@@ -472,9 +472,9 @@ class GoodsController extends BuilderController
 
         $result = false;
 
-        // // 启动事务
-        // DB::beginTransaction();
-        // try {
+        // 启动事务
+        DB::beginTransaction();
+        try {
 
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_goods_attribute_') !== false) {
@@ -529,10 +529,9 @@ class GoodsController extends BuilderController
                 $data2['goods_id'] = $result->id;
                 $data2['shop_id'] = $shopId;
 
-                $properties = '';
-                $propertyName = '';
-
                 foreach($goodsSkus as $key => $value) {
+                    $properties = '';
+                    $propertyName = '';
 
                     foreach($value as $key1 => $value1) {
                         if(strpos($key1,'goodsAttribute_') !== false) {
@@ -541,19 +540,20 @@ class GoodsController extends BuilderController
                             $goodsAttributeName = explode(':',$arr[1])[1];
                             $goodsAttributeValueName = explode(':',$arr[3])[1];
 
-                            $properties = $properties.','.$goodsAttributeValueName;
+                            $properties = $properties.','.$goodsAttributeName.':'.$goodsAttributeValueName;
                             $propertyName = $propertyName.','.$goodsAttributeName;
                         }
                     }
 
-                    $data2['properties'] = $properties;
-                    $data2['property_name'] = $propertyName;
+                    $data2['properties'] = trim($properties,",");
+                    $data2['property_name'] = trim($propertyName,",");
                     $data2['stock_num'] = $value['stock_num'];
                     $data2['cost_price'] = $value['cost_price'];
                     $data2['goods_price'] = $value['goods_price'];
                     $data2['market_price'] = $value['market_price'];
                     $data2['goods_sn'] = $value['goods_sn'];
                     $data2['goods_barcode'] = $value['goods_barcode'];
+                    $data2['status'] = $value['status'];
 
                     if(empty($data2['stock_num'])) {
                         return $this->error('请填写库存！');
@@ -586,12 +586,12 @@ class GoodsController extends BuilderController
                 }
             }
 
-        //      // 提交事务
-        //     DB::commit();	
-        // } catch (\Exception $e) {
-        //     // 回滚事务
-        //     DB::rollback();
-        // }
+             // 提交事务
+            DB::commit();	
+        } catch (\Exception $e) {
+            // 回滚事务
+            DB::rollback();
+        }
 
         if ($result) {
             return $this->success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
@@ -726,6 +726,7 @@ class GoodsController extends BuilderController
         foreach($data['checkedGoodsAttributes'] as $key => $value) {
 
             $goodsInfoAttributeValues = GoodsInfoAttributeValue::where('goods_attribute_id',$value)
+            ->where('goods_id',$data['id'])
             ->where('type',2)
             ->distinct()
             ->pluck('goods_attribute_value_id');
@@ -764,7 +765,9 @@ class GoodsController extends BuilderController
         $data['goodsAttributes'] = $goodsAttributes;
         $data['goodsSkus'] = $goodsSkus;
 
-        $data['goods_category_id'] = $this->getParentCategory($data['goods_category_id'],[0 => $data['goods_category_id']]);
+        $getGoodsCategoryId = $this->getParentCategory($data['goods_category_id'],[0 => $data['goods_category_id']]);
+
+        $data['goods_category_id'] = $getGoodsCategoryId;
         $data['other_category_ids'] = GoodsCategoryRelationship::where('goods_id',$id)->pluck('goods_category_id');
 
         $coverId = $data['cover_id'];
@@ -814,8 +817,8 @@ class GoodsController extends BuilderController
         ->where('id',$id)
         ->first();
 
-        $categorys[] = $getCategory->pid;
-        if($getCategory->pid) {
+        if($getCategory->pid && $getCategory->pid != 0) {
+            $categorys[] = $getCategory->pid;
             $this->getParentCategory($getCategory->pid,$categorys);
         } else {
             return $categorys;
@@ -830,80 +833,81 @@ class GoodsController extends BuilderController
      */
     public function save(Request $request)
     {
-        $id                         =   $request->json('id');
-        $title                      =   $request->json('title','');
-        $logo                       =   $request->json('logo','');
-        $uid                        =   $request->json('uid','');
-        $categoryId                 =   $request->json('category_id',0);
-        $tags                       =   $request->json('tags','');
-        $description                =   $request->json('description');
-        $content                    =   $request->json('content','');
-        $coverIds                   =   $request->json('cover_ids');
-        $level                      =   $request->json('level','');
-        $position                   =   $request->json('position','');
-        $username                   =   $request->json('username','');
-        $phone                      =   $request->json('phone',0);
-        $area                       =   $request->json('area');
-        $address                    =   $request->json('address');
-        $map                        =   $request->json('map');
-        $businessLicenseCoverId     =   $request->json('business_license_cover_id');
-        $corporateName              =   $request->json('corporate_name');
-        $corporateIdcard            =   $request->json('corporate_idcard');
-        $corporateIdcardCoverId     =   $request->json('corporate_idcard_cover_id');
-        $comment                    =   $request->json('comment');
-        $view                       =   $request->json('view');
-        $commentStatus              =   $request->json('comment_status');
-        $rate                       =   $request->json('rate');
-        $openDays                   =   $request->json('open_days');
-        $openTimes                  =   $request->json('open_times');
-        $openStatus                 =   $request->json('open_status');
-        $isSelf                     =   $request->json('is_self');
-        $status                     =   $request->json('status');
+        $id             =   $request->json('id');
+        $requestJson    =   $request->getContent();
+        $requestData    =   json_decode($requestJson,true);
 
-        $bankName                  =   $request->json('bank_name');
-        $bankPayee                 =   $request->json('bank_payee');
-        $bankNumber                =   $request->json('bank_number');
-
-        if(empty($title)) {
-            return $this->error('商家名称不能为空！');
-        }
-
-        if(empty($logo)) {
-            return $this->error('请上传logo！');
-        }
-
-        if(empty($uid)) {
-            return $this->error('请选择绑定用户！');
-        }
-
-        if(empty($categoryId)) {
-            return $this->error('请选择分类！');
-        }
-
-        if(empty($username)) {
-            return $this->error('商家联系人不能为空！');
-        }
-
-        if(empty($phone)) {
-            return $this->error('商家电话不能为空！');
-        }
-
-        $hasMerchant = Merchant::where('uid',$uid)->first();
-
-        if(!empty($hasMerchant)) {
-            $data['mch_id'] = $hasMerchant['id'];
-            $merchantData['uid'] = $uid;
-            $merchantData['bank_name'] = $bankName;
-            $merchantData['bank_payee'] = $bankPayee;
-            $merchantData['bank_number'] = $bankNumber;
-            $merchantInfo = Merchant::where('id',$hasMerchant['id'])->update($merchantData);
+        $shopId                    =   $request->json('shop_id'); // 所属商家
+        $goodsCategoryId           =   $request->json('goods_category_id'); // 商品分类
+        $goodsMode                 =   $request->json('goods_mode',''); // 商品类别
+        $otherCategoryIds          =   $request->json('other_category_ids',0); // 扩展分类
+        $goodsName                 =   $request->json('goods_name'); // 商品名称
+        $keywords                  =   $request->json('keywords'); // 关键词
+        $description               =   $request->json('description',''); // 商品买点
+        $pricingMode               =   $request->json('pricing_mode'); // 计价方式
+        $goodsUnitId               =   $request->json('goods_unit_id',''); // 商品单位
+        $goodsBrandId              =   $request->json('goods_brand_id',''); // 商品品牌
+        $shopGoodsAttributeNames   =   $request->json('shop_goods_attribute_names'); // 店铺自定义属性名称
+        $shopGoodsAttributeValues  =   $request->json('shop_goods_attribute_values'); // 店铺自定义属性值
+        $goodsSkus                 =   $request->json('goods_skus'); // 商品规格
+        $goodsMoq                  =   $request->json('goods_moq'); // 最小起订量
+        $goodsPrice                =   $request->json('goods_price'); // 店铺价
+        $marketPrice               =   $request->json('market_price'); // 市场价
+        $costPrice                 =   $request->json('cost_price'); // 成本价
+        $stockNum                  =   $request->json('stock_num'); // 库存
+        $warnNum                   =   $request->json('warn_num'); // 库存警告数量
+        $goodsSn                   =   $request->json('goods_sn'); // 商品货号
+        $goodsBarcode              =   $request->json('goods_barcode'); // 商品条形码
+        $goodsStockcode            =   $request->json('goods_stockcode'); // 商品库位码
+        $coverId                   =   $request->json('cover_id'); // 上传商品默认主图，无规格主图时展示该图
+        $videoId                   =   $request->json('video_id'); // 主图视频
+        $pcContent                 =   $request->json('pc_content'); // 电脑端商品详情
+        $mobileContent             =   $request->json('mobile_content'); // 手机端商品详情
+        $topLayoutId               =   $request->json('top_layout_id'); // 详情页顶部模板
+        $bottomLayoutId            =   $request->json('bottom_layout_id'); // 详情页底部模板
+        $packingLayoutId           =   $request->json('packing_layout_id'); // 详情页包装清单版式
+        $serviceLayoutId           =   $request->json('service_layout_id'); // 详情页售后保证版式
+        $goodsWeight               =   $request->json('goods_weight'); // 物流重量，商品的重量单位为千克，如果商品的运费模板按照重量计算请填写此项，为空则默认商品重量为0Kg；
+        $goodsVolume               =   $request->json('goods_volume'); // 商品的体积单位为立方米，如果商品的运费模板按照体积计算请填写此项，为空则默认商品体积为0立方米；
+        $goodsFreightType          =   $request->json('goods_freight_type'); // 运费类型 0：店铺承担运费 ，1：运费模板
+        $freightId                 =   $request->json('freight_id'); // 运费模板id
+        $effectiveType             =   $request->json('effective_type'); // 当商品为电子卡券类型商品时，兑换生效期类型：1付款完成立即生效，2付款完成N小时后生效,3付款完成次日生效
+        $effectiveHour             =   $request->json('effective_hour'); // 当商品为电子卡券类型商品时，兑换生效期类型为付款完成N小时后生效，例如：12，为12小时候生效
+        $validPeriodType           =   $request->json('valid_period_type'); // 当商品为电子卡券类型商品时，使用有效期类型：1长期有效，2具有明确截止时间例如2019-01-01到2019-01-31，3自购买之日起，N小时内有效,4自购买之日起，N天内有效
+        $addTime                   =   $request->json('add_time');
+        $validPeriodHour           =   $request->json('valid_period_hour'); // 当商品为电子卡券类型商品时，使用有效期类型为3自购买之日起，N小时内有效
+        $validPeriodDay            =   $request->json('valid_period_day'); // 当商品为电子卡券类型商品时，使用有效期类型为4自购买之日起，N天内有效
+        $isExpiredRefund           =   $request->json('is_expired_refund'); // 当商品为电子卡券类型商品时，是否支持过期退款
+        $stockMode                 =   $request->json('stock_mode'); // 库存计数：1拍下减库存，2付款减库存，3出库减库存 拍下减库存：买家拍下商品即减少库存，存在恶拍风险。热销商品如需避免超卖可选此方式
+        $status                    =   $request->json('status'); // 1出售中，2审核中，3已下架，4商品违规下架
+        
+        if($addTime) {
+            $addTimeBegin              =   $addTime[0]; // 当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，开始时间
+            $addTimeEnd                =   $addTime[1]; // 当商品为电子卡券类型商品时，使用有效期类型为2具有明确截止时间时，结束时间
         } else {
-            $merchantData['uid'] = $uid;
-            $merchantData['bank_name'] = $bankName;
-            $merchantData['bank_payee'] = $bankPayee;
-            $merchantData['bank_number'] = $bankNumber;
-            $merchantInfo = Merchant::create($merchantData);
-            $data['mch_id'] = $merchantInfo['id'];
+            $addTimeBegin              =   null;
+            $addTimeEnd                =   null;
+        }
+
+        if(empty($shopId)) {
+            return $this->error('请选择所属商家！');
+        }
+
+        if(empty($goodsCategoryId)) {
+            return $this->error('请选择所属分类！');
+        }
+
+        if(empty($goodsName)) {
+            return $this->error('请填写商品名称！');
+        }
+
+        if(empty($goodsSkus)) {
+            if(empty($goodsPrice)) {
+                return $this->error('请填写店铺价！');
+            }
+            if(empty($stockNum)) {
+                return $this->error('请填写商品库存！');
+            }
         }
 
         if ($status == true) {
@@ -912,65 +916,205 @@ class GoodsController extends BuilderController
             $status = 2;
         }
 
-        if ($openStatus == true) {
-            $openStatus = 1;
-        } else {
-            $openStatus = 2;
-        }
-
-        if ($commentStatus == true) {
-            $commentStatus = 1;
-        } else {
-            $commentStatus = 2;
-        }
-
-        $data['title'] = $title;
-        $data['logo'] = $logo[0]['id'];
-        $data['category_id'] = $categoryId;
-        $data['tags'] = $tags;
+        $data['goods_name'] = $goodsName;
+        $data['shop_id'] = $shopId;
+        $data['goods_category_id'] = $goodsCategoryId[count($goodsCategoryId)-1];
+        $data['goods_mode'] = $goodsMode;
+        $data['keywords'] = $keywords;
         $data['description'] = $description;
-        $data['content'] = $content;
-        $data['cover_ids'] = json_encode($coverIds);
-        $data['level'] = $level;
-        $data['position'] = collect($position)->sum();
-        $data['username'] = $username;
-        $data['phone'] = $phone;
-        $data['province'] = $area[0];
-        $data['city'] = $area[1];
-        $data['county'] = $area[2];
-        $data['address'] = $address;
+        $data['pricing_mode'] = $pricingMode;
+        $data['goods_unit_id'] = $goodsUnitId;
+        $data['goods_brand_id'] = $goodsBrandId;
+        $data['goods_moq'] = $goodsMoq;
+        $data['goods_price'] = $goodsPrice;
+        $data['market_price'] = $marketPrice;
+        $data['cost_price'] = $costPrice;
+        $data['stock_num'] = $stockNum;
+        $data['warn_num'] = $warnNum;
+        $data['goods_sn'] = $goodsSn;
+        $data['goods_barcode'] = $goodsBarcode;
 
-        if($map) {
-            $maps = explode(',',$map);
-            $data['longitude'] = $maps[0];
-            $data['latitude'] = $maps[1];
+        if($coverId) {
+            $data['cover_id'] = $coverId[0]['id'];
         }
 
-        if($businessLicenseCoverId) {
-            $data['business_license_cover_id'] = $businessLicenseCoverId[0]['id'];
+        if($videoId) {
+            $data['video_id'] = $videoId[0]['id'];
         }
 
-        $data['corporate_name'] = $corporateName;
-        $data['corporate_idcard'] = $corporateIdcard;
-
-        if($corporateIdcardCoverId) {
-            $data['corporate_idcard_cover_id'] = $corporateIdcardCoverId[0]['id'];
-        }
-
-        $data['comment_status'] = $commentStatus;
-        $data['open_days'] = json_encode($openDays);
-
-        $getOpenTimes = [date("H:i", strtotime($openTimes[0])),date("H:i", strtotime($openTimes[1]))];
-
-        $data['open_times'] = json_encode($getOpenTimes);
-        $data['open_status'] = $openStatus;
-        $data['is_self'] = $isSelf;
+        $data['pc_content'] = $pcContent;
+        $data['mobile_content'] = $mobileContent;
+        $data['top_layout_id'] = $topLayoutId;
+        $data['bottom_layout_id'] = $bottomLayoutId;
+        $data['packing_layout_id'] = $packingLayoutId;
+        $data['service_layout_id'] = $serviceLayoutId;
+        $data['goods_weight'] = $goodsWeight;
+        $data['goods_volume'] = $goodsVolume;
+        $data['goods_freight_type'] = $goodsFreightType;
+        $data['freight_id'] = $freightId;
+        $data['effective_type'] = $effectiveType;
+        $data['effective_hour'] = $effectiveHour;
+        $data['valid_period_type'] = $validPeriodType;
+        $data['add_time_begin'] = $addTimeBegin;
+        $data['add_time_end'] = $addTimeEnd;
+        $data['valid_period_hour'] = $validPeriodHour;
+        $data['valid_period_day'] = $validPeriodDay;
+        $data['is_expired_refund'] = $isExpiredRefund;
+        $data['stock_mode'] = $stockMode;
         $data['status'] = $status;
 
-        $result = Goods::where('id',$id)->update($data);
+        if(!empty($goodsSkus)) {
+            $data['is_sku'] = 1;
+        } else {
+            $data['is_sku'] = 0;
+        }
+
+        // 添加商品sku
+        if(!empty($goodsSkus)) {
+            foreach($goodsSkus as $key => $value) {
+
+                if(empty($value['stock_num'])) {
+                    return $this->error('请填写库存！');
+                }
+
+                if(empty($value['goods_price'])) {
+                    return $this->error('请填写商品价格！');
+                }
+            }
+        }
+
+        $result = false;
+
+        // 启动事务
+        DB::beginTransaction();
+        try {
+
+            foreach($requestData as $key => $value) {
+                if(strpos($key,'system_goods_attribute_') !== false) {
+                    // 平台系统属性
+                    $attrId = str_replace("system_goods_attribute_","",$key);
+                    $systemAttrs[] = ['attr_id' => $attrId,'attr_vid' => $value];
+                }
+            }
+
+            // 平台系统属性
+            $data['goods_attrs'] = json_encode($systemAttrs);
+
+            $shopAttrs = [];
+
+            // "other_attr_name":"产地","other_attr_value":"唐山",
+            if(!empty($shopGoodsAttributeNames)) {
+                foreach($shopGoodsAttributeNames as $key => $shopGoodsAttributeName) {
+                    $shopAttrs[] = ['other_attr_name' => $shopGoodsAttributeName,'other_attr_value' => $shopGoodsAttributeValues[$key]];
+                }
+            }
+
+            // 商家自定义属性
+            $data['other_attrs'] = json_encode($shopAttrs);
+
+            $result = Goods::where('id',$id)->update($data);
+
+            GoodsCategoryRelationship::where('goods_id',$id)->delete();
+
+            if(!empty($otherCategoryIds)) {
+                foreach($otherCategoryIds as $otherCategoryIdKey => $otherCategoryId) {
+                    $otherCategoryData['goods_id'] = $id;
+                    $otherCategoryData['goods_category_id'] = $otherCategoryId;
+                    GoodsCategoryRelationship::create($otherCategoryData);
+                }
+            }
+
+            GoodsInfoAttributeValue::where('goods_id',$id)->delete();
+
+            foreach($requestData as $key => $value) {
+                if(strpos($key,'system_goods_attribute_') !== false) {
+                    // 平台系统属性
+                    $attrId = str_replace("system_goods_attribute_","",$key);
+
+                    // 添加平台系统属性spu
+                    $data1['goods_id'] = $id;
+                    $data1['goods_attribute_id'] = $attrId;
+                    $data1['goods_attribute_value_id'] = json_encode($value);
+                    $data1['type'] = 1;
+
+                    $result1 = GoodsInfoAttributeValue::create($data1);
+                }
+            }
+
+            GoodsSku::where('goods_id',$id)->delete();
+
+            // 添加商品sku
+            if(!empty($goodsSkus)) {
+                $data2['goods_id'] = $id;
+                $data2['shop_id'] = $shopId;
+
+                foreach($goodsSkus as $key => $value) {
+
+                    $properties = '';
+                    $propertyName = '';
+
+                    foreach($value as $key1 => $value1) {
+                        if(strpos($key1,'goodsAttribute_') !== false) {
+
+                            $arr = explode(';',$value1);
+                            $goodsAttributeName = explode(':',$arr[1])[1];
+                            $goodsAttributeValueName = explode(':',$arr[3])[1];
+
+                            $properties = $properties.','.$goodsAttributeName.':'.$goodsAttributeValueName;
+                            $propertyName = $propertyName.','.$goodsAttributeName;
+                        }
+                    }
+
+                    $data2['properties'] = trim($properties,",");
+                    $data2['property_name'] = trim($propertyName,",");
+                    $data2['stock_num'] = $value['stock_num'];
+                    $data2['cost_price'] = $value['cost_price'];
+                    $data2['goods_price'] = $value['goods_price'];
+                    $data2['market_price'] = $value['market_price'];
+                    $data2['goods_sn'] = $value['goods_sn'];
+                    $data2['goods_barcode'] = $value['goods_barcode'];
+                    $data2['status'] = $value['status'];
+
+                    if(empty($data2['stock_num'])) {
+                        return $this->error('请填写库存！');
+                    }
+
+                    if(empty($data2['goods_price'])) {
+                        return $this->error('请填写商品价格！');
+                    }
+
+                    $result2 = GoodsSku::create($data2);
+
+                    foreach($value as $key1 => $value1) {
+                        if(strpos($key1,'goodsAttribute_') !== false) {
+
+                            $arr = explode(';',$value1);
+                            $skuId = explode(':',$arr[0])[1];
+                            $skuName = explode(':',$arr[1])[1];
+                            $skuValueId = explode(':',$arr[2])[1];
+                            $skuValueName = explode(':',$arr[3])[1];
+
+                            // 添加规格sku
+                            $data3['goods_id'] = $id;
+                            $data3['goods_sku_id'] = $result2->id;
+                            $data3['goods_attribute_id'] = $skuId;
+                            $data3['goods_attribute_value_id'] = $skuValueId;
+                            $data3['type'] = 2;
+                            GoodsInfoAttributeValue::create($data3);
+                        }
+                    }
+                }
+            }
+
+             // 提交事务
+            DB::commit();	
+        } catch (\Exception $e) {
+            // 回滚事务
+            DB::rollback();
+        }
 
         if ($result) {
-            return $this->success('操作成功！','/mall/shop/index');
+            return $this->success('操作成功！');
         } else {
             return $this->error('操作失败！');
         }
@@ -992,7 +1136,7 @@ class GoodsController extends BuilderController
         if(!empty($fileList)) {
             foreach($fileList as $key => $value) {
                 $data['goods_id'] = $goodsId;
-                $data['goods_sku_id'] = null;
+                $data['goods_color_attribute_value_id'] = null;
                 $data['cover_id'] = $value['id'];
                 $data['sort'] = $key;
                 GoodsPhoto::create($data);
@@ -1008,16 +1152,56 @@ class GoodsController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
+    public function imageEdit(Request $request)
+    {
+        $id = $request->get('id');
+
+        if(empty($id)) {
+            return $this->error('参数错误！');
+        }
+
+        $goodsPhotos = GoodsPhoto::where('goods_id',$id)
+        ->get()
+        ->toArray();
+
+        $data['cover_id'] = false;
+
+        if(!empty($goodsPhotos)) {
+            foreach($goodsPhotos as $key => $value) {
+                $data['cover_id'][$key]['id'] =$value['cover_id'];
+                $data['cover_id'][$key]['uid'] =$value['cover_id'];
+                $data['cover_id'][$key]['name'] = Helper::getPicture($value['cover_id'],'name');
+                $data['cover_id'][$key]['url'] = Helper::getPicture($value['cover_id']);
+            }
+        }
+
+        return $this->success('操作成功！','',$data);
+    }
+
+    /**
+     * 编辑上传封面图
+     * 
+     * @param  Request  $request
+     * @return Response
+     */
     public function imageSave(Request $request)
     {
         $goodsId     =   $request->json('goods_id'); // 商品ID
         $fileList    =   $request->json('file_list'); // 封面图
 
-        if ($result) {
-            return $this->success('操作成功！','/mall/goods/complete?id='.$goodsId);
-        } else {
-            return $this->error('操作失败！');
+        GoodsPhoto::where('goods_id',$goodsId)->delete();
+
+        if(!empty($fileList)) {
+            foreach($fileList as $key => $value) {
+                $data['goods_id'] = $goodsId;
+                $data['goods_color_attribute_value_id'] = null;
+                $data['cover_id'] = $value['id'];
+                $data['sort'] = $key;
+                GoodsPhoto::create($data);
+            }
         }
+
+        return $this->success('操作成功！');
     }
 
     /**

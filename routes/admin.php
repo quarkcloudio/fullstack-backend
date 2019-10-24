@@ -191,6 +191,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/goods/save', 'Admin\\GoodsController@save')->name('api/admin/goods/save');
     
     Route::post('admin/goods/imageStore', 'Admin\\GoodsController@imageStore')->name('api/admin/goods/imageStore');
+    Route::get('admin/goods/imageEdit', 'Admin\\GoodsController@imageEdit')->name('api/admin/goods/imageEdit');
     Route::post('admin/goods/imageSave', 'Admin\\GoodsController@imageSave')->name('api/admin/goods/imageSave');
     Route::get('admin/goods/complete', 'Admin\\GoodsController@complete')->name('api/admin/goods/complete');
 

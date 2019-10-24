@@ -20,7 +20,7 @@ class GoodsPhoto extends Model
      */
     protected $fillable = [
         'goods_id',
-        'goods_sku_id',
+        'goods_color_attribute_value_id',
         'cover_id',
         'sort'
     ];

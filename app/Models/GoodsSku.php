@@ -24,11 +24,11 @@ class GoodsSku extends Model
         'properties',
         'property_name',
         'stock_num',
-        'warn_num',
         'cost_price',
         'goods_price',
         'market_price',
         'goods_sn',
-        'goods_barcode'
+        'goods_barcode',
+        'status'
     ];
 }

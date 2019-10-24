@@ -16,10 +16,10 @@ class CreateGoodsPhotosTable extends Migration
         Schema::create('goods_photos', function (Blueprint $table) {
             $table->engine='innodb';
             $table->increments('id');
-            $table->integer('goods_id')->unsigned()->nullable(); 
-            $table->integer('goods_sku_id')->nullable();            
-            $table->integer('cover_id')->default('0')->nullable()->comment('商品相册'); 
-            $table->integer('sort')->default('0')->nullable()->comment('排序');    
+            $table->integer('goods_id')->unsigned()->nullable();
+            $table->integer('goods_color_attribute_value_id')->nullable()->comment('商品颜色属性值的id，为每个颜色上传不同的商品图');      
+            $table->integer('cover_id')->default('0')->nullable()->comment('商品相册');
+            $table->integer('sort')->default('0')->nullable()->comment('排序');
         });
     }
 
