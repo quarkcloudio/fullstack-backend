@@ -23,7 +23,7 @@ class SearchController extends Controller
 
         switch ($module) {
             case 'article':
-                    $lists = DB::table('posts')
+                    $items = DB::table('posts')
                     ->where('posts.type', 'ARTICLE')
                     ->where('posts.status', 1)
                     ->where('posts.title', 'like', '%'.mb_convert_encoding($query,'UTF-8','auto').'%')
@@ -31,7 +31,7 @@ class SearchController extends Controller
                     ->paginate(8);
                 break;
             case 'page':
-                    $lists = DB::table('posts')
+                    $items = DB::table('posts')
                     ->where('posts.type', 'PAGE')
                     ->where('posts.status', 1)
                     ->where('posts.title', 'like', '%'.mb_convert_encoding($query,'UTF-8','auto').'%')
@@ -39,7 +39,7 @@ class SearchController extends Controller
                     ->paginate(8);
                 break;
             default:
-                    $lists = DB::table('posts')
+                    $items = DB::table('posts')
                     ->where('posts.type', 'ARTICLE')
                     ->where('posts.status', 1)
                     ->where('posts.title', 'like', '%'.mb_convert_encoding($query,'UTF-8','auto').'%')
@@ -47,12 +47,13 @@ class SearchController extends Controller
                     ->paginate(8);
                 break;
         }
+        
         // 获取文章内图片
-        foreach ($lists as $key => $value) {
-            $lists[$key]->content_pictures = Helper::getContentPicture($value->content);
+        foreach ($items as $key => $value) {
+            $items[$key]->content_pictures = Helper::getContentPicture($value->content);
         }
 
-        $data['lists'] = $lists;
+        $data['items'] = $items;
         $data['query'] = $query;
 
         return view('home/search',$data);

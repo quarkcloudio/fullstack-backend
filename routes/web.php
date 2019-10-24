@@ -62,6 +62,7 @@ Route::group(['prefix' => 'cashier','namespace' => 'Cashier'],function ($router)
 // Home未登录路由组
 Route::group(['namespace' => 'Home'],function ($router) {
     $router->get('/', 'IndexController@index')->name('/');
+    $router->get('home/index', 'IndexController@index')->name('home/index');
     $router->get('home/index/index', 'IndexController@index')->name('home/index/index');
     $router->get('home/page/index', 'PageController@index')->name('home/page/index');
     $router->get('home/article/index', 'ArticleController@index')->name('home/article/index');

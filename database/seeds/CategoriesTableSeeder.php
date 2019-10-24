@@ -23,7 +23,7 @@ class CategoriesTableSeeder extends Seeder
                 'description' =>'默认分类',
                 'count' =>0,
                 'index_tpl' =>'article/index',
-                'lists_tpl' =>'article/lists',
+                'lists_tpl' =>'article/list',
                 'detail_tpl' =>'article/detail',
                 'page_num' =>10,
                 'status' =>1,

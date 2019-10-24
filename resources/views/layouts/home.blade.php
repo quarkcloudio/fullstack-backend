@@ -64,7 +64,7 @@
                         @endif
                     @endnavs
                 </ul>
-                <form method="get" action="/pc/search/index" class="form-inline my-2 my-lg-0">
+                <form method="get" action="/home/search/index" class="form-inline my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search" @if(isset($_GET['query']))value="{{$_GET['query']}}"@endif aria-label="Search">
                     <input class="form-control mr-sm-2" type="hidden" name="module" value="article" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">搜索</button>

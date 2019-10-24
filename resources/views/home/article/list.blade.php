@@ -2,9 +2,9 @@
 <!-- 引入模板布局 -->
 @extends('layouts.home')
 <!-- 定义标题 -->
-@section('title', '搜索“'.$query.'”的结果')
-@section('keywords', '搜索“'.$query.'”的结果')
-@section('description', '搜索“'.$query.'”的结果')
+@section('title', $category->title)
+@section('keywords', $category->description)
+@section('description', $category->description)
 
 @section('content')
   <div class="banner rounded"> 
@@ -31,19 +31,19 @@
   <main role="main" class="container"> 
    <div class="row"> 
     <div class="col-md-8 blog-main"> 
-     <h3 class="pb-4 mb-4 font-italic border-bottom"> 搜索“{{ $query }}”的结果 </h3>
-     @foreach($items as $key => $item)
+     <h3 class="pb-4 mb-4 font-italic border-bottom"> {{$category->title}} </h3>
+     @foreach($articles as $key => $article)
      <div class="blog-post"> 
-      <h2 class="blog-post-title"><a href="/home/{{ $_GET['module'] }}/detail?id={{$item->id}}">{{ $helper::msubstr($item->title,0,30) }}</a></h2> 
-      <p class="blog-post-meta">{{date('Y-m-d',strtotime($item->created_at))}}</p> 
+      <h2 class="blog-post-title"><a href="/home/article/detail?id={{$article['id']}}">{{ $helper::msubstr($article['title'],0,30) }}</a></h2> 
+      <p class="blog-post-meta">{{date('Y-m-d',strtotime($article['created_at']))}}</p> 
         <p>
-            {!!strip_tags($item->description)!!}
+            {!!strip_tags($article['description'])!!}
         </p>
      </div>
      <!-- /.blog-post -->
      @endforeach
      <nav class="blog-pagination">
-        {{ $items->appends(['query'=>$query,'module'=>$_GET['module']])->links() }}
+        {{ $articles->appends(['name'=>$category->name])->links() }}
      </nav>
     </div>
     <!-- /.blog-main --> 

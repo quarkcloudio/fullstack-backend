@@ -393,6 +393,7 @@ class Helper
     */
 	static function urlSelected($url,$selected = 'active')
     {
+        $result = '';
 
         if (!empty($url)) {
             
@@ -406,15 +407,16 @@ class Helper
 
             $getUrl = $baseUrl.$host.$requestUri;
 
-            if(!(strpos($getUrl, $url) !== false) || (($requestUri =='/') && ($url == '/home/index/index'))) {
-                $selected = '';
+            if($requestUri =='/' && $url == '/home/index/index') {
+                $result = $selected;
+            } else {
+                if(strpos($getUrl, $url) !== false) {
+                    $result = $selected;
+                }
             }
-
-        } else {
-            $selected = '';
         }
 
-        return $selected;
+        return $result;
     }
 
     /**
