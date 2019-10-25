@@ -460,6 +460,14 @@ class GoodsController extends BuilderController
         if(!empty($goodsSkus)) {
             foreach($goodsSkus as $key => $value) {
 
+                if(!isset($value['stock_num'])) {
+                    return $this->error('请填写库存！');
+                }
+
+                if(!isset($value['goods_price'])) {
+                    return $this->error('请填写商品价格！');
+                }
+
                 if(empty($value['stock_num'])) {
                     return $this->error('请填写库存！');
                 }
@@ -556,6 +564,38 @@ class GoodsController extends BuilderController
                     $propertyIds = trim($propertyIds);
                     $propertyNames = trim($propertyNames);
 
+                    if(!isset($value['stock_num'])) {
+                        return $this->error('请填写库存！');
+                    }
+
+                    if(!isset($value['goods_price'])) {
+                        return $this->error('请填写商品价格！');
+                    }
+
+                    if(!isset($value['cost_price'])) {
+                        $value['cost_price'] = 0;
+                    }
+
+                    if(!isset($value['market_price'])) {
+                        $value['market_price'] = 0;
+                    }
+
+                    if(!isset($value['goods_sn'])) {
+                        $value['goods_sn'] = '';
+                    }
+
+                    if(!isset($value['goods_barcode'])) {
+                        $value['goods_barcode'] = '';
+                    }
+
+                    if(empty($value['stock_num'])) {
+                        return $this->error('请填写库存！');
+                    }
+
+                    if(empty($value['goods_price'])) {
+                        return $this->error('请填写商品价格！');
+                    }
+
                     $data2['properties'] = $properties;
                     $data2['property_ids'] = $propertyIds;
                     $data2['property_names'] = $propertyNames;
@@ -566,14 +606,6 @@ class GoodsController extends BuilderController
                     $data2['goods_sn'] = $value['goods_sn'];
                     $data2['goods_barcode'] = $value['goods_barcode'];
                     $data2['status'] = $value['status'];
-
-                    if(empty($data2['stock_num'])) {
-                        return $this->error('请填写库存！');
-                    }
-
-                    if(empty($data2['goods_price'])) {
-                        return $this->error('请填写商品价格！');
-                    }
 
                     $result2 = GoodsSku::create($data2);
 
@@ -985,6 +1017,14 @@ class GoodsController extends BuilderController
         if(!empty($goodsSkus)) {
             foreach($goodsSkus as $key => $value) {
 
+                if(!isset($value['stock_num'])) {
+                    return $this->error('请填写库存！');
+                }
+
+                if(!isset($value['goods_price'])) {
+                    return $this->error('请填写商品价格！');
+                }
+
                 if(empty($value['stock_num'])) {
                     return $this->error('请填写库存！');
                 }
@@ -1090,6 +1130,38 @@ class GoodsController extends BuilderController
                         GoodsSku::where('goods_id',$id)->delete();
                     }
 
+                    if(!isset($value['stock_num'])) {
+                        return $this->error('请填写库存！');
+                    }
+
+                    if(!isset($value['goods_price'])) {
+                        return $this->error('请填写商品价格！');
+                    }
+
+                    if(!isset($value['cost_price'])) {
+                        $value['cost_price'] = 0;
+                    }
+
+                    if(!isset($value['market_price'])) {
+                        $value['market_price'] = 0;
+                    }
+
+                    if(!isset($value['goods_sn'])) {
+                        $value['goods_sn'] = '';
+                    }
+
+                    if(!isset($value['goods_barcode'])) {
+                        $value['goods_barcode'] = '';
+                    }
+
+                    if(empty($value['stock_num'])) {
+                        return $this->error('请填写库存！');
+                    }
+
+                    if(empty($value['goods_price'])) {
+                        return $this->error('请填写商品价格！');
+                    }
+
                     $data2['properties'] = $properties;
                     $data2['property_ids'] = $propertyIds;
                     $data2['property_names'] = $propertyNames;
@@ -1100,14 +1172,6 @@ class GoodsController extends BuilderController
                     $data2['goods_sn'] = $value['goods_sn'];
                     $data2['goods_barcode'] = $value['goods_barcode'];
                     $data2['status'] = $value['status'];
-
-                    if(empty($data2['stock_num'])) {
-                        return $this->error('请填写库存！');
-                    }
-
-                    if(empty($data2['goods_price'])) {
-                        return $this->error('请填写商品价格！');
-                    }
 
                     $hasGoodsSku = GoodsSku::where('properties',$properties)->where('goods_id',$id)->first();
                     if($hasGoodsSku) {
