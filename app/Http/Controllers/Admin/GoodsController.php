@@ -472,32 +472,32 @@ class GoodsController extends BuilderController
 
         $result = false;
 
-        // 启动事务
-        DB::beginTransaction();
-        try {
+        // // 启动事务
+        // DB::beginTransaction();
+        // try {
 
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_goods_attribute_') !== false) {
                     // 平台系统属性
                     $attrId = str_replace("system_goods_attribute_","",$key);
-                    $systemAttrs[] = ['attr_id' => $attrId,'attr_vid' => $value];
+                    $systemAttrs[] = ['attribute_id' => $attrId,'attribute_value_id' => $value];
                 }
             }
 
             // 平台系统属性
-            $data['goods_attrs'] = json_encode($systemAttrs);
+            $data['goods_system_spus'] = json_encode($systemAttrs);
 
             $shopAttrs = [];
 
             // "other_attr_name":"产地","other_attr_value":"唐山",
             if(!empty($shopGoodsAttributeNames)) {
                 foreach($shopGoodsAttributeNames as $key => $shopGoodsAttributeName) {
-                    $shopAttrs[] = ['other_attr_name' => $shopGoodsAttributeName,'other_attr_value' => $shopGoodsAttributeValues[$key]];
+                    $shopAttrs[] = ['attribute_name' => $shopGoodsAttributeName,'attribute_value' => $shopGoodsAttributeValues[$key]];
                 }
             }
 
             // 商家自定义属性
-            $data['other_attrs'] = json_encode($shopAttrs);
+            $data['goods_shop_spus'] = json_encode($shopAttrs);
 
             $result = Goods::create($data);
 
@@ -530,23 +530,35 @@ class GoodsController extends BuilderController
                 $data2['shop_id'] = $shopId;
 
                 foreach($goodsSkus as $key => $value) {
+
                     $properties = '';
-                    $propertyName = '';
+                    $propertyIds = '';
+                    $propertyNames = '';
+
+                    ksort($value);
 
                     foreach($value as $key1 => $value1) {
                         if(strpos($key1,'goodsAttribute_') !== false) {
 
                             $arr = explode(';',$value1);
+                            $goodsAttributeId = explode(':',$arr[0])[1];
                             $goodsAttributeName = explode(':',$arr[1])[1];
+                            $goodsAttributeValueId = explode(':',$arr[2])[1];
                             $goodsAttributeValueName = explode(':',$arr[3])[1];
 
-                            $properties = $properties.','.$goodsAttributeName.':'.$goodsAttributeValueName;
-                            $propertyName = $propertyName.','.$goodsAttributeName;
+                            $properties = $properties.';'.$goodsAttributeId.':'.$goodsAttributeValueId;
+                            $propertyIds = $propertyIds.';'.$goodsAttributeId;
+                            $propertyNames = $propertyNames.' '.$goodsAttributeValueName;
                         }
                     }
 
-                    $data2['properties'] = trim($properties,",");
-                    $data2['property_name'] = trim($propertyName,",");
+                    $properties = trim($properties,";");
+                    $propertyIds = trim($propertyIds);
+                    $propertyNames = trim($propertyNames);
+
+                    $data2['properties'] = $properties;
+                    $data2['property_ids'] = $propertyIds;
+                    $data2['property_names'] = $propertyNames;
                     $data2['stock_num'] = $value['stock_num'];
                     $data2['cost_price'] = $value['cost_price'];
                     $data2['goods_price'] = $value['goods_price'];
@@ -569,16 +581,16 @@ class GoodsController extends BuilderController
                         if(strpos($key1,'goodsAttribute_') !== false) {
 
                             $arr = explode(';',$value1);
-                            $skuId = explode(':',$arr[0])[1];
-                            $skuName = explode(':',$arr[1])[1];
-                            $skuValueId = explode(':',$arr[2])[1];
-                            $skuValueName = explode(':',$arr[3])[1];
+                            $goodsAttributeId = explode(':',$arr[0])[1];
+                            $goodsAttributeName = explode(':',$arr[1])[1];
+                            $goodsAttributeValueId = explode(':',$arr[2])[1];
+                            $goodsAttributeValueName = explode(':',$arr[3])[1];
 
-                            // 添加规格sku
+                            // 更新或添加规格sku
                             $data3['goods_id'] = $result->id;
                             $data3['goods_sku_id'] = $result2->id;
-                            $data3['goods_attribute_id'] = $skuId;
-                            $data3['goods_attribute_value_id'] = $skuValueId;
+                            $data3['goods_attribute_id'] = $goodsAttributeId;
+                            $data3['goods_attribute_value_id'] = $goodsAttributeValueId;
                             $data3['type'] = 2;
                             GoodsInfoAttributeValue::create($data3);
                         }
@@ -586,12 +598,12 @@ class GoodsController extends BuilderController
                 }
             }
 
-             // 提交事务
-            DB::commit();	
-        } catch (\Exception $e) {
-            // 回滚事务
-            DB::rollback();
-        }
+        //      // 提交事务
+        //     DB::commit();	
+        // } catch (\Exception $e) {
+        //     // 回滚事务
+        //     DB::rollback();
+        // }
 
         if ($result) {
             return $this->success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
@@ -691,7 +703,7 @@ class GoodsController extends BuilderController
             $systemGoodsAttributes[$key]['goods_attribute_value_id'] = json_decode($goodsInfoAttributeValue['goods_attribute_value_id']);
         }
 
-        $shopGoodsAttributes = json_decode($data['other_attrs']);
+        $shopGoodsAttributes = json_decode($data['goods_shop_spus']);
         $data['shopGoodsAttributes'] = $shopGoodsAttributes;
         $data['keys'] = [];
         foreach($shopGoodsAttributes as $key => $shopGoodsAttribute)
@@ -986,31 +998,31 @@ class GoodsController extends BuilderController
         $result = false;
 
         // 启动事务
-        DB::beginTransaction();
-        try {
+        // DB::beginTransaction();
+        // try {
 
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_goods_attribute_') !== false) {
                     // 平台系统属性
                     $attrId = str_replace("system_goods_attribute_","",$key);
-                    $systemAttrs[] = ['attr_id' => $attrId,'attr_vid' => $value];
+                    $systemAttrs[] = ['attribute_id' => $attrId,'attribute_value_id' => $value];
                 }
             }
 
             // 平台系统属性
-            $data['goods_attrs'] = json_encode($systemAttrs);
+            $data['goods_system_spus'] = json_encode($systemAttrs);
 
             $shopAttrs = [];
 
-            // "other_attr_name":"产地","other_attr_value":"唐山",
+            // "attribute_name":"产地","attribute_value":"唐山",
             if(!empty($shopGoodsAttributeNames)) {
                 foreach($shopGoodsAttributeNames as $key => $shopGoodsAttributeName) {
-                    $shopAttrs[] = ['other_attr_name' => $shopGoodsAttributeName,'other_attr_value' => $shopGoodsAttributeValues[$key]];
+                    $shopAttrs[] = ['attribute_name' => $shopGoodsAttributeName,'attribute_value' => $shopGoodsAttributeValues[$key]];
                 }
             }
 
             // 商家自定义属性
-            $data['other_attrs'] = json_encode($shopAttrs);
+            $data['goods_shop_spus'] = json_encode($shopAttrs);
 
             $result = Goods::where('id',$id)->update($data);
 
@@ -1041,8 +1053,6 @@ class GoodsController extends BuilderController
                 }
             }
 
-            GoodsSku::where('goods_id',$id)->delete();
-
             // 添加商品sku
             if(!empty($goodsSkus)) {
                 $data2['goods_id'] = $id;
@@ -1051,22 +1061,38 @@ class GoodsController extends BuilderController
                 foreach($goodsSkus as $key => $value) {
 
                     $properties = '';
-                    $propertyName = '';
+                    $propertyIds = '';
+                    $propertyNames = '';
+
+                    ksort($value);
 
                     foreach($value as $key1 => $value1) {
                         if(strpos($key1,'goodsAttribute_') !== false) {
 
                             $arr = explode(';',$value1);
+                            $goodsAttributeId = explode(':',$arr[0])[1];
                             $goodsAttributeName = explode(':',$arr[1])[1];
+                            $goodsAttributeValueId = explode(':',$arr[2])[1];
                             $goodsAttributeValueName = explode(':',$arr[3])[1];
 
-                            $properties = $properties.','.$goodsAttributeName.':'.$goodsAttributeValueName;
-                            $propertyName = $propertyName.','.$goodsAttributeName;
+                            $properties = $properties.';'.$goodsAttributeId.':'.$goodsAttributeValueId;
+                            $propertyIds = $propertyIds.';'.$goodsAttributeId;
+                            $propertyNames = $propertyNames.' '.$goodsAttributeValueName;
                         }
                     }
 
-                    $data2['properties'] = trim($properties,",");
-                    $data2['property_name'] = trim($propertyName,",");
+                    $properties = trim($properties,";");
+                    $propertyIds = trim($propertyIds);
+                    $propertyNames = trim($propertyNames);
+
+                    $dontNeedDelSku = GoodsSku::where('property_ids',$propertyIds)->where('goods_id',$id)->first();
+                    if(!$dontNeedDelSku) {
+                        GoodsSku::where('goods_id',$id)->delete();
+                    }
+
+                    $data2['properties'] = $properties;
+                    $data2['property_ids'] = $propertyIds;
+                    $data2['property_names'] = $propertyNames;
                     $data2['stock_num'] = $value['stock_num'];
                     $data2['cost_price'] = $value['cost_price'];
                     $data2['goods_price'] = $value['goods_price'];
@@ -1083,22 +1109,29 @@ class GoodsController extends BuilderController
                         return $this->error('请填写商品价格！');
                     }
 
-                    $result2 = GoodsSku::create($data2);
+                    $hasGoodsSku = GoodsSku::where('properties',$properties)->where('goods_id',$id)->first();
+                    if($hasGoodsSku) {
+                        $result2 = GoodsSku::where('id',$hasGoodsSku['id'])->update($data2);
+                        $goodsSkuId = $hasGoodsSku['id'];
+                    } else {
+                        $result2 = GoodsSku::create($data2);
+                        $goodsSkuId = $result2->id;
+                    }
 
                     foreach($value as $key1 => $value1) {
                         if(strpos($key1,'goodsAttribute_') !== false) {
 
                             $arr = explode(';',$value1);
-                            $skuId = explode(':',$arr[0])[1];
-                            $skuName = explode(':',$arr[1])[1];
-                            $skuValueId = explode(':',$arr[2])[1];
-                            $skuValueName = explode(':',$arr[3])[1];
+                            $goodsAttributeId = explode(':',$arr[0])[1];
+                            $goodsAttributeName = explode(':',$arr[1])[1];
+                            $goodsAttributeValueId = explode(':',$arr[2])[1];
+                            $goodsAttributeValueName = explode(':',$arr[3])[1];
 
-                            // 添加规格sku
+                            // 更新或添加规格sku
                             $data3['goods_id'] = $id;
-                            $data3['goods_sku_id'] = $result2->id;
-                            $data3['goods_attribute_id'] = $skuId;
-                            $data3['goods_attribute_value_id'] = $skuValueId;
+                            $data3['goods_sku_id'] = $goodsSkuId;
+                            $data3['goods_attribute_id'] = $goodsAttributeId;
+                            $data3['goods_attribute_value_id'] = $goodsAttributeValueId;
                             $data3['type'] = 2;
                             GoodsInfoAttributeValue::create($data3);
                         }
@@ -1107,11 +1140,11 @@ class GoodsController extends BuilderController
             }
 
              // 提交事务
-            DB::commit();	
-        } catch (\Exception $e) {
-            // 回滚事务
-            DB::rollback();
-        }
+        //     DB::commit();	
+        // } catch (\Exception $e) {
+        //     // 回滚事务
+        //     DB::rollback();
+        // }
 
         if ($result) {
             return $this->success('操作成功！');
@@ -1136,7 +1169,7 @@ class GoodsController extends BuilderController
         if(!empty($fileList)) {
             foreach($fileList as $key => $value) {
                 $data['goods_id'] = $goodsId;
-                $data['goods_color_attribute_value_id'] = null;
+                $data['goods_sku_id'] = null;
                 $data['cover_id'] = $value['id'];
                 $data['sort'] = $key;
                 GoodsPhoto::create($data);
@@ -1194,7 +1227,7 @@ class GoodsController extends BuilderController
         if(!empty($fileList)) {
             foreach($fileList as $key => $value) {
                 $data['goods_id'] = $goodsId;
-                $data['goods_color_attribute_value_id'] = null;
+                $data['goods_sku_id'] = null;
                 $data['cover_id'] = $value['id'];
                 $data['sort'] = $key;
                 GoodsPhoto::create($data);

@@ -266,7 +266,7 @@ class PictureController extends Controller
 
         $entension = $file->getClientOriginalExtension();
 
-        if (!in_array($entension, ['jpg', 'png', 'gif'])) {
+        if (!in_array(strtolower($entension), ['jpeg','jpg', 'png', 'gif'])) {
             return $this->error('只能上传jpg、png、gif格式的图片！');
         }
 
@@ -327,7 +327,7 @@ class PictureController extends Controller
 
         $entension = $file->getClientOriginalExtension();
         
-        if (!in_array($entension, ['jpg', 'png', 'gif'])) {
+        if (!in_array(strtolower($entension), ['jpeg','jpg', 'png', 'gif'])) {
             return $this->error('只能上传jpg、png、gif格式的图片！');
         }
 
