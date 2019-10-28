@@ -480,9 +480,9 @@ class GoodsController extends BuilderController
 
         $result = false;
 
-        // // 启动事务
-        // DB::beginTransaction();
-        // try {
+        // 启动事务
+        DB::beginTransaction();
+        try {
 
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_goods_attribute_') !== false) {
@@ -630,12 +630,12 @@ class GoodsController extends BuilderController
                 }
             }
 
-        //      // 提交事务
-        //     DB::commit();	
-        // } catch (\Exception $e) {
-        //     // 回滚事务
-        //     DB::rollback();
-        // }
+             // 提交事务
+            DB::commit();	
+        } catch (\Exception $e) {
+            // 回滚事务
+            DB::rollback();
+        }
 
         if ($result) {
             return $this->success('操作成功！','/mall/goods/imageCreate?id='.$result->id);
@@ -1038,8 +1038,8 @@ class GoodsController extends BuilderController
         $result = false;
 
         // 启动事务
-        // DB::beginTransaction();
-        // try {
+        DB::beginTransaction();
+        try {
 
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_goods_attribute_') !== false) {
@@ -1203,12 +1203,12 @@ class GoodsController extends BuilderController
                 }
             }
 
-             // 提交事务
-        //     DB::commit();	
-        // } catch (\Exception $e) {
-        //     // 回滚事务
-        //     DB::rollback();
-        // }
+            // 提交事务
+            DB::commit();
+        } catch (\Exception $e) {
+            // 回滚事务
+            DB::rollback();
+        }
 
         if ($result) {
             return $this->success('操作成功！');

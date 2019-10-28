@@ -80,6 +80,8 @@ class MenusTableSeeder extends Seeder
             ['id' =>'56','name' => '评价管理','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/commentIndex','show'  => '1','status' => '1'],
             ['id' =>'57','name' => '商品单位','guard_name' => 'admin','icon' => '','pid' => '46','sort' => '0','path' => '/mall/goods/unitIndex','show'  => '1','status' => '1'],
             ['id' =>'58','name' => '详情版式','guard_name' => 'admin','icon' => '','pid' => '46','sort' => '0','path' => '/mall/goods/layoutIndex','show'  => '1','status' => '1'],
+
+            ['id' =>'59','name' => '分类列表','guard_name' => 'admin','icon' => '','pid' => 3,'sort' => 0,'path' => '/article/categoryIndex','show'  => 1,'status' => 1],
         ]);
     }
 }

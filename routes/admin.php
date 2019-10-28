@@ -39,6 +39,13 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/article/changeStatus', 'Admin\\ArticleController@changeStatus')->name('api/admin/article/changeStatus');
     Route::get('admin/article/myPublished', 'Admin\\ArticleController@myPublished')->name('api/admin/article/myPublished');
     
+    Route::get('admin/article/categoryIndex', 'Admin\\ArticleController@categoryIndex')->name('api/admin/article/categoryIndex');
+    Route::get('admin/article/categoryCreate', 'Admin\\ArticleController@categoryCreate')->name('api/admin/article/categoryCreate');
+    Route::post('admin/article/categoryStore', 'Admin\\ArticleController@categoryStore')->name('api/admin/article/categoryStore');
+    Route::get('admin/article/categoryEdit', 'Admin\\ArticleController@categoryEdit')->name('api/admin/article/categoryEdit');
+    Route::post('admin/article/categorySave', 'Admin\\ArticleController@categorySave')->name('api/admin/article/categorySave');
+    Route::post('admin/article/categoryChangeStatus', 'Admin\\ArticleController@categoryChangeStatus')->name('api/admin/article/categoryChangeStatus');
+
     Route::get('admin/video/index', 'Admin\\VideoController@index')->name('api/admin/video/index');
     Route::get('admin/video/create', 'Admin\\VideoController@create')->name('api/admin/video/create');
     Route::post('admin/video/store', 'Admin\\VideoController@store')->name('api/admin/video/store');
