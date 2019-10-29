@@ -32,8 +32,9 @@ class GoodsOrder extends Model
         'send_status',
         'send_created_at',
         'send_finished_at',
-        'trade_status',
+        'status',
         'remark',
+        'is_virtual',
         'status'
     ];
 }

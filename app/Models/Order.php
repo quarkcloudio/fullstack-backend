@@ -19,25 +19,17 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'shop_id',
         'uid',
         'order_no',
-        'out_trade_no',
+        'thirdparty_order_no',
         'title',
         'total_amount',
-        'receipt_amount',
-        'invoice_amount',
-        'buyer_pay_amount',
-        'freight_amount',
+        'pay_amount',
         'point_amount',
-        'refund_fee',
-        'fund_bill_list',
-        'voucher_detail_list',
+        'discount_amount',
+        'refund_amount',
         'pay_type',
         'paid_at',
-        'refund_status',
-        'refunded_at',
-        'closed_at',
         'type',
         'status'
     ];

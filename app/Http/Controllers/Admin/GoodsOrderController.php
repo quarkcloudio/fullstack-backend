@@ -28,7 +28,9 @@ use App\Services\Helper;
 use EasyWeChat\Factory;
 use App\Models\Goods;
 use App\Models\Category;
-use App\Models\Comment;
+use App\Models\Order;
+use App\Models\GoodsOrder;
+use App\Models\GoodsOrderDetail;
 use DB;
 
 class GoodsOrderController extends BuilderController
@@ -43,7 +45,7 @@ class GoodsOrderController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function commentIndex(Request $request)
+    public function index(Request $request)
     {
         // 获取参数
         $current   = intval($request->get('current',1));
@@ -153,64 +155,19 @@ class GoodsOrderController extends BuilderController
             return $this->success('获取失败！');
         }   
     }
-
-    /**
-     * 格式化数据
-     */
-    public function commentListsFormat($lists)
-    {
-        if($lists) {
-            foreach ($lists as $key => $value) {
-                //格式化状态
-                switch ($value['status']) {
-                    case -1:
-                        $lists[$key]['status'] = '已删除';
-                        break;
-                    case 1:
-                        $lists[$key]['status'] = '正常';
-                        break;
-                    case 2:
-                        $lists[$key]['status'] = '已禁用';
-                        break;
-                    case 3:
-                        $lists[$key]['status'] = '待审核';
-                        break;
-                    default:
-                        $lists[$key]['status'] = '未知';
-                        break;
-                }
-
-                //评论对象
-                $goods = DB::table('goods')->where('id',$value['object_id'])->first();
-                if($goods) {
-                    $lists[$key]['object_title'] = $goods['goods_name'];
-                } else {
-                    $lists[$key]['object_title'] = '暂无';
-                }
-                
-                //格式化用户ID
-                $users=DB::table('users')->where('id',$value['uid'])->get();
-                foreach($users as $user){
-                    $lists[$key]['uid']=$user->nickname;
-                }
-            }
-        }
-
-        return $lists;
-    }
     
     /**
-     * Form页面模板
+     * form页面模板
      * 
      * @param  Request  $request
      * @return Response
      */
-    public function commentForm($data = [])
+    public function form($data = [])
     {
         if(isset($data['id'])) {
-            $action = 'admin/'.$this->controllerName().'/commentSave';
+            $action = 'admin/'.$this->controllerName().'/save';
         } else {
-            $action = 'admin/'.$this->controllerName().'/commentStore';
+            $action = 'admin/'.$this->controllerName().'/store';
         }
 
         $controls = [
@@ -289,7 +246,7 @@ class GoodsOrderController extends BuilderController
             $comment['status'] = false;
         }
 
-        $data = $this->commentForm($comment);
+        $data = $this->form($comment);
         
         return $this->success('获取成功！','',$data);
     }
@@ -300,7 +257,7 @@ class GoodsOrderController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function commentSave(Request $request)
+    public function save(Request $request)
     {
         $id      =   $request->json('id');
         $status  =   $request->json('status');
@@ -330,7 +287,7 @@ class GoodsOrderController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function commentChangeStatus(Request $request)
+    public function changeStatus(Request $request)
     {
         $id = $request->json('id');
         $status = $request->json('status');

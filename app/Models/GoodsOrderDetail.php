@@ -22,6 +22,8 @@ class GoodsOrderDetail extends Model
         'uid',
         'goods_id',
         'goods_sku_id',
+        'goods_properties',
+        'goods_property_names',
         'goods_order_id',
         'title',
         'num',

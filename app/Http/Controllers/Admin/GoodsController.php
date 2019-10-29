@@ -561,7 +561,7 @@ class GoodsController extends BuilderController
                     }
 
                     $properties = trim($properties,";");
-                    $propertyIds = trim($propertyIds);
+                    $propertyIds = trim($propertyIds,";");
                     $propertyNames = trim($propertyNames);
 
                     if(!isset($value['stock_num'])) {
@@ -1122,7 +1122,7 @@ class GoodsController extends BuilderController
                     }
 
                     $properties = trim($properties,";");
-                    $propertyIds = trim($propertyIds);
+                    $propertyIds = trim($propertyIds,";");
                     $propertyNames = trim($propertyNames);
 
                     $dontNeedDelSku = GoodsSku::where('property_ids',$propertyIds)->where('goods_id',$id)->first();
