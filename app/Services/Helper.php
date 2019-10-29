@@ -740,12 +740,18 @@ class Helper
         // 获取文件url，用于外部访问
         if(count(explode('[',$id))>1) {
             $ids = json_decode($id, true);
-            if(isset($ids[$key]) && isset($ids[$key][$field])) {
+            if(isset($ids[$key])) {
 
                 if($field == 'path') {
                     $field = 'url';
                 }
-                return $ids[$key][$field];
+
+                if(isset($ids[$key][$field])) {
+                    return $ids[$key][$field];
+                } else {
+                    return '//'.$_SERVER['HTTP_HOST'].'/images/default.png';
+                }
+
             } else {
                 return '//'.$_SERVER['HTTP_HOST'].'/images/default.png';
             }

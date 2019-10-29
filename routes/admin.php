@@ -25,6 +25,7 @@ Route::group(['middleware' => ['admin']], function() {
 
     Route::get('admin/console/index', 'Admin\\ConsoleController@index')->name('api/admin/console/index');
     Route::get('admin/console/clearCache', 'Admin\\ConsoleController@clearCache')->name('api/admin/console/clearCache');
+    Route::get('admin/console/update', 'Admin\\ConsoleController@update')->name('api/admin/console/update');
     
     Route::any('admin/account/info', 'Admin\\AccountController@info')->name('api/admin/account/info');
     Route::post('admin/account/profile', 'Admin\\AccountController@profile')->name('api/admin/account/profile');

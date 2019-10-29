@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Models\Order;
 use App\Models\Post;
+use App\Services\Helper;
 
 class ConsoleController extends Controller
 {
@@ -30,6 +31,8 @@ class ConsoleController extends Controller
         $result['user_data'] = $this->getUserData();
 
         $result['order_data'] = $this->getOrderData();
+
+        $result['app_version'] = config('app.version');
 
         return $this->success('获取成功！','',$result);
     }
@@ -124,5 +127,29 @@ class ConsoleController extends Controller
         } elseif($type == 2) {
             return $endDate;
         }
+    }
+
+    /**
+     * 版本升级
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function update(Request $request)
+    {
+        $header['Accept'] = 'application/json';
+
+        $repository = json_decode(Helper::curl('https://api.github.com/repos/tangtanglove/fullstack-backend/releases/latest?access_token='.base64_decode('YWM1MWIzYWQ5NjMzMGNlNGZlMTMyYTVhNWY4MDM2ZWEyM2QwY2ZjMw=='),false,'get',$header,1),true);
+
+        $result['app_version'] = config('app.version');
+        $result['repository'] = $repository;
+
+        $result['can_update'] = false;
+
+        if(isset($repository['name'])) {
+            if($repository['name'] != $result['app_version']) {
+                $result['can_update'] = true;
+            }
+        }
+
+        return $this->success('获取成功！','',$result);
     }
 }
