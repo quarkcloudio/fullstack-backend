@@ -9,6 +9,7 @@ use App\User;
 use App\Models\Order;
 use App\Models\Post;
 use App\Services\Helper;
+use Artisan;
 
 class ConsoleController extends Controller
 {
@@ -44,8 +45,15 @@ class ConsoleController extends Controller
      */
     public function clearCache(Request $request)
     {
-        Helper::clearCache();
-        return $this->success('操作成功！');
+        // Helper::clearCache();
+        
+        $result = Artisan::call('config:clear');
+
+        if($result !== false) {
+            return $this->success('操作成功！');
+        } else {
+            return $this->error('操作失败！');
+        }
     }
 
     // 获取用户统计数据
@@ -163,8 +171,10 @@ class ConsoleController extends Controller
     {
         $version   = $request->get('version');
 
-        $url = "https://dev.tencent.com/u/tangtanglove/p/fullstack-backend/git/archive/".$version.".zip";
+        // $url = 'https://github.com/tangtanglove/fullstack-backend/archive/'.$version.'.zip';
+        // $file = readfile($url);
 
+        $url ='https://dev.tencent.com/u/tangtanglove/p/fullstack-backend/git/archive/'.$version.'.zip';
         $file = Helper::curl($url,false,'get',false,1);
 
         // 默认本地上传
@@ -229,10 +239,10 @@ class ConsoleController extends Controller
     {
         $result = Artisan::call('migrate');
 
-        if($result) {
-            return $this->success('数据库更新成功！');
+        if($result !== false) {
+            return $this->success('数据库更新成功！','',$result);
         } else {
-            return $this->error('数据库更新失败！');
+            return $this->error('数据库更新失败！',$result);
         }
     }
 }
