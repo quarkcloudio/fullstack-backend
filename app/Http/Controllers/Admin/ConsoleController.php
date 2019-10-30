@@ -152,7 +152,7 @@ class ConsoleController extends Controller
         $result['app_version'] = config('app.version');
         $result['repository'] = $repository;
 
-        $result['can_update'] = true;
+        $result['can_update'] = false;
 
         if(isset($repository['name'])) {
             if($repository['name'] != $result['app_version']) {
