@@ -152,7 +152,7 @@ class ConsoleController extends Controller
         $result['app_version'] = config('app.version');
         $result['repository'] = $repository;
 
-        $result['can_update'] = false;
+        $result['can_update'] = true;
 
         if(isset($repository['name'])) {
             if($repository['name'] != $result['app_version']) {
@@ -226,7 +226,16 @@ class ConsoleController extends Controller
 
         $path = storage_path('app/').'public/uploads/files/fullstack-backend-'.$version;
 
-        Helper::copyDirToDir($path,base_path());
+        $dirs = Helper::getDir($path);
+        $files = Helper::getFileLists($path);
+
+        foreach ($dirs as $key => $value) {
+            Helper::copyDirToDir(storage_path('app/').'public/uploads/files/fullstack-backend-'.$version.'/'.$value,base_path());
+        }
+
+        foreach ($files as $key => $value) {
+            Helper::copyFileToDir(storage_path('app/').'public/uploads/files/fullstack-backend-'.$version.'/'.$value,base_path());
+        }
 
         return $this->success('程序更新成功！');
     }
