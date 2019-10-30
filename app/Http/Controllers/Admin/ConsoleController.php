@@ -152,7 +152,7 @@ class ConsoleController extends Controller
         $result['app_version'] = config('app.version');
         $result['repository'] = $repository;
 
-        $result['can_update'] = true;
+        $result['can_update'] = false;
 
         if(isset($repository['name'])) {
             if($repository['name'] != $result['app_version']) {
@@ -226,7 +226,7 @@ class ConsoleController extends Controller
 
         $path = storage_path('app/').'public/uploads/files/fullstack-backend-'.$version;
 
-        Helper::copyFileToDir($path,base_path());
+        Helper::copyDirToDir($path,base_path());
 
         return $this->success('程序更新成功！');
     }
@@ -243,6 +243,29 @@ class ConsoleController extends Controller
             return $this->success('数据库更新成功！','',$result);
         } else {
             return $this->error('数据库更新失败！',$result);
+        }
+    }
+
+    /**
+     * 完成，更新程序版本
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function finish(Request $request)
+    {
+        $version   = $request->get('version');
+
+        $data = [
+            'APP_VERSION' => $version
+        ];
+
+        Helper::modifyEnv($data);
+
+        $result = Artisan::call('config:clear');
+
+        if($result !== false) {
+            return $this->success('更新成功！');
+        } else {
+            return $this->error('更新失败！');
         }
     }
 }

@@ -209,7 +209,7 @@ class ConfigController extends BuilderController
                     ];
                 }
 
-                $this->modifyEnv($data);
+                Helper::modifyEnv($data);
             }
 
             $getResult = Config::where('name',$key)->update(['value'=>$value]);
@@ -603,32 +603,5 @@ class ConfigController extends BuilderController
         } else {
             return $this->error('操作失败！');
         }
-    }
-    
-    /**
-     * 改变env文件
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    function modifyEnv(array $data) 
-    {
-        $envPath = base_path() . DIRECTORY_SEPARATOR . '.env';
-
-        $contentArray = collect(file($envPath, FILE_IGNORE_NEW_LINES));
-        
-        $contentArray->transform(function ($item) use ($data){
-            foreach ($data as $key => $value){
-                if(Str::contains($item, $key)){
-                    return $key . '=' . $value;
-                }
-            }
-            
-            return $item;
-        });
-        
-        $content = implode($contentArray->toArray(), "\n");
-        
-        \File::put($envPath, $content);
     }
 }

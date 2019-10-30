@@ -30,6 +30,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::get('admin/console/extract', 'Admin\\ConsoleController@extract')->name('api/admin/console/extract');
     Route::get('admin/console/updateFile', 'Admin\\ConsoleController@updateFile')->name('api/admin/console/updateFile');
     Route::get('admin/console/updateDatabase', 'Admin\\ConsoleController@updateDatabase')->name('api/admin/console/updateDatabase');
+    Route::get('admin/console/finish', 'Admin\\ConsoleController@finish')->name('api/admin/console/finish');
     
     Route::any('admin/account/info', 'Admin\\AccountController@info')->name('api/admin/account/info');
     Route::post('admin/account/profile', 'Admin\\AccountController@profile')->name('api/admin/account/profile');
