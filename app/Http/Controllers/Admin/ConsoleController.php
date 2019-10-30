@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\User;
 use App\Models\Order;
 use App\Models\Post;
@@ -44,6 +45,7 @@ class ConsoleController extends Controller
     public function clearCache(Request $request)
     {
         Helper::clearCache();
+        return $this->success('操作成功！');
     }
 
     // 获取用户统计数据
@@ -142,7 +144,7 @@ class ConsoleController extends Controller
         $result['app_version'] = config('app.version');
         $result['repository'] = $repository;
 
-        $result['can_update'] = false;
+        $result['can_update'] = true;
 
         if(isset($repository['name'])) {
             if($repository['name'] != $result['app_version']) {
@@ -151,5 +153,86 @@ class ConsoleController extends Controller
         }
 
         return $this->success('获取成功！','',$result);
+    }
+
+    /**
+     * 下载最新版本文件
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function download(Request $request)
+    {
+        $version   = $request->get('version');
+
+        $url = "https://dev.tencent.com/u/tangtanglove/p/fullstack-backend/git/archive/".$version.".zip";
+
+        $file = Helper::curl($url,false,'get',false,1);
+
+        // 默认本地上传
+        $path = 'uploads/files/'.$version.".zip";
+
+        $result = Storage::disk('public')->put($path,$file);
+
+        if($result) {
+            return $this->success('文件下载成功！','',$path);
+        } else {
+            return $this->error('文件下载失败！');
+        }
+    }
+
+    /**
+     * 解压程序包
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function extract(Request $request)
+    {
+        $version   = $request->get('version');
+
+        $path = storage_path('app/').'public/uploads/files/'.$version.".zip";
+        $outPath = storage_path('app/').'public/uploads/files/';
+
+        $zip = new \ZipArchive();
+
+        $result = $zip->open($path);
+
+        if ($result === true) {
+          $zip->extractTo($outPath);
+          $zip->close();
+        }
+
+        if($result) {
+            return $this->success('文件解压成功！');
+        } else {
+            return $this->error('文件解压失败！');
+        }
+    }
+
+    /**
+     * 更新文件
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function updateFile(Request $request)
+    {
+        $version   = $request->get('version');
+
+        $path = storage_path('app/').'public/uploads/files/fullstack-backend-'.$version;
+
+        Helper::copyFileToDir($path,base_path());
+
+        return $this->success('程序更新成功！');
+    }
+
+    /**
+     * 更新数据库
+     * @author  tangtanglove <dai_hang_love@126.com>
+     */
+    public function updateDatabase(Request $request)
+    {
+        $result = Artisan::call('migrate');
+
+        if($result) {
+            return $this->success('数据库更新成功！');
+        } else {
+            return $this->error('数据库更新失败！');
+        }
     }
 }
