@@ -37,7 +37,7 @@ class GoodsOrderController extends BuilderController
 {
     public function __construct()
     {
-        $this->pageTitle = '订单评论';
+        $this->pageTitle = '订单列表';
     }
 
     /**
@@ -51,28 +51,28 @@ class GoodsOrderController extends BuilderController
         $current   = intval($request->get('current',1));
         $pageSize  = intval($request->get('pageSize',10));
         $search    = $request->get('search');
-            
+
         // 定义对象
-        $query = Comment::where('comments.type','ORDER');
+        $query = Order::query();
 
         // 查询
         if(!empty($search)) {
             // 标题
             if(isset($search['title'])) {
-                $query->where('comments.title','like','%'.$search['title'].'%');
+                $query->where('title','like','%'.$search['title'].'%');
             }
 
             // 状态
             if(isset($search['status'])) {
                 if(!empty($search['status'])) {
-                    $query->where('comments.status',$search['status']);
+                    $query->where('status',$search['status']);
                 }
             }
 
             // 时间范围
             if(isset($search['dateRange'])) {
                 if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('comments.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                    $query->whereBetween('created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
                 }
             }
         }
@@ -82,11 +82,75 @@ class GoodsOrderController extends BuilderController
 
         // 查询列表
         $lists = $query
+        ->where('type','MALL')
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
-        ->orderBy('comments.id', 'desc')
-        ->get()
-        ->toArray();
+        ->orderBy('id', 'desc')
+        ->get();
+
+        foreach ($lists as $key => $value) {
+            $lists[$key]['username'] = $value->user->username;
+            $lists[$key]['nickname'] = $value->user->nickname;
+            $lists[$key]['phone'] = $value->user->phone;
+
+            // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
+            switch ($value['status']) {
+                case 'NOT_PAID':
+                    $lists[$key]['status'] = '未支付';
+                    break;
+
+                case 'SUCCESS':
+                    $lists[$key]['status'] = '支付成功';
+                    break;
+
+                case 'REFUND':
+                    $lists[$key]['status'] = '转入退款';
+                    break;
+
+                case 'CLOSED':
+                    $lists[$key]['status'] = '交易关闭';
+                    break;
+
+                case 'PAY_ERROR':
+                    $lists[$key]['status'] = '支付失败';
+                    break;
+
+                default:
+                    $lists[$key]['status'] = '未知';
+                    break;
+            }
+
+            // WECHAT_APP 微信APP支付， WECHAT_JSAPI 微信公众号支付， WECHAT_NATIVE 微信电脑网站支付， ALIPAY_PAGE 支付宝电脑网站支付， ALIPAY_APP 支付宝APP支付， ALIPAY_WAP 支付宝手机网站支付， ALIPAY_F2F 支付宝当面付， ALIPAY_JS 支付宝JSAPI
+            switch ($value['pay_type']) {
+                case 'WECHAT_APP':
+                    $lists[$key]['pay_type'] = '微信APP支付，';
+                    break;
+                case 'WECHAT_JSAPI':
+                    $lists[$key]['pay_type'] = '微信公众号支付';
+                    break;
+                case 'WECHAT_NATIVE':
+                    $lists[$key]['pay_type'] = '微信电脑网站支付';
+                    break;
+                case 'ALIPAY_PAGE':
+                    $lists[$key]['pay_type'] = '支付宝电脑网站支付';
+                    break;
+                case 'ALIPAY_APP':
+                    $lists[$key]['pay_type'] = '支付宝APP支付';
+                    break;
+                case 'ALIPAY_WAP':
+                    $lists[$key]['pay_type'] = '支付宝手机网站支付';
+                    break;
+                case 'ALIPAY_F2F':
+                    $lists[$key]['pay_type'] = '支付宝当面付';
+                    break;
+                case 'ALIPAY_JS':
+                    $lists[$key]['pay_type'] = '支付宝JSAPI';
+                    break;
+                default:
+                    $lists[$key]['pay_type'] = '暂无';
+                    break;
+            }
+        }
 
         // 默认页码
         $pagination['defaultCurrent'] = 1;
@@ -97,60 +161,8 @@ class GoodsOrderController extends BuilderController
         // 总数量
         $pagination['total'] = $total;
 
-        $status = [
-            [
-                'name'=>'所有状态',
-                'value'=>'0',
-            ],
-            [
-                'name'=>'正常',
-                'value'=>'1',
-            ],
-            [
-                'name'=>'禁用',
-                'value'=>'2',
-            ],
-        ];
-
-        $searchs = [
-            Select::make('状态','status')->option($status)->value('0'),
-            Input::make('搜索内容','title'),
-            Button::make('搜索')->onClick('search'),
-        ];
-
-        $advancedSearchs = [
-            RangePicker::make('评论时间','created_at')->format("YYYY-MM-DD HH:mm:ss"),
-            Select::make('状态','status')->option($status)->value('0'),
-            Button::make('搜索')->type('primary')->onClick('search'),
-            Button::make('重置')->onClick('resetSearch'),
-        ];
-
-        $columns = [
-            Column::make('ID','id'),
-            Column::make('评论对象','object_title')->withA('admin/mall/goodsOrder/commentEdit'),
-            Column::make('用户','uid'),
-            Column::make('评论标题','title'),
-            Column::make('内容','content'),
-            Column::make('状态','status')->withTag("text === '已禁用' ? 'red' : 'blue'"),
-            Column::make('评论时间','created_at'),
-        ];
-
-        $headerButtons = [
-            Button::make('刷新')->icon('reload')->type('default')->href('admin/mall/goodsOrder/commentIndex'),
-        ];
-
-        $actions = [
-            Button::make('启用|禁用')->type('link')->onClick('changeStatus','1|2','admin/'.$this->controllerName().'/commentChangeStatus'),
-            Button::make('编辑')->type('link')->href('admin/mall/goodsOrder/commentEdit'),
-            Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/commentChangeStatus'),
-        ];
-
-        $lists = $this->commentListsFormat($lists);
-
-        $data = $this->listBuilder($columns,$lists,$pagination,$searchs,$advancedSearchs,$headerButtons,null,$actions);
-
-        if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+        if(!empty($lists)) {
+            return $this->success('获取成功！','',$lists,$pagination,$search);
         } else {
             return $this->success('获取失败！');
         }   

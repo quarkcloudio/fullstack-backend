@@ -19,6 +19,7 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
+        'id',
         'uid',
         'order_no',
         'thirdparty_order_no',
@@ -33,4 +34,12 @@ class Order extends Model
         'type',
         'status'
     ];
+
+    public function goodsOrder() {
+        return $this->hasOne(GoodsOrder::class, 'order_id');
+    }
+
+    public function user() {
+        return $this->belongsTo('App\User','uid');
+    }
 }
