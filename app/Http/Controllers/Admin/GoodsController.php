@@ -483,6 +483,7 @@ class GoodsController extends BuilderController
         // 启动事务
         DB::beginTransaction();
         try {
+            $systemAttrs = [];
 
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_goods_attribute_') !== false) {
@@ -1040,6 +1041,7 @@ class GoodsController extends BuilderController
         // 启动事务
         DB::beginTransaction();
         try {
+            $systemAttrs = [];
 
             foreach($requestData as $key => $value) {
                 if(strpos($key,'system_goods_attribute_') !== false) {

@@ -90,8 +90,20 @@ class GoodsOrderController extends BuilderController
 
         foreach ($lists as $key => $value) {
             $lists[$key]['username'] = $value->user->username;
-            $lists[$key]['nickname'] = $value->user->nickname;
             $lists[$key]['phone'] = $value->user->phone;
+
+            $goodsOrderDetail = [];
+            foreach ($value->goodsOrderDetail as $key1 => $value1) {
+                $goodsOrderDetail[$key1]['cover_id'] = Helper::getPicture($value1['cover_id']);
+                $goodsOrderDetail[$key1]['goods_id'] = $value1['goods_id'];
+                $goodsOrderDetail[$key1]['goods_name'] = $value1['goods_name'];
+                $goodsOrderDetail[$key1]['goods_price'] = $value1['goods_price'];
+                $goodsOrderDetail[$key1]['num'] = $value1['num'];
+                $goodsOrderDetail[$key1]['goods_property_names'] = $value1['goods_property_names'];
+                $goodsOrderDetail[$key1]['description'] = $value1['description'];
+            }
+
+            $lists[$key]['goods_order_details'] = $goodsOrderDetail;
 
             // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
             switch ($value['status']) {

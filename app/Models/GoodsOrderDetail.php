@@ -20,17 +20,19 @@ class GoodsOrderDetail extends Model
      */
     protected $fillable = [
         'uid',
+        'order_id',
+        'goods_order_id',
         'goods_id',
         'goods_sku_id',
+        'goods_name',
+        'num',
         'goods_properties',
         'goods_property_names',
-        'goods_order_id',
-        'title',
-        'num',
         'goods_price',
         'market_price',
         'description',
-        'cover_ids',
+        'cover_id',
+        'virtual_code',
         'status'
     ];
 }

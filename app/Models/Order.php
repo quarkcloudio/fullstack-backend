@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Services\Helper;
 
 class Order extends Model
 {
@@ -37,6 +38,10 @@ class Order extends Model
 
     public function goodsOrder() {
         return $this->hasOne(GoodsOrder::class, 'order_id');
+    }
+
+    public function goodsOrderDetail() {
+        return $this->hasMany(GoodsOrderDetail::class, 'order_id');
     }
 
     public function user() {
