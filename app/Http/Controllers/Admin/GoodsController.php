@@ -786,6 +786,10 @@ class GoodsController extends BuilderController
             $data['checkedGoodsAttributeValues'][] = $getGoodsInfoAttributeData;
         }
         
+        if(count($data['checkedGoodsAttributes'])==0) {
+            $data['checkedGoodsAttributes'] = false;
+        } 
+
         //////
         $goodsSkus = GoodsSku::where('goods_id',$data['id'])->get()->toArray();
 
@@ -805,9 +809,9 @@ class GoodsController extends BuilderController
         }
 
         // 模板数据
-        $data['systemGoodsAttributes'] = $systemGoodsAttributes;
-        $data['shopGoodsAttributes'] = $shopGoodsAttributes;
-        $data['goodsAttributes'] = $goodsAttributes;
+        $data['systemGoodsAttributes'] = $systemGoodsAttributes ? $systemGoodsAttributes : false;
+        $data['shopGoodsAttributes'] = $shopGoodsAttributes ? $shopGoodsAttributes : false;
+        $data['goodsAttributes'] = $goodsAttributes ? $goodsAttributes : false;
         $data['goodsSkus'] = $goodsSkus;
 
         $getGoodsCategoryId = $this->getParentCategory($data['goods_category_id'],[0 => $data['goods_category_id']]);
