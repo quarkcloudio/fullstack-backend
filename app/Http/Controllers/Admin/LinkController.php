@@ -153,7 +153,7 @@ class LinkController extends BuilderController
         $data = $this->listBuilder($columns,$lists,$pagination,$searchs,[],$headerButtons,null,$actions);
 
         if(!empty($data)) {
-            return $this->success('获取成功！','',$data,$pagination,$search);
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }   

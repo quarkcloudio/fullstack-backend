@@ -37,20 +37,12 @@ class Controller extends BaseController
     * 成功是返回json数据
     * @author tangtanglove <dai_hang_love@126.com>
     */
-    public function success($msg,$url ='',$data = '',$pagination = [],$search = [],$status = 'success')
+    public function success($msg,$url ='',$data = '',$status = 'success')
     {
         if(Request::ajax() || $this->isApi()) {
             $result['msg'] = $msg;
             $result['url'] = $url;
             $result['data'] = $data;
-    
-            if(!(empty($pagination))) {
-                $result['pagination'] = $pagination;
-            }
-    
-            if(!(empty($search))) {
-                $result['search'] = $search;
-            }
             $result['status'] = $status;
             return Helper::unsetNull($result);
         } else {

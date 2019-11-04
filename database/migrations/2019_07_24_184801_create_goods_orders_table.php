@@ -26,7 +26,7 @@ class CreateGoodsOrdersTable extends Migration
             $table->string('consignee')->nullable()->comment('收货人');
             $table->string('address')->nullable()->comment('收货地址');
             $table->string('phone')->nullable()->comment('收货人电话');
-            $table->string('status')->default('NOT_PAID')->comment('NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUNDING:退款中的订单');
+            $table->string('status')->default('NOT_PAID')->comment('NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUND:退款中的订单');
             $table->longText('remark')->nullable()->comment('备注');
             $table->tinyInteger('is_virtual')->default(0)->comment('是否为虚拟商品');
             $table->timestamps();

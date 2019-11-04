@@ -173,8 +173,31 @@ class GoodsOrderController extends BuilderController
         // 总数量
         $pagination['total'] = $total;
 
+        $data['totalNum'] = $total;
+
+        // NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUND:退款中的订单
+        $notPaidNum = GoodsOrder::where('status','NOT_PAID')->count();
+        $paidNum = GoodsOrder::where('status','PAID')->count();
+        $sendNum = GoodsOrder::where('status','SEND')->count();
+        $successNum = GoodsOrder::where('status','SUCCESS')->count();
+        $closeNum = GoodsOrder::where('status','CLOSE')->count();
+        $refundNum = GoodsOrder::where('status','REFUND')->count();
+
+        $data['notPaidNum'] = $notPaidNum ? $notPaidNum : 0;
+        $data['paidNum'] = $paidNum ? $paidNum : 0;
+        $data['sendNum'] = $sendNum ? $sendNum : 0;
+        $data['successNum'] = $successNum ? $successNum : 0;
+        $data['closeNum'] = $closeNum ? $closeNum : 0;
+        $data['refundNum'] = $refundNum ? $refundNum : 0;
+
+        $data['totalMoney'] = GoodsOrder::where('status','SUCCESS')->sum('total_amount');
+
         if(!empty($lists)) {
-            return $this->success('获取成功！','',$lists,$pagination,$search);
+
+            $data['lists'] = $lists;
+            $data['pagination'] = $pagination;
+
+            return $this->success('获取成功！','',$data);
         } else {
             return $this->success('获取失败！');
         }   
