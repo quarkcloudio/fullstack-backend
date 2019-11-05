@@ -192,6 +192,8 @@ class GoodsOrderController extends BuilderController
 
         $data['totalMoney'] = GoodsOrder::where('status','SUCCESS')->sum('total_amount');
 
+        $data['search'] = $search;
+
         if(!empty($lists)) {
 
             $data['lists'] = $lists;
