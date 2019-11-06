@@ -53,26 +53,63 @@ class GoodsOrderController extends BuilderController
         $search    = $request->get('search');
 
         // 定义对象
-        $query = Order::query();
+        $query = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('users', 'users.id', '=', 'orders.uid');
 
         // 查询
         if(!empty($search)) {
             // 标题
             if(isset($search['title'])) {
-                $query->where('title','like','%'.$search['title'].'%');
+                $title = "%{$search['title']}%";
+                $query->whereRaw('(users.username like ? or users.phone like ? or orders.order_no like ?)', [$title, $title, $title]);
             }
 
             // 状态
             if(isset($search['status'])) {
-                if(!empty($search['status'])) {
-                    $query->where('status',$search['status']);
+                if(!empty($search['status']) && $search['status'] != 'ALL') {
+                    $query->where('goods_orders.status',$search['status']);
                 }
             }
 
             // 时间范围
             if(isset($search['dateRange'])) {
                 if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                    $query->whereBetween('orders.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                }
+            }
+
+            // 付款方式
+            if(isset($search['payType'])) {
+                if(!empty($search['payType'])) {
+                    $query->where('orders.pay_type',$search['payType']);
+                }
+            }
+
+            // 订单类型
+            if(isset($search['type'])) {
+                if(!empty($search['type'])) {
+                    $query->where('orders.type',$search['type']);
+                }
+            }
+
+            // 收货人姓名
+            if(isset($search['consignee'])) {
+                if(!empty($search['consignee'])) {
+                    $query->where('goods_orders.consignee',$search['consignee']);
+                }
+            }
+
+            // 收货人手机号
+            if(isset($search['phone'])) {
+                if(!empty($search['phone'])) {
+                    $query->where('goods_orders.phone',$search['phone']);
+                }
+            }
+
+            // 收货人地址
+            if(isset($search['address'])) {
+                if(!empty($search['address'])) {
+                    $query->where('goods_orders.address','like','%'.$search['address'].'%');;
                 }
             }
         }
@@ -82,15 +119,13 @@ class GoodsOrderController extends BuilderController
 
         // 查询列表
         $lists = $query
-        ->where('type','MALL')
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
-        ->orderBy('id', 'desc')
+        ->orderBy('orders.id', 'desc')
+        ->select('orders.*','goods_orders.status as goods_order_status','users.username','users.nickname','users.phone')
         ->get();
 
         foreach ($lists as $key => $value) {
-            $lists[$key]['username'] = $value->user->username;
-            $lists[$key]['phone'] = $value->user->phone;
 
             $goodsOrderDetail = [];
             foreach ($value->goodsOrderDetail as $key1 => $value1) {
@@ -106,29 +141,37 @@ class GoodsOrderController extends BuilderController
             $lists[$key]['goods_order_details'] = $goodsOrderDetail;
 
             // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
-            switch ($value['status']) {
+            switch ($value['goods_order_status']) {
                 case 'NOT_PAID':
-                    $lists[$key]['status'] = '未支付';
+                    $lists[$key]['goods_order_status'] = '未支付';
+                    break;
+
+                case 'PAID':
+                    $lists[$key]['goods_order_status'] = '待发货';
+                    break;
+
+                case 'SEND':
+                    $lists[$key]['goods_order_status'] = '已发货';
                     break;
 
                 case 'SUCCESS':
-                    $lists[$key]['status'] = '支付成功';
+                    $lists[$key]['goods_order_status'] = '支付成功';
                     break;
 
                 case 'REFUND':
-                    $lists[$key]['status'] = '转入退款';
+                    $lists[$key]['goods_order_status'] = '转入退款';
                     break;
 
                 case 'CLOSED':
-                    $lists[$key]['status'] = '交易关闭';
+                    $lists[$key]['goods_order_status'] = '交易关闭';
                     break;
 
                 case 'PAY_ERROR':
-                    $lists[$key]['status'] = '支付失败';
+                    $lists[$key]['goods_order_status'] = '支付失败';
                     break;
 
                 default:
-                    $lists[$key]['status'] = '未知';
+                    $lists[$key]['goods_order_status'] = '未知';
                     break;
             }
 
@@ -173,9 +216,8 @@ class GoodsOrderController extends BuilderController
         // 总数量
         $pagination['total'] = $total;
 
-        $data['totalNum'] = $total;
-
         // NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUND:退款中的订单
+        $totalNum = GoodsOrder::count();
         $notPaidNum = GoodsOrder::where('status','NOT_PAID')->count();
         $paidNum = GoodsOrder::where('status','PAID')->count();
         $sendNum = GoodsOrder::where('status','SEND')->count();
@@ -183,6 +225,7 @@ class GoodsOrderController extends BuilderController
         $closeNum = GoodsOrder::where('status','CLOSE')->count();
         $refundNum = GoodsOrder::where('status','REFUND')->count();
 
+        $data['totalNum'] = $totalNum ? $totalNum : 0;
         $data['notPaidNum'] = $notPaidNum ? $notPaidNum : 0;
         $data['paidNum'] = $paidNum ? $paidNum : 0;
         $data['sendNum'] = $sendNum ? $sendNum : 0;
@@ -193,6 +236,12 @@ class GoodsOrderController extends BuilderController
         $data['totalMoney'] = GoodsOrder::where('status','SUCCESS')->sum('total_amount');
 
         $data['search'] = $search;
+
+        $q['search'] = $search;
+        $q['token'] = Helper::token($request);
+
+        $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
+        $data['exportUrl'] = $exportUrl;
 
         if(!empty($lists)) {
 
@@ -247,7 +296,7 @@ class GoodsOrderController extends BuilderController
      * @param  Request  $request
      * @return Response
      */
-    public function commentEdit(Request $request)
+    public function edit(Request $request)
     {
         $id = $request->input('id');
 
@@ -361,5 +410,218 @@ class GoodsOrderController extends BuilderController
         } else {
             return $this->error('操作失败！');
         }
+    }
+
+    /**
+     * 导出数据
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function export(Request $request)
+    {
+        // 获取参数
+        $search    = $request->get('search');
+
+        // 定义对象
+        $query = GoodsOrderDetail::join('orders', 'goods_order_details.order_id', '=', 'orders.id')
+        ->join('goods_orders', 'goods_order_details.goods_order_id', '=', 'goods_orders.id')
+        ->join('users', 'users.id', '=', 'orders.uid');
+
+        // 查询
+        if(!empty($search)) {
+            // 标题
+            if(isset($search['title'])) {
+                $title = "%{$search['title']}%";
+                $query->whereRaw('(users.username like ? or users.phone like ? or orders.order_no like ?)', [$title, $title, $title]);
+            }
+
+            // 状态
+            if(isset($search['status'])) {
+                if(!empty($search['status']) && $search['status'] != 'ALL') {
+                    $query->where('goods_orders.status',$search['status']);
+                }
+            }
+
+            // 时间范围
+            if(isset($search['dateRange'])) {
+                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
+                    $query->whereBetween('orders.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                }
+            }
+
+            // 付款方式
+            if(isset($search['payType'])) {
+                if(!empty($search['payType'])) {
+                    $query->where('orders.pay_type',$search['payType']);
+                }
+            }
+
+            // 订单类型
+            if(isset($search['type'])) {
+                if(!empty($search['type'])) {
+                    $query->where('orders.type',$search['type']);
+                }
+            }
+
+            // 收货人姓名
+            if(isset($search['consignee'])) {
+                if(!empty($search['consignee'])) {
+                    $query->where('goods_orders.consignee',$search['consignee']);
+                }
+            }
+
+            // 收货人手机号
+            if(isset($search['phone'])) {
+                if(!empty($search['phone'])) {
+                    $query->where('goods_orders.phone',$search['phone']);
+                }
+            }
+
+            // 收货人地址
+            if(isset($search['address'])) {
+                if(!empty($search['address'])) {
+                    $query->where('goods_orders.address','like','%'.$search['address'].'%');;
+                }
+            }
+        }
+
+        // 查询列表
+        $lists = $query
+        ->orderBy('orders.id', 'desc')
+        ->select(
+            'orders.id',
+            'orders.order_no',
+            'orders.thirdparty_order_no',
+            'goods_order_details.goods_name',
+            'goods_order_details.goods_property_names',
+            'goods_order_details.goods_price',
+            'goods_order_details.num',
+            'users.username',
+            'users.phone as userphone',
+            'goods_orders.consignee',
+            'goods_orders.phone',
+            'goods_orders.address',
+            'goods_orders.status as goods_order_status',
+            'goods_orders.total_amount',
+            'goods_orders.pay_amount',
+            'orders.pay_type',
+            'orders.paid_at',
+            'orders.type',
+            'orders.created_at'
+        )->get()
+        ->toArray();
+
+        foreach ($lists as $key => $value) {
+
+            // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
+            switch ($value['goods_order_status']) {
+                case 'NOT_PAID':
+                    $lists[$key]['goods_order_status'] = '未支付';
+                    break;
+
+                case 'PAID':
+                    $lists[$key]['goods_order_status'] = '待发货';
+                    break;
+
+                case 'SEND':
+                    $lists[$key]['goods_order_status'] = '已发货';
+                    break;
+
+                case 'SUCCESS':
+                    $lists[$key]['goods_order_status'] = '支付成功';
+                    break;
+
+                case 'REFUND':
+                    $lists[$key]['goods_order_status'] = '转入退款';
+                    break;
+
+                case 'CLOSED':
+                    $lists[$key]['goods_order_status'] = '交易关闭';
+                    break;
+
+                case 'PAY_ERROR':
+                    $lists[$key]['goods_order_status'] = '支付失败';
+                    break;
+
+                default:
+                    $lists[$key]['goods_order_status'] = '未知';
+                    break;
+            }
+
+            // WECHAT_APP 微信APP支付， WECHAT_JSAPI 微信公众号支付， WECHAT_NATIVE 微信电脑网站支付， ALIPAY_PAGE 支付宝电脑网站支付， ALIPAY_APP 支付宝APP支付， ALIPAY_WAP 支付宝手机网站支付， ALIPAY_F2F 支付宝当面付， ALIPAY_JS 支付宝JSAPI
+            switch ($value['pay_type']) {
+                case 'WECHAT_APP':
+                    $lists[$key]['pay_type'] = '微信APP支付，';
+                    break;
+                case 'WECHAT_JSAPI':
+                    $lists[$key]['pay_type'] = '微信公众号支付';
+                    break;
+                case 'WECHAT_NATIVE':
+                    $lists[$key]['pay_type'] = '微信电脑网站支付';
+                    break;
+                case 'ALIPAY_PAGE':
+                    $lists[$key]['pay_type'] = '支付宝电脑网站支付';
+                    break;
+                case 'ALIPAY_APP':
+                    $lists[$key]['pay_type'] = '支付宝APP支付';
+                    break;
+                case 'ALIPAY_WAP':
+                    $lists[$key]['pay_type'] = '支付宝手机网站支付';
+                    break;
+                case 'ALIPAY_F2F':
+                    $lists[$key]['pay_type'] = '支付宝当面付';
+                    break;
+                case 'ALIPAY_JS':
+                    $lists[$key]['pay_type'] = '支付宝JSAPI';
+                    break;
+                default:
+                    $lists[$key]['pay_type'] = '暂无';
+                    break;
+            }
+
+            switch ($value['type']) {
+                case 'MALL':
+                    $lists[$key]['type'] = '普通订单';
+                    break;
+
+                default:
+                    $lists[$key]['goods_order_status'] = '未知';
+                    break;
+            }
+        }
+
+        $fileName = 'data';
+
+        $title = [
+            'ID',
+            '订单号',
+            '第三方单号',
+            '商品名称',
+            '商品规格',
+            '商品单价',
+            '购买数量',
+            '购买账号',
+            '账号手机号',
+            '收货人',
+            '收货联系方式',
+            '收货地址',
+            '订单状态',
+            '订单总金额',
+            '支付金额',
+            '支付方式',
+            '付款时间',
+            '订单类型',
+            '拍下订单时间'
+        ];
+
+        $columnFormats = [
+            'B' => 'FORMAT_TEXT', //字符串
+            'C' => 'FORMAT_TEXT', //字符串
+            'L' => 'FORMAT_TEXT', //字符串
+            'K' => 'FORMAT_TEXT', //字符串
+        ];
+
+        return Helper::export($fileName,$title,$lists,$columnFormats);
     }
 }

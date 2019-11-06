@@ -11,6 +11,8 @@ use App\Models\Sms;
 use App\Models\Wechat;
 use App\Models\Printer;
 use App\User;
+use App\Excels\Export;
+use App\Excels\Import;
 use Flc\Alidayu\Client;
 use Flc\Alidayu\App;
 use Flc\Alidayu\Requests\AlibabaAliqinFcSmsNumSend;
@@ -1240,7 +1242,7 @@ class Helper
     * 导出Excel
     * @author tangtanglove <dai_hang_love@126.com>
     */
-    static function export($fileName,$titles,$lists)
+    static function export($fileName,$titles,$lists,$columnFormats = [])
     {
         $getTitles = [];
         $getLists  = [];
@@ -1262,13 +1264,9 @@ class Helper
             $getLists  = $lists;
         }
 
-        Excel::create($fileName.'_'.date('YmdHis'),function($excel) use ($fileName,$getTitles,$getLists) {
-            $excel->sheet($fileName, function($sheet) use ($getTitles,$getLists) {
-                $sheet->setAutoSize(true);
-                $sheet->prependRow($getTitles);
-                $sheet->rows($getLists);
-            });
-        })->export('xls');
+        $export = new Export($getLists,$getTitles,$columnFormats);
+
+        return Excel::download($export,$fileName.'_'.date('YmdHis').'.xlsx');
     }
 
     /**
@@ -1279,12 +1277,10 @@ class Helper
     {
         $file = File::where('id',$fileId)->first();
 
-        Excel::load(storage_path('app/').$file->path, function($reader) use (&$results) {
-            $reader = $reader->getSheet(0);//excel第一张sheet
-            $results = $reader->toArray();
-        });
+        $results = Excel::toArray(new Import, storage_path('app/').$file->path);
 
         unset($results[0]);//去除表头
+
         return $results;
     }
 

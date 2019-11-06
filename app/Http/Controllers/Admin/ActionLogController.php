@@ -275,6 +275,7 @@ class ActionLogController extends BuilderController
                 }
             }
         }
+
         // 查询列表
         $lists = $query
         ->where('status', '>', 0)
@@ -307,6 +308,6 @@ class ActionLogController extends BuilderController
 
         $title = ['ID','用户名称','行为','访问地址','备注','IP地址','状态','发生时间','发生时间'];
 
-        Helper::export($fileName,$title,$lists);
+        return Helper::export($fileName,$title,$lists);
     }
 }

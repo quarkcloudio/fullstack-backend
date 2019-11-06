@@ -263,6 +263,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/goodsBrand/changeStatus', 'Admin\\GoodsBrandController@changeStatus')->name('api/admin/goodsBrand/changeStatus');
 
     Route::get('admin/goodsOrder/index', 'Admin\\GoodsOrderController@index')->name('api/admin/goodsOrder/index');
+    Route::get('admin/goodsOrder/export', 'Admin\\GoodsOrderController@export')->name('api/admin/goodsOrder/export');
     Route::get('admin/goodsOrder/edit', 'Admin\\GoodsOrderController@edit')->name('api/admin/goodsOrder/edit');
     Route::post('admin/goodsOrder/save', 'Admin\\GoodsOrderController@save')->name('api/admin/goodsOrder/save');
     Route::post('admin/goodsOrder/changeStatus', 'Admin\\GoodsOrderController@changeStatus')->name('api/admin/goodsOrder/changeStatus');
