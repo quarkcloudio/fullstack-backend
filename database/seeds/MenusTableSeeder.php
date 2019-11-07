@@ -75,13 +75,15 @@ class MenusTableSeeder extends Seeder
             ['id' =>'51','name' => '商品类型','guard_name' => 'admin','icon' => '','pid' => '46','sort' => '0','path' => '/mall/goods/typeIndex','show'  => '1','status' => '1'],
             ['id' =>'52','name' => '商品订单','guard_name' => 'admin','icon' => '','pid' => '38','sort' => '0','path' => '/mall/goodsOrder','show'  => '1','status' => '1'],
             ['id' =>'53','name' => '订单列表','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/index','show'  => '1','status' => '1'],
-            ['id' =>'54','name' => '退款订单','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/refundIndex','show'  => '1','status' => '1'],
-            ['id' =>'55','name' => '售后订单','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/afterSaleIndex','show'  => '1','status' => '1'],
-            ['id' =>'56','name' => '评价管理','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/commentIndex','show'  => '1','status' => '1'],
-            ['id' =>'57','name' => '商品单位','guard_name' => 'admin','icon' => '','pid' => '46','sort' => '0','path' => '/mall/goods/unitIndex','show'  => '1','status' => '1'],
-            ['id' =>'58','name' => '详情版式','guard_name' => 'admin','icon' => '','pid' => '46','sort' => '0','path' => '/mall/goods/layoutIndex','show'  => '1','status' => '1'],
+            ['id' =>'54','name' => '虚拟订单','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/virtualOrderIndex','show'  => '1','status' => '1'],
+            ['id' =>'55','name' => '发货单列表','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/deliveryIndex','show'  => '1','status' => '1'],
+            ['id' =>'56','name' => '退款订单','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/refundIndex','show'  => '1','status' => '1'],
+            ['id' =>'57','name' => '售后订单','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/afterSaleIndex','show'  => '0','status' => '0'],
+            ['id' =>'58','name' => '评价管理','guard_name' => 'admin','icon' => '','pid' => '52','sort' => '0','path' => '/mall/goodsOrder/commentIndex','show'  => '1','status' => '1'],
+            ['id' =>'59','name' => '商品单位','guard_name' => 'admin','icon' => '','pid' => '46','sort' => '0','path' => '/mall/goods/unitIndex','show'  => '1','status' => '1'],
+            ['id' =>'60','name' => '详情版式','guard_name' => 'admin','icon' => '','pid' => '46','sort' => '0','path' => '/mall/goods/layoutIndex','show'  => '1','status' => '1'],
 
-            ['id' =>'59','name' => '分类列表','guard_name' => 'admin','icon' => '','pid' => 3,'sort' => 0,'path' => '/article/categoryIndex','show'  => 1,'status' => 1],
+            ['id' =>'61','name' => '分类列表','guard_name' => 'admin','icon' => '','pid' => 3,'sort' => 0,'path' => '/article/categoryIndex','show'  => 1,'status' => 1],
         ]);
     }
 }

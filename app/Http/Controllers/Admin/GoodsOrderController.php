@@ -54,7 +54,8 @@ class GoodsOrderController extends BuilderController
 
         // 定义对象
         $query = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
-        ->join('users', 'users.id', '=', 'orders.uid');
+        ->join('users', 'users.id', '=', 'orders.uid')
+        ->where('goods_mode',1);
 
         // 查询
         if(!empty($search)) {
@@ -122,7 +123,22 @@ class GoodsOrderController extends BuilderController
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
         ->orderBy('orders.id', 'desc')
-        ->select('orders.*','goods_orders.status as goods_order_status','users.username','users.nickname','users.phone')
+        ->select(
+            'orders.*',
+            'goods_orders.total_amount',
+            'goods_orders.buyer_pay_amount',
+            'goods_orders.point_amount',
+            'goods_orders.mdiscount_amount',
+            'goods_orders.discount_amount',
+            'goods_orders.freight_amount',
+            'goods_orders.consignee',
+            'goods_orders.address',
+            'goods_orders.phone as goods_order_phone',
+            'goods_orders.status as goods_order_status',
+            'users.username',
+            'users.nickname',
+            'users.phone'
+        )
         ->get();
 
         foreach ($lists as $key => $value) {
@@ -143,7 +159,7 @@ class GoodsOrderController extends BuilderController
             // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
             switch ($value['goods_order_status']) {
                 case 'NOT_PAID':
-                    $lists[$key]['goods_order_status'] = '未支付';
+                    $lists[$key]['goods_order_status'] = '等待付款';
                     break;
 
                 case 'PAID':
@@ -155,7 +171,7 @@ class GoodsOrderController extends BuilderController
                     break;
 
                 case 'SUCCESS':
-                    $lists[$key]['goods_order_status'] = '支付成功';
+                    $lists[$key]['goods_order_status'] = '交易成功';
                     break;
 
                 case 'REFUND':
@@ -166,12 +182,35 @@ class GoodsOrderController extends BuilderController
                     $lists[$key]['goods_order_status'] = '交易关闭';
                     break;
 
+                default:
+                    $lists[$key]['goods_order_status'] = '未知';
+                    break;
+            }
+
+            // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
+            switch ($value['status']) {
+                case 'NOT_PAID':
+                    $lists[$key]['status'] = '未支付';
+                    break;
+
+                case 'SUCCESS':
+                    $lists[$key]['status'] = '支付成功';
+                    break;
+
+                case 'REFUND':
+                    $lists[$key]['status'] = '转入退款';
+                    break;
+
+                case 'CLOSED':
+                    $lists[$key]['status'] = '交易关闭';
+                    break;
+
                 case 'PAY_ERROR':
-                    $lists[$key]['goods_order_status'] = '支付失败';
+                    $lists[$key]['status'] = '支付失败';
                     break;
 
                 default:
-                    $lists[$key]['goods_order_status'] = '未知';
+                    $lists[$key]['status'] = '未知';
                     break;
             }
 
@@ -217,13 +256,13 @@ class GoodsOrderController extends BuilderController
         $pagination['total'] = $total;
 
         // NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUND:退款中的订单
-        $totalNum = GoodsOrder::count();
-        $notPaidNum = GoodsOrder::where('status','NOT_PAID')->count();
-        $paidNum = GoodsOrder::where('status','PAID')->count();
-        $sendNum = GoodsOrder::where('status','SEND')->count();
-        $successNum = GoodsOrder::where('status','SUCCESS')->count();
-        $closeNum = GoodsOrder::where('status','CLOSE')->count();
-        $refundNum = GoodsOrder::where('status','REFUND')->count();
+        $totalNum = GoodsOrder::where('goods_mode',1)->count();
+        $notPaidNum = GoodsOrder::where('goods_mode',1)->where('status','NOT_PAID')->count();
+        $paidNum = GoodsOrder::where('goods_mode',1)->where('status','PAID')->count();
+        $sendNum = GoodsOrder::where('goods_mode',1)->where('status','SEND')->count();
+        $successNum = GoodsOrder::where('goods_mode',1)->where('status','SUCCESS')->count();
+        $closeNum = GoodsOrder::where('goods_mode',1)->where('status','CLOSE')->count();
+        $refundNum = GoodsOrder::where('goods_mode',1)->where('status','REFUND')->count();
 
         $data['totalNum'] = $totalNum ? $totalNum : 0;
         $data['notPaidNum'] = $notPaidNum ? $notPaidNum : 0;
@@ -233,7 +272,7 @@ class GoodsOrderController extends BuilderController
         $data['closeNum'] = $closeNum ? $closeNum : 0;
         $data['refundNum'] = $refundNum ? $refundNum : 0;
 
-        $data['totalMoney'] = GoodsOrder::where('status','SUCCESS')->sum('total_amount');
+        $data['totalMoney'] = GoodsOrder::where('goods_mode',1)->where('status','SUCCESS')->sum('total_amount');
 
         $data['search'] = $search;
 
@@ -253,100 +292,149 @@ class GoodsOrderController extends BuilderController
             return $this->success('获取失败！');
         }   
     }
-    
-    /**
-     * form页面模板
-     * 
-     * @param  Request  $request
-     * @return Response
-     */
-    public function form($data = [])
-    {
-        if(isset($data['id'])) {
-            $action = 'admin/'.$this->controllerName().'/save';
-        } else {
-            $action = 'admin/'.$this->controllerName().'/store';
-        }
-
-        $controls = [
-            ID::make('ID','id'),
-            Text::make('评论对象','object_title')->style(['width'=>400])->value($data['object_title']),
-            Text::make('标题','title')->style(['width'=>400])->value($data['title']),
-            Image::make('晒图','cover_ids')->mode('multiple')->rule('1111'),
-            Text::make('内容','content')->style(['width'=>400])->value($data['content']),
-            Text::make('顶','ding')->style(['width'=>200])->value($data['ding']),
-            Text::make('举报','report')->style(['width'=>200])->value($data['report']),
-            Text::make('评分','rate')->style(['width'=>200])->value($data['rate']),
-            Text::make('评论时间')->style(['width'=>200])->value($data['created_at']),
-            SwitchButton::make('状态','status')->checkedText('正常')->unCheckedText('禁用')->value(true),
-            Button::make('提交')
-            ->type('primary')
-            ->style(['width'=>100,'float'=>'left','marginLeft'=>200])
-            ->onClick('submit',null,$action),
-        ];
-
-        $result = $this->formBuilder($controls,$data);
-
-        return $result;
-    }
 
     /**
-     * 编辑页面
+     * 订单详情
      *
      * @param  Request  $request
      * @return Response
      */
-    public function edit(Request $request)
+    public function info(Request $request)
     {
         $id = $request->input('id');
 
-        $comment = Comment::find($id)->toArray();
+        // 定义对象
+        $order = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('shops', 'goods_orders.shop_id', '=', 'shops.id')
+        ->join('users', 'users.id', '=', 'orders.uid')
+        ->where('goods_mode',1)
+        ->where('orders.id',$id)
+        ->select(
+            'orders.*',
+            'goods_orders.total_amount',
+            'goods_orders.buyer_pay_amount',
+            'goods_orders.point_amount',
+            'goods_orders.mdiscount_amount',
+            'goods_orders.discount_amount',
+            'goods_orders.freight_amount',
+            'goods_orders.consignee',
+            'goods_orders.address',
+            'goods_orders.phone as goods_order_phone',
+            'goods_orders.status as goods_order_status',
+            'goods_orders.remark',
+            'users.username',
+            'users.nickname',
+            'users.phone',
+            'shops.title as shop_title'
+        )->first();
 
-        //评论对象
-        $goods =  Goods::find($comment['object_id']);
-        if($goods['goods_name']) {
-            $comment['object_title'] = $goods['goods_name'];
-        } else {
-            $comment['object_title'] = '暂无';
+        // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
+        switch ($order['goods_order_status']) {
+            case 'NOT_PAID':
+                $order['goods_order_status'] = '等待付款';
+                break;
+
+            case 'PAID':
+                $order['goods_order_status'] = '待发货';
+                break;
+
+            case 'SEND':
+                $order['goods_order_status'] = '已发货';
+                break;
+
+            case 'SUCCESS':
+                $order['goods_order_status'] = '交易成功';
+                break;
+
+            case 'REFUND':
+                $order['goods_order_status'] = '转入退款';
+                break;
+
+            case 'CLOSED':
+                $order['goods_order_status'] = '交易关闭';
+                break;
+
+            default:
+                $order['goods_order_status'] = '未知';
+                break;
         }
-        
-        //获取图片
-        $cover_ids = json_decode($comment['cover_ids'],true);
-        unset($comment['cover_ids']);
-        foreach($cover_ids as $key=>$cover_id) {
-            $comment['cover_ids'][$key]['id'] =$cover_id;
-            $comment['cover_ids'][$key]['uid'] =$cover_id;
-            $comment['cover_ids'][$key]['name'] = Helper::getPicture($cover_id,'name');
-            $comment['cover_ids'][$key]['url'] = Helper::getPicture($cover_id);
+
+        // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
+        switch ($order['status']) {
+            case 'NOT_PAID':
+                $order['status'] = '未支付';
+                break;
+
+            case 'SUCCESS':
+                $order['status'] = '支付成功';
+                break;
+
+            case 'REFUND':
+                $order['status'] = '转入退款';
+                break;
+
+            case 'CLOSED':
+                $order['status'] = '交易关闭';
+                break;
+
+            case 'PAY_ERROR':
+                $order['status'] = '支付失败';
+                break;
+
+            default:
+                $order['status'] = '未知';
+                break;
         }
-        
-        switch ($comment['report']) {
-            case '0':
-                $comment['report'] = '暂无举报';
+
+        // WECHAT_APP 微信APP支付， WECHAT_JSAPI 微信公众号支付， WECHAT_NATIVE 微信电脑网站支付， ALIPAY_PAGE 支付宝电脑网站支付， ALIPAY_APP 支付宝APP支付， ALIPAY_WAP 支付宝手机网站支付， ALIPAY_F2F 支付宝当面付， ALIPAY_JS 支付宝JSAPI
+        switch ($order['pay_type']) {
+            case 'WECHAT_APP':
+                $order['pay_type'] = '微信APP支付，';
                 break;
-            case '1':
-                $comment['report'] = '淫秽色情';
+            case 'WECHAT_JSAPI':
+                $order['pay_type'] = '微信公众号支付';
                 break;
-            case '2':
-                $comment['report'] = '垃圾广告';
+            case 'WECHAT_NATIVE':
+                $order['pay_type'] = '微信电脑网站支付';
                 break;
-            case '3':
-                $comment['report'] = '违法信息';
+            case 'ALIPAY_PAGE':
+                $order['pay_type'] = '支付宝电脑网站支付';
+                break;
+            case 'ALIPAY_APP':
+                $order['pay_type'] = '支付宝APP支付';
+                break;
+            case 'ALIPAY_WAP':
+                $order['pay_type'] = '支付宝手机网站支付';
+                break;
+            case 'ALIPAY_F2F':
+                $order['pay_type'] = '支付宝当面付';
+                break;
+            case 'ALIPAY_JS':
+                $order['pay_type'] = '支付宝JSAPI';
                 break;
             default:
-                $comment['report'] = '未知';
+                $order['pay_type'] = '暂无';
                 break;
         }
-
-        if ($comment['status'] == 1) {
-            $comment['status'] = true;
-        } else {
-            $comment['status'] = false;
+        
+        $goodsOrderDetail = [];
+        foreach ($order->goodsOrderDetail as $key => $value) {
+            $goodsOrderDetail[$key]['cover_id'] = Helper::getPicture($value['cover_id']);
+            $goodsOrderDetail[$key]['goods_id'] = $value['goods_id'];
+            $goodsOrderDetail[$key]['goods_name'] = $value['goods_name'];
+            $goodsOrderDetail[$key]['goods_price'] = $value['goods_price'];
+            $goodsOrderDetail[$key]['num'] = $value['num'];
+            $goodsOrderDetail[$key]['goods_property_names'] = $value['goods_property_names'];
+            $goodsOrderDetail[$key]['description'] = $value['description'];
+            $goodsInfo = Goods::where('id',$value['goods_id'])->first();
+            $goodsOrderDetail[$key]['stock_num'] = $goodsInfo['stock_num'];
+            $goodsOrderDetail[$key]['service_status'] = '正常';
+            $goodsOrderDetail[$key]['status'] = $order['goods_order_status'];
         }
 
-        $data = $this->form($comment);
-        
-        return $this->success('获取成功！','',$data);
+        $order['goods_order_details'] = $goodsOrderDetail;
+
+        return $this->success('获取成功！','',$order);
     }
 
     /**

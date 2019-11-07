@@ -16,7 +16,8 @@ class CreateGoodsOrderDetailsTable extends Migration
         Schema::create('goods_order_details', function (Blueprint $table) {
             $table->engine='innodb';
             $table->increments('id')->unsigned();
-            $table->integer('uid')->unsigned()->default('0'); 
+            $table->integer('uid')->unsigned()->default('0');
+            $table->integer('shop_id')->unsigned()->default('0');
             $table->integer('order_id')->unsigned()->default('0');
             $table->integer('goods_order_id')->unsigned()->default('0');
             $table->integer('goods_id')->unsigned()->default('0');

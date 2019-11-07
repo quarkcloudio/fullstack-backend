@@ -20,7 +20,7 @@ class CreateGoodsTable extends Migration
             $table->integer('goods_category_id')->nullable()->comment('商品主分类');
             $table->string('shop_self_category_ids')->nullable()->comment('商家商品分类');
             $table->string('tags')->nullable()->comment('标签');
-            $table->tinyInteger('goods_mode')->default('1')->nullable()->comment('1实物商品（物流发货），2电子卡券（无需物流，如：团购类型需要消费码的商品），3服务商品（无需物流，如：点卡，Q币，游戏装备，激活码）');          
+            $table->tinyInteger('goods_mode')->default('1')->nullable()->comment('1实物商品（物流发货），2电子卡券（无需物流，如：团购类型需要消费码的商品），3服务商品（无需物流，如：点卡，Q币，游戏装备，激活码）');
             $table->string('goods_name')->nullable()->comment('商品名称');
             $table->string('keywords')->nullable()->comment('关键字');
             $table->string('description')->nullable()->comment('描述');
