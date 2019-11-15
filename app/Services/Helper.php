@@ -1231,10 +1231,12 @@ class Helper
     static function isWechat()
     {
         // 微信中登录认证
-        if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) { 
-            return true;
-        } else {
-            return false;
+        if(isset($_SERVER['HTTP_USER_AGENT'])) {
+            if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
