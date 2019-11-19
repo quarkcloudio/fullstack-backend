@@ -223,9 +223,9 @@ class SmsController extends BuilderController
         }
 
         if ($sendResult) {
-            return $this->success('操作成功！');
+            return $this->success('短信发送成功！');
         } else {
-            return $this->error('操作失败！');
+            return $this->error('短信发送失败，'.$result['msg']);
         }
     }
 
@@ -244,6 +244,9 @@ class SmsController extends BuilderController
         $sendResult = true;
 
         if(is_array($phones)) {
+
+            $phones = array_values(array_unique($phones));
+
             foreach ($phones as $key => $phone) {
                 if(empty($phone)) {
                     return $this->error('手机号不能为空！');
@@ -319,7 +322,7 @@ class SmsController extends BuilderController
         if($sendResult) {
             return $this->success('短信已发送！');
         } else {
-            return $this->error('短信发送失败！');
+            return $this->error('短信发送失败，'.$result['msg']);
         }
     }
 }

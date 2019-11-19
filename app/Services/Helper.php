@@ -435,7 +435,7 @@ class Helper
         $uid = self::config('SIOO_UID');
         $password = self::config('SIOO_PASSWORD');
 
-        if(empty($uid) || empty($code) || empty($password)) {
+        if(empty($uid) || empty($password)) {
             return self::error('接口配置错误！');
         }
 
@@ -453,12 +453,14 @@ class Helper
 
         $response = $client->request('GET', $url);
 
-        $result = $response->getBody();
-        
-        if ($result>=0) {
+        $body = $response->getBody()->getContents();
+
+        $result = json_decode($body,true);
+
+        if ($result['code'] == 0) {
             return self::success('发送成功！');
         } else {
-            return self::error('发送失败！');
+            return self::error($result['msg']);
         }
     }
 
