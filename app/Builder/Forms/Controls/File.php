@@ -9,7 +9,7 @@ class File extends Control
     function __construct() {
         $this->button = '上传文件';
         $this->limitSize = 2; // 默认文件大小2M
-        $this->limitType = ['image/jpeg','image/png'];
+        $this->limitType = ['image/jpeg','image/png','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
         $this->limitNum = 3; // 默认上传个数
         $this->componentName = 'file';
     }

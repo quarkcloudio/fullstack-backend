@@ -522,6 +522,8 @@ class PictureController extends BuilderController
                 }
     
                 // 数据
+                $data['obj_type'] = 'ADMINID';
+                $data['obj_id'] = ADMINID;
                 $data['name'] = $name;
                 $data['size'] = $ossResult['info']['size_upload'];
                 $data['md5'] = md5($content);
@@ -563,6 +565,8 @@ class PictureController extends BuilderController
                     $path = 'public/'.$uploadPath;
 
                     // 数据
+                    $data['obj_type'] = 'ADMINID';
+                    $data['obj_id'] = ADMINID;
                     $data['name'] = $name;
                     $data['md5'] = md5_file(storage_path('app/').$path);
                     $data['path'] = $path;
@@ -619,6 +623,8 @@ class PictureController extends BuilderController
             $size = Storage::size($path);
 
             // 数据
+            $data['obj_type'] = 'ADMINID';
+            $data['obj_id'] = ADMINID;
             $data['name'] = $name;
             $data['size'] = $size;
             $data['md5'] = $md5;
@@ -715,6 +721,8 @@ class PictureController extends BuilderController
             }
 
             // 数据
+            $data['obj_type'] = 'ADMINID';
+            $data['obj_id'] = ADMINID;
             $data['name'] = $name;
             $data['size'] = $ossResult['info']['size_upload'];
             $data['md5'] = $md5;

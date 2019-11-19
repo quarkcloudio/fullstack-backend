@@ -59,16 +59,18 @@ class FileController extends BuilderController
     protected function localUpload($request)
     {
         $file = $request->file('file');
-        $uid  = $request->input('uid');
         $md5  = md5_file($file->getRealPath());
         $name = $file->getClientOriginalName();
+        $ext = $file->getClientOriginalExtension();
 
         $hasFile = File::where('md5',$md5)->where('name',$name)->first();
 
         // 不存在文件，则插入数据库
         if(empty($hasFile)) {
 
-            $path = $file->store('public/uploads/files');
+            $saveFileName = Helper::makeRand(40,true).'.'.$ext;
+
+            $path = $file->storeAs('public/uploads/files',$saveFileName);
 
             // 获取文件url，用于外部访问
             $url = Storage::url($path);
@@ -77,11 +79,13 @@ class FileController extends BuilderController
             $size = Storage::size($path);
 
             // 数据
-            $data['uid'] = $uid;
+            $data['obj_type'] = 'ADMINID';
+            $data['obj_id'] = ADMINID;
             $data['name'] = $name;
             $data['size'] = $size;
             $data['md5'] = $md5;
             $data['path'] = $path;
+            $data['ext'] = $ext;
 
             // 插入数据库
             $file = File::create($data);
@@ -89,7 +93,7 @@ class FileController extends BuilderController
         } else {
             $fileId = $hasFile->id;
 
-            if(strpos($hasFile->path,'http') !== false) { 
+            if(strpos($hasFile->path,'http') !== false) {
                 $url = $hasFile->path;
             } else {
                 // 获取文件url，用于外部访问
@@ -101,7 +105,6 @@ class FileController extends BuilderController
         }
 
         $result['id'] = $fileId;
-        $result['uid'] = $uid;
         $result['name'] = $name;
         $result['url'] = asset($url);
         $result['size'] = $size;
@@ -119,7 +122,6 @@ class FileController extends BuilderController
     protected function ossUpload($request)
     {
         $file = $request->file('file');
-        $uid  = $request->input('uid');
 
         $accessKeyId = Helper::config('OSS_ACCESS_KEY_ID');
         $accessKeySecret = Helper::config('OSS_ACCESS_KEY_SECRET');
@@ -159,7 +161,7 @@ class FileController extends BuilderController
 
         $md5 = md5($content);
         $name = $file->getClientOriginalName();
-
+        $ext = $file->getClientOriginalExtension();
         // 判断文件是否已经上传
         $hasFile = File::where('md5',$md5)->where('name',$name)->first();
 
@@ -176,10 +178,12 @@ class FileController extends BuilderController
             }
 
             // 数据
-            $data['uid'] = $uid;
+            $data['obj_type'] = 'ADMINID';
+            $data['obj_id'] = ADMINID;
             $data['name'] = $name;
             $data['size'] = $ossResult['info']['size_upload'];
             $data['md5'] = $md5;
+            $data['ext'] = $ext;
 
             // 设置自定义域名，则文件url执行自定义域名
             if(!empty($myDomain)) {
@@ -214,7 +218,6 @@ class FileController extends BuilderController
         }
 
         $result['id'] = $fileId;
-        $result['uid'] = $uid;
         $result['name'] = $name;
         $result['url'] = $url;
         $result['size'] = $size;

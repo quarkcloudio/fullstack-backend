@@ -19,6 +19,15 @@ class Picture extends Model
      * @var array
      */
     protected $fillable = [
-        'uid','sort', 'name','size', 'path','md5','status'
+        'obj_type',
+        'obj_id',
+        'picture_category_id',
+        'ext',
+        'sort',
+        'name',
+        'size',
+        'path',
+        'md5',
+        'status'
     ];
 }

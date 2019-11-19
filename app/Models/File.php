@@ -19,6 +19,15 @@ class File extends Model
      * @var array
      */
      protected $fillable = [
-        'uid','sort','name', 'path','md5','size','status'
+        'obj_type',
+        'obj_id',
+        'file_category_id',
+        'ext',
+        'sort',
+        'name',
+        'path',
+        'md5',
+        'size',
+        'status'
     ];
 }
