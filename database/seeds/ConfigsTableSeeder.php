@@ -39,7 +39,6 @@ class ConfigsTableSeeder extends Seeder
             ['id' => 22,'title' => '开启云存储','type' => 'switch','name' => 'OSS_OPEN','group_name' => '阿里云存储','value' => '0','remark' => '','status' => 1],
 
             ['id' => 23,'title' => '用户ID','type' => 'text','name' => 'SIOO_UID','group_name' => '希奥短信','value' => '','remark' => '','status' => 1],
-            ['id' => 24,'title' => '企业代码','type' => 'text','name' => 'SIOO_CODE','group_name' => '希奥短信','value' => '','remark' => '','status' => 1],
             ['id' => 25,'title' => '用户密码','type' => 'text','name' => 'SIOO_PASSWORD','group_name' => '希奥短信','value' => '','remark' => '','status' => 1],
 
             ['id' => 26,'title' => '开发者ID','type' => 'text','name' => 'WECHAT_PAY_APP_ID','group_name' => '微信支付','value' => '','remark' => 'AppID（JSAPI支付授权目录，例如：http://www.web.com/wechat/wechat/）','status' => 1],

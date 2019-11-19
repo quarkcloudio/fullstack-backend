@@ -162,7 +162,9 @@ Route::group(['middleware' => ['admin']], function() {
 
     Route::get('admin/sms/index', 'Admin\\SmsController@index')->name('api/admin/sms/index');
     Route::post('admin/sms/changeStatus', 'Admin\\SmsController@destroy')->name('api/admin/sms/changeStatus');
-    Route::post('admin/sms/send', 'Admin\\SmsController@send')->name('api/admin/sms/send');
+    Route::any('admin/sms/import', 'Admin\\SmsController@import')->name('api/admin/sms/import');
+    Route::post('admin/sms/sendImportSms', 'Admin\\SmsController@sendImportSms')->name('api/admin/sms/sendImportSms');
+    Route::post('admin/sms/sendSms', 'Admin\\SmsController@sendSms')->name('api/admin/sms/sendSms');
 
     Route::get('admin/actionLog/index', 'Admin\\ActionLogController@index')->name('api/admin/actionLog/index');
     Route::post('admin/actionLog/changeStatus', 'Admin\\ActionLogController@changeStatus')->name('api/admin/actionLog/changeStatus');

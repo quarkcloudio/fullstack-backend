@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use GuzzleHttp\Client as HttpClient;
 use Mail;
 use Excel;
 use Cache;
@@ -432,7 +433,6 @@ class Helper
         }
 
         $uid = self::config('SIOO_UID');
-        $code = self::config('SIOO_CODE');
         $password = self::config('SIOO_PASSWORD');
 
         if(empty($uid) || empty($code) || empty($password)) {
@@ -443,15 +443,18 @@ class Helper
         $msg  = mb_convert_encoding($content,'GBK','utf-8');
 
         // 接口url
-        $url = "http://sms.10690221.com:9011/hy/?uid="
+        $url = "https://submit.10690221.com/send/ordinarykv?uid="
         .$uid
-        ."&auth=".md5($code.$password)
+        ."&password=".md5($password)
         ."&mobile=".$phone
-        ."&msg=".$msg
-        ."&expid=0";
+        ."&msg=".$content;
 
-        $result = self::curl($url);
+        $client = new HttpClient();
 
+        $response = $client->request('GET', $url);
+
+        $result = $response->getBody();
+        
         if ($result>=0) {
             return self::success('发送成功！');
         } else {
@@ -1279,9 +1282,9 @@ class Helper
     {
         $file = File::where('id',$fileId)->first();
 
-        $results = Excel::toArray(new Import, storage_path('app/').$file->path);
+        $importData = Excel::toArray(new Import, storage_path('app/').$file['path']);
 
-        unset($results[0]);//去除表头
+        $results = $importData[0];
 
         return $results;
     }

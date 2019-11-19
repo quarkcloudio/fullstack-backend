@@ -25,6 +25,7 @@ use App\Builder\Lists\Tables\Table;
 use App\Builder\Lists\Tables\Column;
 use App\Builder\Lists\ListBuilder;
 use App\Models\Sms;
+use App\Services\Helper;
 
 class SmsController extends BuilderController
 {
@@ -45,7 +46,7 @@ class SmsController extends BuilderController
         $current   = intval($request->get('current',1));
         $pageSize  = intval($request->get('pageSize',10));
         $search     = $request->get('search');
-            
+
         // 定义对象
         $query = Sms::query();
 
@@ -90,7 +91,7 @@ class SmsController extends BuilderController
         $pagination['pageSize'] = $pageSize;
         // 总数量
         $pagination['total'] = $total;
-            
+
         foreach ($lists as $key => $list) {
             $statue = $list['status'];
             if($statue == 1) {
@@ -100,7 +101,7 @@ class SmsController extends BuilderController
                 $lists[$key]['status'] = '发送失败';
             }
         }
-        
+
         $searchs = [
             Input::make('搜索内容','title'),
             Button::make('搜索')->onClick('search'),
@@ -120,12 +121,12 @@ class SmsController extends BuilderController
         ];
 
         $toolbarButtons = [
-            Button::make('重发')->type('primary')->onClick('submit',null,'admin/'.$this->controllerName().'/sendSms'),
+            Button::make('重发')->type('primary')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/sendSms'),
             Button::make('删除')->type('danger')->onClick('multiChangeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
         ];
 
         $actions = [
-            Button::make('重发')->type('link')->onClick('submit',null,'admin/'.$this->controllerName().'/sendSms'),
+            Button::make('重发')->type('link')->onClick('changeStatus','-1','admin/'.$this->controllerName().'/sendSms'),
             Popconfirm::make('删除')->type('link')->title('确定删除吗？')->onConfirm('changeStatus','-1','admin/'.$this->controllerName().'/changeStatus'),
         ];
 
@@ -161,48 +162,163 @@ class SmsController extends BuilderController
         }
     }
 
+    // 上传文件
+    public function import(Request $request)
+    {
+        $fileId = $request->input('fileId');
+
+        $results = Helper::import($fileId);
+
+        foreach ($results as $key => $value) {
+            $phones[] = $value[0];
+        }
+
+        $phones = implode("\r",$phones);
+
+        if($phones) {
+            return $this->success('导入成功！','',$phones);
+        } else {
+            return $this->error('导入失败！');
+        }
+    }
+
+    /**
+     * 发送短信验证码
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function sendSms(Request $request)
+    {
+        $id = $request->json('id');
+        $status = $request->json('status');
+
+        if(empty($id) || empty($status)) {
+            return $this->error('参数错误！');
+        }
+
+        // 定义对象
+        $query = Sms::query();
+
+        if(is_array($id)) {
+            $query->whereIn('id',$id);
+        } else {
+            $query->where('id',$id);
+        }
+
+        $sms = $query->get();
+
+        $sendResult = true;
+
+        foreach ($sms as $key => $value) {
+            $result = Helper::siooSendSms($value['phone'],$value['content']);
+            if($result['status'] == 'success') {
+                $data['status'] = 1;
+                Sms::where('id',$value['id'])->update($data);
+            } else {
+                $sendResult =false;
+                $data['status'] = 2;
+                Sms::where('id',$value['id'])->update($data);
+            }
+        }
+
+        if ($sendResult) {
+            return $this->success('操作成功！');
+        } else {
+            return $this->error('操作失败！');
+        }
+    }
+
     /**
      * 发送短信验证码
      * @param  integer
      * @return string
      */
-    public function send(Request $request)
+    public function sendImportSms(Request $request)
     {
-        $phone = $request->input('phone');
-        $content = $request->input('content');
+        $phones = $request->json('phone');
+        $content = $request->json('content');
 
-        if(empty($phone)) {
-            return $this->error('手机号不能为空！');
+        $phones = explode("\r", $phones);
+
+        $sendResult = true;
+
+        if(is_array($phones)) {
+            foreach ($phones as $key => $phone) {
+                if(empty($phone)) {
+                    return $this->error('手机号不能为空！');
+                }
+
+                if(!preg_match("/^1[34578]\d{9}$/", $phone)) {
+                    return $this->error('手机号格式不正确！');
+                }
+
+                if(empty($content)) {
+                    return $this->error('内容不能为空！');
+                }
+
+                $sendDayCount = Sms::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
+                    ->where('phone',$phone)->count();
+
+                // 每天最多发送6条短信
+                if($sendDayCount >6) {
+                    return $this->error('抱歉，每个手机号一天最多获取6条短信！');
+                }
+
+                $result = Helper::siooSendSms($phone,$content);
+
+                $data['phone'] = $phone;
+                $data['content'] = $content;
+
+                if($result['status'] == 'success') {
+                    $data['status'] = 1;
+                    Sms::create($data);
+                } else {
+                    $sendResult =false;
+
+                    $data['status'] = 2;
+                    Sms::create($data);
+                }
+            }
+        } else {
+            if(empty($phone)) {
+                return $this->error('手机号不能为空！');
+            }
+
+            if(!preg_match("/^1[34578]\d{9}$/", $phone)) {
+                return $this->error('手机号格式不正确！');
+            }
+
+            if(empty($content)) {
+                return $this->error('内容不能为空！');
+            }
+
+            $sendDayCount = Sms::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
+                ->where('phone',$phone)->count();
+
+            // 每天最多发送6条短信
+            if($sendDayCount >6) {
+                return $this->error('抱歉，每个手机号一天最多获取6条短信！');
+            }
+
+            $result = Helper::siooSendSms($phone,$content);
+
+            $data['phone'] = $phone;
+            $data['content'] = $content;
+
+            if($result['status'] == 'success') {
+                $data['status'] = 1;
+                Sms::create($data);
+            } else {
+                $sendResult =false;
+                $data['status'] = 2;
+                Sms::create($data);
+            }
         }
 
-        if(!preg_match("/^1[34578]\d{9}$/", $phone)) {
-            return $this->error('手机号格式不正确！');
-        }
-
-        if(empty($content)) {
-            return $this->error('内容不能为空！');
-        }
-
-        $sendDayCount = Sms::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
-        ->where('phone',$phone)->count();
-
-        // 每天最多发送6条短信
-        if($sendDayCount >6) {
-            return $this->error('抱歉，每个手机号一天最多获取6条短信！');
-        }
-
-        $result = Helper::siooSendSms($phone,$content);
-
-        $data['phone'] = $phone;
-        $data['content'] = $content;
-
-        if($result) {
-            $data['status'] = 1;
-            Sms::create($data);
+        if($sendResult) {
             return $this->success('短信已发送！');
         } else {
-            $data['status'] = 2;
-            Sms::create($data);
             return $this->error('短信发送失败！');
         }
     }
