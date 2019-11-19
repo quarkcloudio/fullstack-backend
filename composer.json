@@ -25,7 +25,8 @@
         "overtrue/socialite": "^2.0",
         "overtrue/wechat": "^4.1",
         "spatie/laravel-permission": "^3.0",
-        "topthink/think-image": "^1.0"
+        "topthink/think-image": "^1.0",
+        "guzzlehttp/guzzle": "^6.4"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
