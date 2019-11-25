@@ -462,7 +462,8 @@ class GoodsOrderController extends BuilderController
 
         $goodsOrderStatusRecordInfo = GoodsOrderStatusRecord::where('order_id',$order['id'])
         ->where('status','NOT_PAID')
-        ->first();
+        ->first()
+        ->toArray();
 
         if($goodsOrderStatusRecordInfo) {
             $order['create_time'] = $goodsOrderStatusRecordInfo['created_at'];

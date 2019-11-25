@@ -19,22 +19,30 @@ class GoodsOrder extends Model
      * @var array
      */
     protected $fillable = [
+        'uid',
+        'shop_id',
         'order_id',
+        'total_amount',
+        'buyer_pay_amount',
+        'point_amount',
+        'mdiscount_amount',
+        'discount_amount',
+        'freight_amount',
         'cart_ids',
-        'consignee',
-        'address',
-        'phone',
-        'express_name',
-        'express_no',
-        'express_created_at',
-        'express_finished_at',
-        'send_uid',
-        'send_status',
-        'send_created_at',
-        'send_finished_at',
+        'consignee_name',
+        'consignee_phone',
+        'consignee_province',
+        'consignee_city',
+        'consignee_county',
+        'consignee_town',
+        'consignee_address',
         'status',
+        'close_type',
+        'close_reason',
+        'timeout_express',
+        'timeout_receipt',
+        'virtual_code',
         'remark',
-        'is_virtual',
-        'status'
+        'goods_mode'
     ];
 }
