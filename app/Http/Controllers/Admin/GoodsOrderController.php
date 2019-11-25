@@ -31,6 +31,8 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\GoodsOrder;
 use App\Models\GoodsOrderDetail;
+use App\Models\GoodsOrderStatusRecord;
+use App\Models\GoodsOrderDelivery;
 use DB;
 
 class GoodsOrderController extends BuilderController
@@ -131,9 +133,9 @@ class GoodsOrderController extends BuilderController
             'goods_orders.mdiscount_amount',
             'goods_orders.discount_amount',
             'goods_orders.freight_amount',
-            'goods_orders.consignee',
-            'goods_orders.address',
-            'goods_orders.phone as goods_order_phone',
+            'goods_orders.consignee_name',
+            'goods_orders.consignee_address',
+            'goods_orders.consignee_phone',
             'goods_orders.status as goods_order_status',
             'users.username',
             'users.nickname',
@@ -317,11 +319,14 @@ class GoodsOrderController extends BuilderController
             'goods_orders.mdiscount_amount',
             'goods_orders.discount_amount',
             'goods_orders.freight_amount',
-            'goods_orders.consignee',
-            'goods_orders.address',
-            'goods_orders.phone as goods_order_phone',
+            'goods_orders.consignee_name',
+            'goods_orders.consignee_address',
+            'goods_orders.consignee_phone',
             'goods_orders.status as goods_order_status',
             'goods_orders.remark',
+            'goods_orders.timeout_receipt',
+            'goods_orders.close_type',
+            'goods_orders.close_reason',
             'users.username',
             'users.nickname',
             'users.phone',
@@ -331,31 +336,31 @@ class GoodsOrderController extends BuilderController
         // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
         switch ($order['goods_order_status']) {
             case 'NOT_PAID':
-                $order['goods_order_status'] = '等待付款';
+                $order['goods_order_status_title'] = '等待付款';
                 break;
 
             case 'PAID':
-                $order['goods_order_status'] = '待发货';
+                $order['goods_order_status_title'] = '待发货';
                 break;
 
             case 'SEND':
-                $order['goods_order_status'] = '已发货';
+                $order['goods_order_status_title'] = '已发货';
                 break;
 
             case 'SUCCESS':
-                $order['goods_order_status'] = '交易成功';
+                $order['goods_order_status_title'] = '交易成功';
                 break;
 
             case 'REFUND':
-                $order['goods_order_status'] = '转入退款';
+                $order['goods_order_status_title'] = '转入退款';
                 break;
 
             case 'CLOSED':
-                $order['goods_order_status'] = '交易关闭';
+                $order['goods_order_status_title'] = '交易关闭';
                 break;
 
             default:
-                $order['goods_order_status'] = '未知';
+                $order['goods_order_status_title'] = '未知';
                 break;
         }
 
@@ -417,6 +422,23 @@ class GoodsOrderController extends BuilderController
                 break;
         }
         
+        switch ($order['close_type']) {
+            case '1':
+                $order['close_type'] = '买家取消订单';
+                break;
+
+            case '2':
+                $order['close_type'] = '卖家取消订单';
+                break;
+
+            case '3':
+                $order['close_type'] = '订单超时未支付';
+                break;
+            default:
+                $order['close_type'] = '未知';
+                break;
+        }
+
         $goodsOrderDetail = [];
         foreach ($order->goodsOrderDetail as $key => $value) {
             $goodsOrderDetail[$key]['cover_id'] = Helper::getPicture($value['cover_id']);
@@ -433,6 +455,62 @@ class GoodsOrderController extends BuilderController
         }
 
         $order['goods_order_details'] = $goodsOrderDetail;
+
+        $order['goodsOrderStatusRecords'] = GoodsOrderStatusRecord::where('order_id',$order['id'])->orderBy('created_at','asc')->get()->toArray();
+
+        $order['goodsOrderStatusRecordCount'] = count($order['goodsOrderStatusRecords']);
+
+        $goodsOrderStatusRecordInfo = GoodsOrderStatusRecord::where('order_id',$order['id'])
+        ->where('status','NOT_PAID')
+        ->first();
+
+        if($goodsOrderStatusRecordInfo) {
+            $order['create_time'] = $goodsOrderStatusRecordInfo['created_at'];
+        } else {
+            $order['create_time'] = '';
+        }
+
+        $goodsOrderStatusRecordInfo1 = GoodsOrderStatusRecord::where('order_id',$order['id'])
+        ->where('status','PAID')
+        ->first();
+
+        if($goodsOrderStatusRecordInfo1) {
+            $order['pay_time'] = $goodsOrderStatusRecordInfo1['created_at'];
+        } else {
+            $order['pay_time'] = '';
+        }
+
+        $goodsOrderStatusRecordInfo2 = GoodsOrderStatusRecord::where('order_id',$order['id'])
+        ->where('status','SEND')
+        ->first();
+
+        if($goodsOrderStatusRecordInfo2) {
+            $order['send_time'] = $goodsOrderStatusRecordInfo2['created_at'];
+        } else {
+            $order['send_time'] = '';
+        }
+
+        $goodsOrderStatusRecordInfo3 = GoodsOrderStatusRecord::where('order_id',$order['id'])
+        ->where('status','SUCCESS')
+        ->first();
+
+        if($goodsOrderStatusRecordInfo3) {
+            $order['finish_time'] = $goodsOrderStatusRecordInfo3['created_at'];
+        } else {
+            $order['finish_time'] = '';
+        }
+
+        // 自动确认收货截止时间
+        $order['timeout_receipt'] = date($order['paid_at'],strtotime($order['timeout_receipt']));
+
+        // 发货单信息
+        $goodsOrderDeliveries = GoodsOrderDelivery::where('order_id',$order['id'])->get()->toArray();
+
+        foreach ($goodsOrderDeliveries as $key => $value) {
+            $goodsOrderDeliveries[$key]['goods'] = GoodsOrderDetail::where('id',$value['goods_order_detail_id'])->first();
+        }
+
+        $order['goodsOrderDeliveries'] = $goodsOrderDeliveries;
 
         return $this->success('获取成功！','',$order);
     }

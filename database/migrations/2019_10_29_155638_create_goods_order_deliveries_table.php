@@ -17,7 +17,6 @@ class CreateGoodsOrderDeliveriesTable extends Migration
             $table->bigIncrements('id');
             $table->integer('order_id')->unsigned()->default('0');
             $table->integer('goods_order_id')->unsigned()->default('0');
-            $table->integer('goods_order_detail_id')->unsigned()->default('0')->comment('具体商品');
             $table->string('delivery_no')->nullable()->comment('发货单编号');
             $table->string('express_type')->nullable()->comment('1,无需配送；2，平台自配送；3，第三方物流');
             $table->string('express_name')->nullable()->comment('快递名称');

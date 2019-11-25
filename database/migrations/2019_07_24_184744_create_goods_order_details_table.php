@@ -30,8 +30,6 @@ class CreateGoodsOrderDetailsTable extends Migration
             $table->decimal('market_price',10,2)->comment('原价');
             $table->string('description')->nullable();
             $table->integer('cover_id')->default('0');
-            $table->string('virtual_code')->nullable()->comment('核销码');
-            $table->tinyInteger('status')->default('0')->comment('0:未核销，1:已核销');
             $table->timestamps();
         });
     }
