@@ -19,7 +19,6 @@ class GoodsOrderStatusRecord extends Model
      * @var array
      */
     protected $fillable = [
-        'shop_id',
         'order_id',
         'goods_order_id',
         'status'

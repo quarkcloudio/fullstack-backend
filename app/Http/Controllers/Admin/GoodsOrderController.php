@@ -33,6 +33,8 @@ use App\Models\GoodsOrder;
 use App\Models\GoodsOrderDetail;
 use App\Models\GoodsOrderStatusRecord;
 use App\Models\GoodsOrderDelivery;
+use App\Models\GoodsOrderDeliveryDetail;
+use App\Models\GoodsExpress;
 use DB;
 
 class GoodsOrderController extends BuilderController
@@ -451,7 +453,7 @@ class GoodsOrderController extends BuilderController
             $goodsInfo = Goods::where('id',$value['goods_id'])->first();
             $goodsOrderDetail[$key]['stock_num'] = $goodsInfo['stock_num'];
             $goodsOrderDetail[$key]['service_status'] = '正常';
-            $goodsOrderDetail[$key]['status'] = $order['goods_order_status'];
+            $goodsOrderDetail[$key]['status'] = $order['goods_order_status_title'];
         }
 
         $order['goods_order_details'] = $goodsOrderDetail;
@@ -508,7 +510,8 @@ class GoodsOrderController extends BuilderController
         $goodsOrderDeliveries = GoodsOrderDelivery::where('order_id',$order['id'])->get()->toArray();
 
         foreach ($goodsOrderDeliveries as $key => $value) {
-            $goodsOrderDeliveries[$key]['goods'] = GoodsOrderDetail::where('id',$value['goods_order_detail_id'])->first();
+            $goodsOrderDetailIds = GoodsOrderDeliveryDetail::where('goods_order_delivery_id',$value['id'])->pluck('goods_order_detail_id')->toArray();
+            $goodsOrderDeliveries[$key]['goodsOrderDetails'] = GoodsOrderDetail::whereIn('id',$goodsOrderDetailIds)->get()->toArray();
         }
 
         $order['goodsOrderDeliveries'] = $goodsOrderDeliveries;
@@ -517,66 +520,159 @@ class GoodsOrderController extends BuilderController
     }
 
     /**
-     * 保存编辑数据
+     * 一键发货
      *
      * @param  Request  $request
      * @return Response
      */
-    public function save(Request $request)
+    public function quickDelivery(Request $request)
     {
-        $id      =   $request->json('id');
-        $status  =   $request->json('status');
+        $id = $request->input('id');
 
-        $comment = Comment::find($id)->toArray();
+        // 定义对象
+        $order = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('shops', 'goods_orders.shop_id', '=', 'shops.id')
+        ->join('users', 'users.id', '=', 'orders.uid')
+        ->where('goods_mode',1)
+        ->where('orders.id',$id)
+        ->select(
+            'orders.*',
+            'goods_orders.total_amount',
+            'goods_orders.buyer_pay_amount',
+            'goods_orders.point_amount',
+            'goods_orders.mdiscount_amount',
+            'goods_orders.discount_amount',
+            'goods_orders.freight_amount',
+            'goods_orders.consignee_name',
+            'goods_orders.consignee_address',
+            'goods_orders.consignee_phone',
+            'goods_orders.status as goods_order_status',
+            'goods_orders.remark',
+            'goods_orders.timeout_receipt',
+            'goods_orders.close_type',
+            'goods_orders.close_reason',
+            'users.username',
+            'users.nickname',
+            'users.phone',
+            'shops.title as shop_title'
+        )->first();
 
-        if ($status == 'on') {
-            $status = 1;
-        } else {
-            $status = 2; //禁用
+        $goodsOrderDetail = [];
+        foreach ($order->goodsOrderDetail as $key => $value) {
+            $goodsOrderDetail[$key]['cover_id'] = Helper::getPicture($value['cover_id']);
+            $goodsOrderDetail[$key]['goods_id'] = $value['goods_id'];
+            $goodsOrderDetail[$key]['goods_name'] = $value['goods_name'];
+            $goodsOrderDetail[$key]['goods_price'] = $value['goods_price'];
+            $goodsOrderDetail[$key]['num'] = $value['num'];
+            $goodsOrderDetail[$key]['goods_property_names'] = $value['goods_property_names'];
+            $goodsOrderDetail[$key]['description'] = $value['description'];
+            $goodsInfo = Goods::where('id',$value['goods_id'])->first();
+            $goodsOrderDetail[$key]['stock_num'] = $goodsInfo['stock_num'];
+            $goodsOrderDetail[$key]['service_status'] = '正常';
+            $goodsOrderDetail[$key]['status'] = $order['goods_order_status_title'];
         }
-       
-        $data['status'] = $status;
 
-        $result = Comment::where('id',$id)->update($data);
+        $order['goods_order_details'] = $goodsOrderDetail;
 
-        if ($result) {
-            return $this->success('操作成功！','CommentIndex');
-        } else {
-            return $this->error('操作失败！');
-        }
+        $order['goodsExpresses'] = GoodsExpress::where('status',1)
+        ->get()
+        ->toArray();
+
+        return $this->success('获取成功！','',$order);
     }
 
     /**
-     * 改变数据状态
+     * 执行发货
      *
      * @param  Request  $request
      * @return Response
      */
-    public function changeStatus(Request $request)
+    public function send(Request $request)
     {
-        $id = $request->json('id');
-        $status = $request->json('status');
+        $orderId = $request->input('order_id');
+        $expressType = $request->input('express_type');
+        $expressId = $request->input('express_id');
+        $expressNo = $request->input('express_no');
 
-        if(empty($id) || empty($status)) {
-            return $this->error('参数错误！');
+        if(empty($orderId)) {
+            return $this->error('参数错误');
+        }
+
+        if($expressType == 2) {
+            if(empty($expressId)) {
+                return $this->error('请选择快递公司');
+            }
+
+            if(empty($expressNo)) {
+                return $this->error('请填写快递单号');
+            }
         }
 
         // 定义对象
-        $query = Comment::query();
+        $order = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('shops', 'goods_orders.shop_id', '=', 'shops.id')
+        ->join('users', 'users.id', '=', 'orders.uid')
+        ->where('goods_mode',1)
+        ->where('orders.id',$orderId)
+        ->select(
+            'orders.*',
+            'goods_orders.id as goods_order_id',
+            'goods_orders.total_amount',
+            'goods_orders.buyer_pay_amount',
+            'goods_orders.point_amount',
+            'goods_orders.mdiscount_amount',
+            'goods_orders.discount_amount',
+            'goods_orders.freight_amount',
+            'goods_orders.consignee_name',
+            'goods_orders.consignee_address',
+            'goods_orders.consignee_phone',
+            'goods_orders.status as goods_order_status',
+            'goods_orders.remark',
+            'goods_orders.timeout_receipt',
+            'goods_orders.close_type',
+            'goods_orders.close_reason',
+            'users.username',
+            'users.nickname',
+            'users.phone',
+            'shops.title as shop_title'
+        )->first();
 
-        if(is_array($id)) {
-            $query->whereIn('id',$id);
-        } else {
-            $query->where('id',$id);
+        $goodsOrderDetails = GoodsOrderDetail::where('goods_order_id',$order['goods_order_id'])
+        ->get()
+        ->toArray();
+
+        $data['order_id'] = $orderId;
+        $data['goods_order_id'] = $order['goods_order_id'];
+        $data['delivery_no'] = Helper::createOrderNo();
+        $data['express_type'] = $expressType;
+        $data['goods_express_id'] = $expressId;
+        $data['express_no'] = $expressNo;
+        $data['express_send_at'] = date('Y-m-d H:i:s');
+        $data['status'] = 1;
+
+        // 创建发货单
+        $result = GoodsOrderDelivery::create($data);
+
+        if($result) {
+            foreach ($goodsOrderDetails as $key => $value) {
+                $data1['order_id'] = $orderId;
+                $data1['goods_order_id'] = $order['goods_order_id'];
+                $data1['goods_order_delivery_id'] = $result['id'];
+                $data1['goods_order_detail_id'] = $value['id'];
+                $data1['num'] = $value['num'];
+                GoodsOrderDeliveryDetail::create($data1);
+            }
+
+            GoodsOrder::where('id',$order['goods_order_id'])->update(['status'=>'SEND']);
+
+            $data2['order_id'] = $orderId;
+            $data2['goods_order_id'] = $order['goods_order_id'];
+            $data2['status'] = 'SEND';
+
+            GoodsOrderStatusRecord::create($data2);
         }
 
-        $result = $query->update(['status'=>$status]);
-
-        if ($result) {
-            return $this->success('操作成功！');
-        } else {
-            return $this->error('操作失败！');
-        }
+        return $this->success('获取成功！','',$order);
     }
 
     /**
