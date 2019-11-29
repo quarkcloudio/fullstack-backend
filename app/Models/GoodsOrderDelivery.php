@@ -23,7 +23,7 @@ class GoodsOrderDelivery extends Model
         'goods_order_id',
         'delivery_no',
         'express_type',
-        'express_name',
+        'goods_express_id',
         'express_no',
         'express_send_at',
         'status'

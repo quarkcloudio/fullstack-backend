@@ -45,7 +45,7 @@ class GoodsOrderController extends BuilderController
     }
 
     /**
-     * 评论列表页
+     * 订单列表页
      * @param  Request  $request
      * @return Response
      */
@@ -464,10 +464,10 @@ class GoodsOrderController extends BuilderController
 
         $goodsOrderStatusRecordInfo = GoodsOrderStatusRecord::where('order_id',$order['id'])
         ->where('status','NOT_PAID')
-        ->first()
-        ->toArray();
+        ->first();
 
         if($goodsOrderStatusRecordInfo) {
+            $goodsOrderStatusRecordInfo = $goodsOrderStatusRecordInfo->toArray();
             $order['create_time'] = $goodsOrderStatusRecordInfo['created_at'];
         } else {
             $order['create_time'] = '';
@@ -478,6 +478,7 @@ class GoodsOrderController extends BuilderController
         ->first();
 
         if($goodsOrderStatusRecordInfo1) {
+            $goodsOrderStatusRecordInfo1 = $goodsOrderStatusRecordInfo1->toArray();
             $order['pay_time'] = $goodsOrderStatusRecordInfo1['created_at'];
         } else {
             $order['pay_time'] = '';
@@ -488,6 +489,7 @@ class GoodsOrderController extends BuilderController
         ->first();
 
         if($goodsOrderStatusRecordInfo2) {
+            $goodsOrderStatusRecordInfo2 = $goodsOrderStatusRecordInfo2->toArray();
             $order['send_time'] = $goodsOrderStatusRecordInfo2['created_at'];
         } else {
             $order['send_time'] = '';
@@ -498,6 +500,7 @@ class GoodsOrderController extends BuilderController
         ->first();
 
         if($goodsOrderStatusRecordInfo3) {
+            $goodsOrderStatusRecordInfo3 = $goodsOrderStatusRecordInfo3->toArray();
             $order['finish_time'] = $goodsOrderStatusRecordInfo3['created_at'];
         } else {
             $order['finish_time'] = '';
@@ -507,11 +510,23 @@ class GoodsOrderController extends BuilderController
         $order['timeout_receipt'] = date($order['paid_at'],strtotime($order['timeout_receipt']));
 
         // 发货单信息
-        $goodsOrderDeliveries = GoodsOrderDelivery::where('order_id',$order['id'])->get()->toArray();
+        $goodsOrderDeliveries = GoodsOrderDelivery::where('order_id',$order['id'])
+        ->get()
+        ->toArray();
 
         foreach ($goodsOrderDeliveries as $key => $value) {
-            $goodsOrderDetailIds = GoodsOrderDeliveryDetail::where('goods_order_delivery_id',$value['id'])->pluck('goods_order_detail_id')->toArray();
-            $goodsOrderDeliveries[$key]['goodsOrderDetails'] = GoodsOrderDetail::whereIn('id',$goodsOrderDetailIds)->get()->toArray();
+
+            $goodsExpress = GoodsExpress::where('id',$value['goods_express_id'])->where('status',1)->first();
+
+            $goodsOrderDeliveries[$key]['express_name'] = $goodsExpress['name'];
+
+            $goodsOrderDetailIds = GoodsOrderDeliveryDetail::where('goods_order_delivery_id',$value['id'])
+            ->pluck('goods_order_detail_id')
+            ->toArray();
+
+            $goodsOrderDeliveries[$key]['goodsOrderDetails'] = GoodsOrderDetail::whereIn('id',$goodsOrderDetailIds)
+            ->get()
+            ->toArray();
         }
 
         $order['goodsOrderDeliveries'] = $goodsOrderDeliveries;
@@ -556,6 +571,37 @@ class GoodsOrderController extends BuilderController
             'users.phone',
             'shops.title as shop_title'
         )->first();
+
+        // WECHAT_APP 微信APP支付， WECHAT_JSAPI 微信公众号支付， WECHAT_NATIVE 微信电脑网站支付， ALIPAY_PAGE 支付宝电脑网站支付， ALIPAY_APP 支付宝APP支付， ALIPAY_WAP 支付宝手机网站支付， ALIPAY_F2F 支付宝当面付， ALIPAY_JS 支付宝JSAPI
+        switch ($order['pay_type']) {
+            case 'WECHAT_APP':
+                $order['pay_type'] = '微信APP支付，';
+                break;
+            case 'WECHAT_JSAPI':
+                $order['pay_type'] = '微信公众号支付';
+                break;
+            case 'WECHAT_NATIVE':
+                $order['pay_type'] = '微信电脑网站支付';
+                break;
+            case 'ALIPAY_PAGE':
+                $order['pay_type'] = '支付宝电脑网站支付';
+                break;
+            case 'ALIPAY_APP':
+                $order['pay_type'] = '支付宝APP支付';
+                break;
+            case 'ALIPAY_WAP':
+                $order['pay_type'] = '支付宝手机网站支付';
+                break;
+            case 'ALIPAY_F2F':
+                $order['pay_type'] = '支付宝当面付';
+                break;
+            case 'ALIPAY_JS':
+                $order['pay_type'] = '支付宝JSAPI';
+                break;
+            default:
+                $order['pay_type'] = '暂无';
+                break;
+        }
 
         $goodsOrderDetail = [];
         foreach ($order->goodsOrderDetail as $key => $value) {
@@ -673,6 +719,360 @@ class GoodsOrderController extends BuilderController
         }
 
         return $this->success('获取成功！','',$order);
+    }
+
+    /**
+     * 发货单列表
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function deliveryIndex(Request $request)
+    {
+        // 获取参数
+        $current   = intval($request->get('current',1));
+        $pageSize  = intval($request->get('pageSize',10));
+        $search    = $request->get('search');
+
+        // 定义对象
+        $query = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('users', 'users.id', '=', 'orders.uid')
+        ->where('goods_mode',2);
+
+        // 查询
+        if(!empty($search)) {
+            // 标题
+            if(isset($search['title'])) {
+                $title = "%{$search['title']}%";
+                $query->whereRaw('(users.username like ? or users.phone like ? or orders.order_no like ?)', [$title, $title, $title]);
+            }
+
+            // 状态
+            if(isset($search['status'])) {
+                if(!empty($search['status']) && $search['status'] != 'ALL') {
+                    $query->where('goods_orders.status',$search['status']);
+                }
+            }
+
+            // 时间范围
+            if(isset($search['dateRange'])) {
+                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
+                    $query->whereBetween('orders.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                }
+            }
+
+            // 付款方式
+            if(isset($search['payType'])) {
+                if(!empty($search['payType'])) {
+                    $query->where('orders.pay_type',$search['payType']);
+                }
+            }
+
+            // 订单类型
+            if(isset($search['type'])) {
+                if(!empty($search['type'])) {
+                    $query->where('orders.type',$search['type']);
+                }
+            }
+        }
+
+        // 查询数量
+        $total = $query->count();
+
+        // 查询列表
+        $lists = $query
+        ->skip(($current-1)*$pageSize)
+        ->take($pageSize)
+        ->orderBy('orders.id', 'desc')
+        ->select(
+            'orders.*',
+            'goods_orders.total_amount',
+            'goods_orders.buyer_pay_amount',
+            'goods_orders.point_amount',
+            'goods_orders.mdiscount_amount',
+            'goods_orders.discount_amount',
+            'goods_orders.freight_amount',
+            'goods_orders.status as goods_order_status',
+            'users.username',
+            'users.nickname',
+            'users.phone'
+        )
+        ->get();
+
+        foreach ($lists as $key => $value) {
+
+        }
+
+        // 默认页码
+        $pagination['defaultCurrent'] = 1;
+        // 当前页码
+        $pagination['current'] = $current;
+        // 分页数量
+        $pagination['pageSize'] = $pageSize;
+        // 总数量
+        $pagination['total'] = $total;
+
+        // NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUND:退款中的订单
+        $totalNum = GoodsOrder::where('goods_mode',2)->count();
+        $notPaidNum = GoodsOrder::where('goods_mode',2)->where('status','NOT_PAID')->count();
+        $paidNum = GoodsOrder::where('goods_mode',2)->where('status','PAID')->count();
+        $sendNum = GoodsOrder::where('goods_mode',2)->where('status','SEND')->count();
+        $successNum = GoodsOrder::where('goods_mode',2)->where('status','SUCCESS')->count();
+        $closeNum = GoodsOrder::where('goods_mode',2)->where('status','CLOSE')->count();
+        $refundNum = GoodsOrder::where('goods_mode',2)->where('status','REFUND')->count();
+
+        $data['totalNum'] = $totalNum ? $totalNum : 0;
+        $data['notPaidNum'] = $notPaidNum ? $notPaidNum : 0;
+        $data['paidNum'] = $paidNum ? $paidNum : 0;
+        $data['sendNum'] = $sendNum ? $sendNum : 0;
+        $data['successNum'] = $successNum ? $successNum : 0;
+        $data['closeNum'] = $closeNum ? $closeNum : 0;
+        $data['refundNum'] = $refundNum ? $refundNum : 0;
+
+        $data['totalMoney'] = GoodsOrder::where('goods_mode',2)->where('status','SUCCESS')->sum('total_amount');
+
+        $data['search'] = $search;
+
+        $q['search'] = $search;
+        $q['token'] = Helper::token($request);
+
+        $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
+        $data['exportUrl'] = $exportUrl;
+
+        if(!empty($lists)) {
+
+            $data['lists'] = $lists;
+            $data['pagination'] = $pagination;
+
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
+    }
+
+    /**
+     * 虚拟订单列表页
+     * @param  Request  $request
+     * @return Response
+     */
+    public function virtualOrderIndex(Request $request)
+    {
+        // 获取参数
+        $current   = intval($request->get('current',1));
+        $pageSize  = intval($request->get('pageSize',10));
+        $search    = $request->get('search');
+
+        // 定义对象
+        $query = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('users', 'users.id', '=', 'orders.uid')
+        ->where('goods_mode',2);
+
+        // 查询
+        if(!empty($search)) {
+            // 标题
+            if(isset($search['title'])) {
+                $title = "%{$search['title']}%";
+                $query->whereRaw('(users.username like ? or users.phone like ? or orders.order_no like ?)', [$title, $title, $title]);
+            }
+
+            // 状态
+            if(isset($search['status'])) {
+                if(!empty($search['status']) && $search['status'] != 'ALL') {
+                    $query->where('goods_orders.status',$search['status']);
+                }
+            }
+
+            // 时间范围
+            if(isset($search['dateRange'])) {
+                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
+                    $query->whereBetween('orders.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                }
+            }
+
+            // 付款方式
+            if(isset($search['payType'])) {
+                if(!empty($search['payType'])) {
+                    $query->where('orders.pay_type',$search['payType']);
+                }
+            }
+
+            // 订单类型
+            if(isset($search['type'])) {
+                if(!empty($search['type'])) {
+                    $query->where('orders.type',$search['type']);
+                }
+            }
+        }
+
+        // 查询数量
+        $total = $query->count();
+
+        // 查询列表
+        $lists = $query
+        ->skip(($current-1)*$pageSize)
+        ->take($pageSize)
+        ->orderBy('orders.id', 'desc')
+        ->select(
+            'orders.*',
+            'goods_orders.total_amount',
+            'goods_orders.buyer_pay_amount',
+            'goods_orders.point_amount',
+            'goods_orders.mdiscount_amount',
+            'goods_orders.discount_amount',
+            'goods_orders.freight_amount',
+            'goods_orders.status as goods_order_status',
+            'users.username',
+            'users.nickname',
+            'users.phone'
+        )
+        ->get();
+
+        foreach ($lists as $key => $value) {
+
+            $goodsOrderDetail = [];
+            foreach ($value->goodsOrderDetail as $key1 => $value1) {
+                $goodsOrderDetail[$key1]['cover_id'] = Helper::getPicture($value1['cover_id']);
+                $goodsOrderDetail[$key1]['goods_id'] = $value1['goods_id'];
+                $goodsOrderDetail[$key1]['goods_name'] = $value1['goods_name'];
+                $goodsOrderDetail[$key1]['goods_price'] = $value1['goods_price'];
+                $goodsOrderDetail[$key1]['num'] = $value1['num'];
+                $goodsOrderDetail[$key1]['goods_property_names'] = $value1['goods_property_names'];
+                $goodsOrderDetail[$key1]['description'] = $value1['description'];
+            }
+
+            $lists[$key]['goods_order_details'] = $goodsOrderDetail;
+
+            // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
+            switch ($value['goods_order_status']) {
+                case 'NOT_PAID':
+                    $lists[$key]['goods_order_status'] = '等待付款';
+                    break;
+
+                case 'PAID':
+                    $lists[$key]['goods_order_status'] = '待核验';
+                    break;
+
+                case 'SUCCESS':
+                    $lists[$key]['goods_order_status'] = '交易成功';
+                    break;
+
+                case 'REFUND':
+                    $lists[$key]['goods_order_status'] = '转入退款';
+                    break;
+
+                case 'CLOSED':
+                    $lists[$key]['goods_order_status'] = '交易关闭';
+                    break;
+
+                default:
+                    $lists[$key]['goods_order_status'] = '未知';
+                    break;
+            }
+
+            // NOT_PAID:未支付;SUCCESS:支付成功;REFUND:转入退款的订单（由订单退款表记录详情）;CLOSED:交易关闭，不可退款;PAY_ERROR:支付失败
+            switch ($value['status']) {
+                case 'NOT_PAID':
+                    $lists[$key]['status'] = '未支付';
+                    break;
+
+                case 'SUCCESS':
+                    $lists[$key]['status'] = '支付成功';
+                    break;
+
+                case 'REFUND':
+                    $lists[$key]['status'] = '转入退款';
+                    break;
+
+                case 'CLOSED':
+                    $lists[$key]['status'] = '交易关闭';
+                    break;
+
+                case 'PAY_ERROR':
+                    $lists[$key]['status'] = '支付失败';
+                    break;
+
+                default:
+                    $lists[$key]['status'] = '未知';
+                    break;
+            }
+
+            // WECHAT_APP 微信APP支付， WECHAT_JSAPI 微信公众号支付， WECHAT_NATIVE 微信电脑网站支付， ALIPAY_PAGE 支付宝电脑网站支付， ALIPAY_APP 支付宝APP支付， ALIPAY_WAP 支付宝手机网站支付， ALIPAY_F2F 支付宝当面付， ALIPAY_JS 支付宝JSAPI
+            switch ($value['pay_type']) {
+                case 'WECHAT_APP':
+                    $lists[$key]['pay_type'] = '微信APP支付，';
+                    break;
+                case 'WECHAT_JSAPI':
+                    $lists[$key]['pay_type'] = '微信公众号支付';
+                    break;
+                case 'WECHAT_NATIVE':
+                    $lists[$key]['pay_type'] = '微信电脑网站支付';
+                    break;
+                case 'ALIPAY_PAGE':
+                    $lists[$key]['pay_type'] = '支付宝电脑网站支付';
+                    break;
+                case 'ALIPAY_APP':
+                    $lists[$key]['pay_type'] = '支付宝APP支付';
+                    break;
+                case 'ALIPAY_WAP':
+                    $lists[$key]['pay_type'] = '支付宝手机网站支付';
+                    break;
+                case 'ALIPAY_F2F':
+                    $lists[$key]['pay_type'] = '支付宝当面付';
+                    break;
+                case 'ALIPAY_JS':
+                    $lists[$key]['pay_type'] = '支付宝JSAPI';
+                    break;
+                default:
+                    $lists[$key]['pay_type'] = '暂无';
+                    break;
+            }
+        }
+
+        // 默认页码
+        $pagination['defaultCurrent'] = 1;
+        // 当前页码
+        $pagination['current'] = $current;
+        // 分页数量
+        $pagination['pageSize'] = $pageSize;
+        // 总数量
+        $pagination['total'] = $total;
+
+        // NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUND:退款中的订单
+        $totalNum = GoodsOrder::where('goods_mode',2)->count();
+        $notPaidNum = GoodsOrder::where('goods_mode',2)->where('status','NOT_PAID')->count();
+        $paidNum = GoodsOrder::where('goods_mode',2)->where('status','PAID')->count();
+        $sendNum = GoodsOrder::where('goods_mode',2)->where('status','SEND')->count();
+        $successNum = GoodsOrder::where('goods_mode',2)->where('status','SUCCESS')->count();
+        $closeNum = GoodsOrder::where('goods_mode',2)->where('status','CLOSE')->count();
+        $refundNum = GoodsOrder::where('goods_mode',2)->where('status','REFUND')->count();
+
+        $data['totalNum'] = $totalNum ? $totalNum : 0;
+        $data['notPaidNum'] = $notPaidNum ? $notPaidNum : 0;
+        $data['paidNum'] = $paidNum ? $paidNum : 0;
+        $data['sendNum'] = $sendNum ? $sendNum : 0;
+        $data['successNum'] = $successNum ? $successNum : 0;
+        $data['closeNum'] = $closeNum ? $closeNum : 0;
+        $data['refundNum'] = $refundNum ? $refundNum : 0;
+
+        $data['totalMoney'] = GoodsOrder::where('goods_mode',2)->where('status','SUCCESS')->sum('total_amount');
+
+        $data['search'] = $search;
+
+        $q['search'] = $search;
+        $q['token'] = Helper::token($request);
+
+        $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
+        $data['exportUrl'] = $exportUrl;
+
+        if(!empty($lists)) {
+
+            $data['lists'] = $lists;
+            $data['pagination'] = $pagination;
+
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
     }
 
     /**
