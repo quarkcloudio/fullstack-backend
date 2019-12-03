@@ -961,11 +961,38 @@ class GoodsOrderController extends BuilderController
         $search    = $request->get('search');
 
         // 定义对象
-        $query = GoodsOrderDelivery::query();
+        $query = GoodsOrderDelivery::join('orders', 'orders.id', '=', 'goods_order_deliveries.order_id')
+        ->join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('users', 'users.id', '=', 'orders.uid');
 
         // 查询
         if(!empty($search)) {
+            // 标题
+            if(isset($search['title'])) {
+                $title = "%{$search['title']}%";
+                $query->whereRaw('(users.username like ? or goods_order_deliveries.delivery_no like ? or orders.order_no like ?)', [$title, $title, $title]);
+            }
 
+            // 状态
+            if(isset($search['status'])) {
+                if(!empty($search['status']) && $search['status'] != 'ALL') {
+                    $query->where('goods_order_deliveries.status',$search['status']);
+                }
+            }
+
+            // 时间范围
+            if(isset($search['dateRange'])) {
+                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
+                    $query->whereBetween('goods_order_deliveries.express_send_at', [$search['dateRange'][0], $search['dateRange'][1]]);
+                }
+            }
+
+            // 物流类型
+            if(isset($search['expressType'])) {
+                if(!empty($search['expressType'])) {
+                    $query->where('goods_order_deliveries.express_type',$search['expressType']);
+                }
+            }
         }
 
         // 查询数量
@@ -976,26 +1003,22 @@ class GoodsOrderController extends BuilderController
         ->skip(($current-1)*$pageSize)
         ->take($pageSize)
         ->orderBy('id', 'desc')
-        ->get();
+        ->select(
+            'goods_order_deliveries.*',
+            'orders.order_no',
+            'orders.paid_at',
+            'goods_orders.consignee_name',
+            'goods_orders.consignee_phone',
+            'goods_orders.consignee_province',
+            'goods_orders.consignee_city',
+            'goods_orders.consignee_county',
+            'goods_orders.consignee_address',
+            'users.username',
+            'users.nickname',
+            'users.phone'
+        )->get();
 
         foreach ($lists as $key => $value) {
-            $order = Order::where('id',$value['order_id'])->first();
-            $lists[$key]['order_no'] = $order['order_no'];
-            $lists[$key]['paid_at'] = $order['paid_at'];
-
-            $goodsOrder = GoodsOrder::where('id',$value['order_id'])->first();
-            $lists[$key]['consignee_name'] = $goodsOrder['consignee_name'];
-            $lists[$key]['consignee_phone'] = $goodsOrder['consignee_phone'];
-            $lists[$key]['consignee_province'] = $goodsOrder['consignee_province'];
-            $lists[$key]['consignee_city'] = $goodsOrder['consignee_city'];
-            $lists[$key]['consignee_county'] = $goodsOrder['consignee_county'];
-            $lists[$key]['consignee_address'] = $goodsOrder['consignee_address'];
-
-            $userInfo = User::where('id',$goodsOrder['uid'])->first();
-
-            $lists[$key]['username'] = $userInfo['username'];
-            $lists[$key]['nickname'] = $userInfo['nickname'];
-            $lists[$key]['phone'] = $userInfo['phone'];
 
             $goodsOrderDetailIds = GoodsOrderDeliveryDetail::where('goods_order_delivery_id',$value['id'])
             ->pluck('goods_order_detail_id')
