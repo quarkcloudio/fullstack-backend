@@ -35,6 +35,7 @@ use App\Models\GoodsOrderStatusRecord;
 use App\Models\GoodsOrderDelivery;
 use App\Models\GoodsOrderDeliveryDetail;
 use App\Models\GoodsExpress;
+use App\User;
 use DB;
 
 class GoodsOrderController extends BuilderController
@@ -722,135 +723,6 @@ class GoodsOrderController extends BuilderController
     }
 
     /**
-     * 发货单列表
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function deliveryIndex(Request $request)
-    {
-        // 获取参数
-        $current   = intval($request->get('current',1));
-        $pageSize  = intval($request->get('pageSize',10));
-        $search    = $request->get('search');
-
-        // 定义对象
-        $query = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
-        ->join('users', 'users.id', '=', 'orders.uid')
-        ->where('goods_mode',2);
-
-        // 查询
-        if(!empty($search)) {
-            // 标题
-            if(isset($search['title'])) {
-                $title = "%{$search['title']}%";
-                $query->whereRaw('(users.username like ? or users.phone like ? or orders.order_no like ?)', [$title, $title, $title]);
-            }
-
-            // 状态
-            if(isset($search['status'])) {
-                if(!empty($search['status']) && $search['status'] != 'ALL') {
-                    $query->where('goods_orders.status',$search['status']);
-                }
-            }
-
-            // 时间范围
-            if(isset($search['dateRange'])) {
-                if(!empty($search['dateRange'][0]) || !empty($search['dateRange'][1])) {
-                    $query->whereBetween('orders.created_at', [$search['dateRange'][0], $search['dateRange'][1]]);
-                }
-            }
-
-            // 付款方式
-            if(isset($search['payType'])) {
-                if(!empty($search['payType'])) {
-                    $query->where('orders.pay_type',$search['payType']);
-                }
-            }
-
-            // 订单类型
-            if(isset($search['type'])) {
-                if(!empty($search['type'])) {
-                    $query->where('orders.type',$search['type']);
-                }
-            }
-        }
-
-        // 查询数量
-        $total = $query->count();
-
-        // 查询列表
-        $lists = $query
-        ->skip(($current-1)*$pageSize)
-        ->take($pageSize)
-        ->orderBy('orders.id', 'desc')
-        ->select(
-            'orders.*',
-            'goods_orders.total_amount',
-            'goods_orders.buyer_pay_amount',
-            'goods_orders.point_amount',
-            'goods_orders.mdiscount_amount',
-            'goods_orders.discount_amount',
-            'goods_orders.freight_amount',
-            'goods_orders.status as goods_order_status',
-            'users.username',
-            'users.nickname',
-            'users.phone'
-        )
-        ->get();
-
-        foreach ($lists as $key => $value) {
-
-        }
-
-        // 默认页码
-        $pagination['defaultCurrent'] = 1;
-        // 当前页码
-        $pagination['current'] = $current;
-        // 分页数量
-        $pagination['pageSize'] = $pageSize;
-        // 总数量
-        $pagination['total'] = $total;
-
-        // NOT_PAID:等待买家付款;PAY_PENDING:付款确认中;PAID:买家已付款;SEND:卖家已发货;SUCCESS:交易成功;CLOSED:交易关闭;REFUND:退款中的订单
-        $totalNum = GoodsOrder::where('goods_mode',2)->count();
-        $notPaidNum = GoodsOrder::where('goods_mode',2)->where('status','NOT_PAID')->count();
-        $paidNum = GoodsOrder::where('goods_mode',2)->where('status','PAID')->count();
-        $sendNum = GoodsOrder::where('goods_mode',2)->where('status','SEND')->count();
-        $successNum = GoodsOrder::where('goods_mode',2)->where('status','SUCCESS')->count();
-        $closeNum = GoodsOrder::where('goods_mode',2)->where('status','CLOSE')->count();
-        $refundNum = GoodsOrder::where('goods_mode',2)->where('status','REFUND')->count();
-
-        $data['totalNum'] = $totalNum ? $totalNum : 0;
-        $data['notPaidNum'] = $notPaidNum ? $notPaidNum : 0;
-        $data['paidNum'] = $paidNum ? $paidNum : 0;
-        $data['sendNum'] = $sendNum ? $sendNum : 0;
-        $data['successNum'] = $successNum ? $successNum : 0;
-        $data['closeNum'] = $closeNum ? $closeNum : 0;
-        $data['refundNum'] = $refundNum ? $refundNum : 0;
-
-        $data['totalMoney'] = GoodsOrder::where('goods_mode',2)->where('status','SUCCESS')->sum('total_amount');
-
-        $data['search'] = $search;
-
-        $q['search'] = $search;
-        $q['token'] = Helper::token($request);
-
-        $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
-        $data['exportUrl'] = $exportUrl;
-
-        if(!empty($lists)) {
-
-            $data['lists'] = $lists;
-            $data['pagination'] = $pagination;
-
-            return $this->success('获取成功！','',$data);
-        } else {
-            return $this->success('获取失败！');
-        }
-    }
-
-    /**
      * 虚拟订单列表页
      * @param  Request  $request
      * @return Response
@@ -1062,6 +934,102 @@ class GoodsOrderController extends BuilderController
         $q['token'] = Helper::token($request);
 
         $exportUrl = url('api/admin/'.$this->controllerName().'/export?'.http_build_query($q));
+        $data['exportUrl'] = $exportUrl;
+
+        if(!empty($lists)) {
+
+            $data['lists'] = $lists;
+            $data['pagination'] = $pagination;
+
+            return $this->success('获取成功！','',$data);
+        } else {
+            return $this->success('获取失败！');
+        }
+    }
+
+    /**
+     * 发货单列表
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function deliveryIndex(Request $request)
+    {
+        // 获取参数
+        $current   = intval($request->get('current',1));
+        $pageSize  = intval($request->get('pageSize',10));
+        $search    = $request->get('search');
+
+        // 定义对象
+        $query = GoodsOrderDelivery::query();
+
+        // 查询
+        if(!empty($search)) {
+
+        }
+
+        // 查询数量
+        $total = $query->count();
+
+        // 查询列表
+        $lists = $query
+        ->skip(($current-1)*$pageSize)
+        ->take($pageSize)
+        ->orderBy('id', 'desc')
+        ->get();
+
+        foreach ($lists as $key => $value) {
+            $order = Order::where('id',$value['order_id'])->first();
+            $lists[$key]['order_no'] = $order['order_no'];
+            $lists[$key]['paid_at'] = $order['paid_at'];
+
+            $goodsOrder = GoodsOrder::where('id',$value['order_id'])->first();
+            $lists[$key]['consignee_name'] = $goodsOrder['consignee_name'];
+            $lists[$key]['consignee_phone'] = $goodsOrder['consignee_phone'];
+            $lists[$key]['consignee_province'] = $goodsOrder['consignee_province'];
+            $lists[$key]['consignee_city'] = $goodsOrder['consignee_city'];
+            $lists[$key]['consignee_county'] = $goodsOrder['consignee_county'];
+            $lists[$key]['consignee_address'] = $goodsOrder['consignee_address'];
+
+            $userInfo = User::where('id',$goodsOrder['uid'])->first();
+
+            $lists[$key]['username'] = $userInfo['username'];
+            $lists[$key]['nickname'] = $userInfo['nickname'];
+            $lists[$key]['phone'] = $userInfo['phone'];
+
+            $goodsOrderDetailIds = GoodsOrderDeliveryDetail::where('goods_order_delivery_id',$value['id'])
+            ->pluck('goods_order_detail_id')
+            ->toArray();
+
+            $lists[$key]['goods_order_details'] = GoodsOrderDetail::whereIn('id',$goodsOrderDetailIds)
+            ->get()
+            ->toArray();
+        }
+
+        // 默认页码
+        $pagination['defaultCurrent'] = 1;
+        // 当前页码
+        $pagination['current'] = $current;
+        // 分页数量
+        $pagination['pageSize'] = $pageSize;
+        // 总数量
+        $pagination['total'] = $total;
+
+        $totalNum = GoodsOrderDelivery::count();
+        $waitSendNum = GoodsOrderDelivery::where('status',1)->count();
+        $sendNum = GoodsOrder::where('status',2)->count();
+
+        $data['totalNum'] = $totalNum ? $totalNum : 0;
+        $data['waitSendNum'] = $waitSendNum ? $waitSendNum : 0;
+        $data['sendNum'] = $sendNum ? $sendNum : 0;
+
+
+        $data['search'] = $search;
+
+        $q['search'] = $search;
+        $q['token'] = Helper::token($request);
+
+        $exportUrl = url('api/admin/'.$this->controllerName().'/deliveryExport?'.http_build_query($q));
         $data['exportUrl'] = $exportUrl;
 
         if(!empty($lists)) {

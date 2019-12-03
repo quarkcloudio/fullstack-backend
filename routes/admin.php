@@ -271,6 +271,7 @@ Route::group(['middleware' => ['admin']], function() {
     Route::post('admin/goodsOrder/send', 'Admin\\GoodsOrderController@send')->name('api/admin/goodsOrder/send');
     
     Route::get('admin/goodsOrder/virtualOrderIndex', 'Admin\\GoodsOrderController@virtualOrderIndex')->name('api/admin/goodsOrder/virtualOrderIndex');
+    Route::get('admin/goodsOrder/deliveryIndex', 'Admin\\GoodsOrderController@deliveryIndex')->name('api/admin/goodsOrder/deliveryIndex');
 
     Route::get('admin/goodsOrder/commentIndex', 'Admin\\GoodsOrderController@commentIndex')->name('api/admin/goodsOrder/commentIndex');
     Route::get('admin/goodsOrder/commentEdit', 'Admin\\GoodsOrderController@commentEdit')->name('api/admin/goodsOrder/commentEdit');
