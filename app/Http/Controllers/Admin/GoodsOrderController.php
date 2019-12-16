@@ -576,7 +576,7 @@ class GoodsOrderController extends BuilderController
         // WECHAT_APP 微信APP支付， WECHAT_JSAPI 微信公众号支付， WECHAT_NATIVE 微信电脑网站支付， ALIPAY_PAGE 支付宝电脑网站支付， ALIPAY_APP 支付宝APP支付， ALIPAY_WAP 支付宝手机网站支付， ALIPAY_F2F 支付宝当面付， ALIPAY_JS 支付宝JSAPI
         switch ($order['pay_type']) {
             case 'WECHAT_APP':
-                $order['pay_type'] = '微信APP支付，';
+                $order['pay_type'] = '微信APP支付';
                 break;
             case 'WECHAT_JSAPI':
                 $order['pay_type'] = '微信公众号支付';
@@ -695,7 +695,7 @@ class GoodsOrderController extends BuilderController
         $data['goods_express_id'] = $expressId;
         $data['express_no'] = $expressNo;
         $data['express_send_at'] = date('Y-m-d H:i:s');
-        $data['status'] = 1;
+        $data['status'] = 2;
 
         // 创建发货单
         $result = GoodsOrderDelivery::create($data);
@@ -1064,6 +1064,99 @@ class GoodsOrderController extends BuilderController
         } else {
             return $this->success('获取失败！');
         }
+    }
+
+    /**
+     * 编辑运货单
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function deliveryEdit(Request $request)
+    {
+        $id = $request->input('id');
+
+        // 定义对象
+        $order = Order::join('goods_orders', 'goods_orders.order_id', '=', 'orders.id')
+        ->join('shops', 'goods_orders.shop_id', '=', 'shops.id')
+        ->join('users', 'users.id', '=', 'orders.uid')
+        ->where('goods_mode',1)
+        ->where('orders.id',$id)
+        ->select(
+            'orders.*',
+            'goods_orders.total_amount',
+            'goods_orders.buyer_pay_amount',
+            'goods_orders.point_amount',
+            'goods_orders.mdiscount_amount',
+            'goods_orders.discount_amount',
+            'goods_orders.freight_amount',
+            'goods_orders.consignee_name',
+            'goods_orders.consignee_address',
+            'goods_orders.consignee_phone',
+            'goods_orders.status as goods_order_status',
+            'goods_orders.remark',
+            'goods_orders.timeout_receipt',
+            'goods_orders.close_type',
+            'goods_orders.close_reason',
+            'users.username',
+            'users.nickname',
+            'users.phone',
+            'shops.title as shop_title'
+        )->first();
+
+        // WECHAT_APP 微信APP支付， WECHAT_JSAPI 微信公众号支付， WECHAT_NATIVE 微信电脑网站支付， ALIPAY_PAGE 支付宝电脑网站支付， ALIPAY_APP 支付宝APP支付， ALIPAY_WAP 支付宝手机网站支付， ALIPAY_F2F 支付宝当面付， ALIPAY_JS 支付宝JSAPI
+        switch ($order['pay_type']) {
+            case 'WECHAT_APP':
+                $order['pay_type'] = '微信APP支付';
+                break;
+            case 'WECHAT_JSAPI':
+                $order['pay_type'] = '微信公众号支付';
+                break;
+            case 'WECHAT_NATIVE':
+                $order['pay_type'] = '微信电脑网站支付';
+                break;
+            case 'ALIPAY_PAGE':
+                $order['pay_type'] = '支付宝电脑网站支付';
+                break;
+            case 'ALIPAY_APP':
+                $order['pay_type'] = '支付宝APP支付';
+                break;
+            case 'ALIPAY_WAP':
+                $order['pay_type'] = '支付宝手机网站支付';
+                break;
+            case 'ALIPAY_F2F':
+                $order['pay_type'] = '支付宝当面付';
+                break;
+            case 'ALIPAY_JS':
+                $order['pay_type'] = '支付宝JSAPI';
+                break;
+            default:
+                $order['pay_type'] = '暂无';
+                break;
+        }
+
+        $goodsOrderDetail = [];
+        foreach ($order->goodsOrderDetail as $key => $value) {
+            $goodsOrderDetail[$key]['cover_id'] = Helper::getPicture($value['cover_id']);
+            $goodsOrderDetail[$key]['goods_id'] = $value['goods_id'];
+            $goodsOrderDetail[$key]['goods_name'] = $value['goods_name'];
+            $goodsOrderDetail[$key]['goods_price'] = $value['goods_price'];
+            $goodsOrderDetail[$key]['num'] = $value['num'];
+            $goodsOrderDetail[$key]['goods_property_names'] = $value['goods_property_names'];
+            $goodsOrderDetail[$key]['description'] = $value['description'];
+            $goodsInfo = Goods::where('id',$value['goods_id'])->first();
+            $goodsOrderDetail[$key]['stock_num'] = $goodsInfo['stock_num'];
+            $goodsOrderDetail[$key]['service_status'] = '正常';
+            $goodsOrderDetail[$key]['status'] = $order['goods_order_status_title'];
+        }
+
+        $order['goods_order_details'] = $goodsOrderDetail;
+
+        $order['goodsExpresses'] = GoodsExpress::where('status',1)
+        ->get()
+        ->toArray();
+
+        return $this->success('获取成功！','',$order);
     }
 
     /**
