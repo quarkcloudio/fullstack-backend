@@ -272,6 +272,9 @@ Route::group(['middleware' => ['admin']], function() {
     
     Route::get('admin/goodsOrder/virtualOrderIndex', 'Admin\\GoodsOrderController@virtualOrderIndex')->name('api/admin/goodsOrder/virtualOrderIndex');
     Route::get('admin/goodsOrder/deliveryIndex', 'Admin\\GoodsOrderController@deliveryIndex')->name('api/admin/goodsOrder/deliveryIndex');
+    Route::get('admin/goodsOrder/deliveryInfo', 'Admin\\GoodsOrderController@deliveryInfo')->name('api/admin/goodsOrder/deliveryInfo');
+    Route::get('admin/goodsOrder/deliveryEdit', 'Admin\\GoodsOrderController@deliveryEdit')->name('api/admin/goodsOrder/deliveryEdit');
+    Route::post('admin/goodsOrder/deliverySave', 'Admin\\GoodsOrderController@deliverySave')->name('api/admin/goodsOrder/deliverySave');
 
     Route::get('admin/goodsOrder/commentIndex', 'Admin\\GoodsOrderController@commentIndex')->name('api/admin/goodsOrder/commentIndex');
     Route::get('admin/goodsOrder/commentEdit', 'Admin\\GoodsOrderController@commentEdit')->name('api/admin/goodsOrder/commentEdit');
