@@ -11,9 +11,11 @@
         "php": "^7.2",
         "aliyuncs/oss-sdk-php": "^2.0",
         "anam/phantommagick": "^2.0",
+        "caffeinated/modules": "^6.1",
         "endroid/qrcode": "^2.5",
         "fideloper/proxy": "^4.0",
         "gregwar/captcha": "^1.0",
+        "guzzlehttp/guzzle": "^6.3",
         "intervention/image": "^2.5",
         "laravel/framework": "^6.2",
         "laravel/passport": "^7.5",
@@ -25,8 +27,7 @@
         "overtrue/socialite": "^2.0",
         "overtrue/wechat": "^4.1",
         "spatie/laravel-permission": "^3.0",
-        "topthink/think-image": "^1.0",
-        "guzzlehttp/guzzle": "^6.4"
+        "topthink/think-image": "^1.0"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
