@@ -57,8 +57,9 @@ class LoginController extends Controller
             $username = $request->input('username');
             $password = $request->input('password');
             $captcha = $request->input('captcha');
+
             // 一天内累计6次登录错误，则必须开启验证码
-            $loginErrorCount = Log::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
+            $loginErrorCount = ActionLog::whereBetween('created_at', [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')])
             ->where('action',$username.'LOGIN_ERROR')
             ->count();
             
@@ -74,7 +75,7 @@ class LoginController extends Controller
             }
 
             // 用户名登录
-            $nameLoginSuccess = Auth::guard('web')->attempt(['name' => $username, 'password' => $password]);
+            $nameLoginSuccess = Auth::guard('web')->attempt(['username' => $username, 'password' => $password]);
 
             // 邮箱登录
             $emailLoginSuccess = Auth::guard('web')->attempt(['email' => $username, 'password' => $password]);
@@ -99,10 +100,10 @@ class LoginController extends Controller
                 $log['remark'] = '浏览器 '.$getAddress['province'].' '.$getAddress['city'];
                 Helper::actionLog($log);
 
-                if(Helper::isMobile()){
-                    return $this->success('登录成功','mobile/index/index');
-                }else{
-                    return $this->success('登录成功','pc/index/index');
+                if(Helper::isMobile()) {
+                    return $this->success('登录成功','mobile/index');
+                } else {
+                    return $this->success('登录成功','index');
                 }
                 
             } else {
@@ -118,7 +119,11 @@ class LoginController extends Controller
                 return $this->error('用户名或密码错误！');
             }
         } else {
-            return view('auth/login');
+            if(Helper::isMobile()) {
+                return view('auth.mobile.login');
+            } else {
+                return view('auth.login');
+            }
         }
     }
 
@@ -150,7 +155,7 @@ class LoginController extends Controller
 
             $uid = User::insertGetId($data);
             if($uid) {
-                $updateData['name'] = Helper::createRand().'-ID'.$uid;
+                $updateData['username'] = Helper::createRand().'-ID'.$uid;
                 $updateData['nickname'] = Helper::createRand().'-ID'.$uid;
                 User::where('id',$uid)->update($updateData);
             } else {

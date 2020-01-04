@@ -27,7 +27,7 @@
             <span class="sr-only">下一个</span>
         </a>
     </div>
-  </div> 
+  </div>
   <main role="main" class="container"> 
    <div class="row"> 
     <div class="col-md-12 blog-main"> 

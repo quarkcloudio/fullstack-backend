@@ -90,10 +90,10 @@
                     </li>
                 @else
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="javascript:loginJump();">请登录</a>
+                        <a class="nav-link text-dark" href="{{ route('login') }}">请登录</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="javascript:registerJump();">免费注册</a>
+                        <a class="nav-link text-dark" href="{{ route('register') }}">免费注册</a>
                     </li>
                 @endif
                 </ul>
