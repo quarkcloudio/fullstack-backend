@@ -26,7 +26,7 @@ class CreateShopsTable extends Migration
             $table->longText('content')->comment('店铺介绍');
             $table->string('cover_ids')->comment('店铺封面');
             $table->string('level')->comment('店铺排序，越大越靠前');
-            $table->tinyInteger('position')->comment('推荐位');
+            $table->tinyInteger('position')->nullable()->comment('推荐位');
             $table->string('username')->comment('店铺联系人');
             $table->string('phone')->comment('店铺电话');
             $table->string('province')->comment('省')->nullable();
@@ -34,8 +34,8 @@ class CreateShopsTable extends Migration
             $table->string('county')->comment('县')->nullable();
             $table->string('town')->comment('镇')->nullable();
             $table->string('address')->comment('详细地址')->nullable();
-            $table->string('longitude')->comment('经度');
-            $table->string('latitude')->comment('纬度');
+            $table->string('longitude')->nullable()->comment('经度');
+            $table->string('latitude')->nullable()->comment('纬度');
             $table->integer('business_license_cover_id')->nullable()->comment('营业执照照片');
             $table->string('corporate_name')->nullable()->comment('法人姓名');
             $table->string('corporate_idcard')->nullable()->comment('法人身份证号');
