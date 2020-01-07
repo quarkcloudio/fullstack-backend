@@ -20,7 +20,7 @@ class FileController extends Controller
      */
     public function uploadFile(Request $request)
     {
-        $ossOpen = Helper::getConfig('OSS_OPEN');
+        $ossOpen = Helper::config('OSS_OPEN');
 
         if($ossOpen == 'on') {
             $driver = 'oss';
@@ -116,12 +116,12 @@ class FileController extends Controller
         $file = $request->file('file');
         $uid  = $request->input('uid');
 
-        $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
-        $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
-        $endpoint = Helper::getConfig('OSS_ENDPOINT');
-        $bucket = Helper::getConfig('OSS_BUCKET');
+        $accessKeyId = Helper::config('OSS_ACCESS_KEY_ID');
+        $accessKeySecret = Helper::config('OSS_ACCESS_KEY_SECRET');
+        $endpoint = Helper::config('OSS_ENDPOINT');
+        $bucket = Helper::config('OSS_BUCKET');
         // 设置自定义域名。
-        $myDomain = Helper::getConfig('OSS_MYDOMAIN');
+        $myDomain = Helper::config('OSS_MYDOMAIN');
 
         try {
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);

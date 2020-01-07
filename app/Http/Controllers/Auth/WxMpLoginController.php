@@ -80,11 +80,23 @@ class WxMpLoginController extends Controller
             $decryptedData = $app->encryptor->decryptData($wxMpAuth['session_key'], $vi, $encryptedData);
 
             // 不存在用户，插入到数据库中
+
             $data['username'] = Helper::makeRand(8) . '-' . time(); // 临时用户名
-            $data['nickname'] = $decryptedData['nickName'];
+            $data['email'] = Helper::makeRand(8) . '-' . time(); // 临时邮箱
+            $data['phone'] = Helper::makeRand(8) . '-' . time(); // 临时手机号
+            $data['nickname'] = Helper::filterEmoji($decryptedData['nickName']);
             $data['sex'] = $decryptedData['gender'];
             $data['password'] = bcrypt(env('APP_KEY'));
-            $data['cover_id'] = $decryptedData['avatarUrl'];
+
+            // 将微信头像保存到服务器
+            $avatarInfo = Helper::uploadPictureFromUrl($decryptedData['avatarUrl']);
+
+            if($avatarInfo['status'] == 'error') {
+                return $avatarInfo;
+            }
+
+            $data['avatar'] = $avatarInfo['data']['id'];
+
             $data['wechat_openid'] = $decryptedData['openId'];
             if(isset($decryptedData['unionId'])) {
                 $data['wechat_unionid'] = $decryptedData['unionId'];

@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use OSS\OssClient;
+use OSS\Core\OssException;
 use GuzzleHttp\Client as HttpClient;
 use Mail;
 use Excel;
@@ -31,26 +33,28 @@ use DB;
 class Helper
 {
     /**
-    * 错误返回数据
+    * 错误时返回json数据
     * @author tangtanglove <dai_hang_love@126.com>
     */
     static function error($msg,$url = '')
     {
         $result['msg'] = $msg;
+        $result['url'] = $url;
         $result['status'] = 'error';
-        return $result;
+        return self::unsetNull($result);
     }
 
     /**
-    * 成功返回数据
+    * 成功是返回json数据
     * @author tangtanglove <dai_hang_love@126.com>
     */
-    static function success($msg,$data = '',$status = 'success')
+    static function success($msg,$url ='',$data = '',$status = 'success')
     {
         $result['msg'] = $msg;
+        $result['url'] = $url;
         $result['data'] = $data;
         $result['status'] = $status;
-        return $result;
+        return self::unsetNull($result);
     }
 
     /**
@@ -1838,5 +1842,166 @@ class Helper
         $content = implode($contentArray->toArray(), "\n");
         
         \File::put($envPath, $content);
+    }
+
+    /**
+     * 通过远程url上传图片
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    static function uploadPictureFromUrl($url)
+    {
+        $fileArray = explode('/',$url);
+
+        if(!count($fileArray)) {
+            return self::error('未读取到图片名称！');
+        }
+
+        $fileInfo = explode('.',$fileArray[count($fileArray)-1]);
+
+        if(count($fileInfo)>=2) {
+            $fileName = $fileInfo[0];
+            $fileType = $fileInfo[1];
+
+            $name = self::makeRand(40,true).'.'.$fileType;
+        } else {
+            $name = self::makeRand(40,true).'.png';
+        }
+
+        $ossOpen = self::config('OSS_OPEN');
+
+        if($ossOpen == 'on') {
+            $driver = 'oss';
+        } else {
+            $driver = 'local';
+        }
+
+        if(strpos($url,'https') !== false) {
+            $https = 1;
+        } else {
+            $https = 0;
+        }
+
+        $content = self::curl($url,false,'get',false,$https);
+
+        switch ($driver) {
+            case 'oss':
+
+                // 阿里云上传
+                $accessKeyId = self::config('OSS_ACCESS_KEY_ID');
+                $accessKeySecret = self::config('OSS_ACCESS_KEY_SECRET');
+                $endpoint = self::config('OSS_ENDPOINT');
+                $bucket = self::config('OSS_BUCKET');
+                // 设置自定义域名。
+                $myDomain = self::config('OSS_MYDOMAIN');
+        
+                try {
+                    $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+        
+                    // 如果设置自定义域名
+                    if(!empty($myDomain)) {
+                        // 查看CNAME记录。
+                        $cnameConfig = $ossClient->getBucketCname($bucket);
+        
+                        $hasCname = false;
+                        foreach ($cnameConfig as $key => $value) {
+                            if($value['Domain'] == $myDomain) {
+                                $hasCname = true;
+                            }
+                        }
+        
+                        // 未添加CNAME记录，则程序自动添加
+                        if($hasCname === false) {
+                            // 添加CNAME记录。
+                            $ossClient->addBucketCname($bucket, $myDomain);
+                        }
+                    }
+        
+                } catch (OssException $e) {
+                    print $e->getMessage();
+                }
+        
+                $object = 'pictures/'.$name;
+        
+                // 上传到阿里云
+                try {
+                    $ossResult = $ossClient->putObject($bucket, $object, $content);
+                } catch (OssException $e) {
+                    $ossResult = $e->getMessage();
+                    // 返回数据
+                    return self::error('上传失败！');
+                }
+    
+                // 数据
+                $data['name'] = $name;
+                $data['size'] = $ossResult['info']['size_upload'];
+                $data['md5'] = md5($content);
+    
+                // 设置自定义域名，则文件url执行自定义域名
+                if(!empty($myDomain)) {
+                    $data['path'] = str_replace($bucket.'.'.$endpoint,$myDomain,$ossResult['info']['url']);
+                    $data['path'] = str_replace('http','https',$data['path']);
+                
+                } else {
+                    $data['path'] = $ossResult['info']['url'];
+                    $data['path'] = str_replace('http','https',$data['path']);
+                }
+    
+                // 插入数据库
+                $picture = Picture::create($data);
+                $pictureId = $picture->id;
+    
+                // 获取文件url，用于外部访问
+                $url = $data['path'];
+    
+                // 获取文件大小
+                $size = $ossResult['info']['size_upload'];
+        
+                $result['id'] = $pictureId;
+                $result['name'] = $name;
+                $result['url'] = $url;
+                $result['size'] = $size;
+        
+                break;
+            
+            default:
+
+                // 默认本地上传
+                $uploadPath = 'uploads/pictures/'.$name;
+                $getResult = Storage::disk('public')->put($uploadPath,$content);
+                
+                if($getResult) {
+                    $path = 'public/'.$uploadPath;
+
+                    // 数据
+                    $data['name'] = $name;
+                    $data['md5'] = md5_file(storage_path('app/').$path);
+                    $data['path'] = $path;
+
+                    // 插入数据库
+                    $picture = Picture::create($data);
+                    $pictureId = $picture->id;
+
+                    // 获取文件url，用于外部访问
+                    $url = Storage::url($path);
+
+                    // 获取文件大小
+                    $size = Storage::size($path);
+
+                    $result['id'] = $pictureId;
+                    $result['name'] = $name;
+                    $result['url'] = asset($url);
+                    $result['size'] = $size;
+
+                } else {
+                    return self::error('上传失败！');
+                }
+
+                break;
+        }
+
+        // 返回数据
+        return self::success('上传成功！','',$result);
     }
 }

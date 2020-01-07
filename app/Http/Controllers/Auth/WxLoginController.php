@@ -95,7 +95,15 @@ class WxLoginController extends Controller
             $data['nickname'] = Helper::filterEmoji($wechatUser['nickname']);
             $data['sex'] = $wechatUser['original']['sex'];
             $data['password'] = bcrypt(env('APP_KEY'));
-            $data['cover_id'] = $wechatUser['avatar'];
+
+            // 将微信头像保存到服务器
+            $avatarInfo = Helper::uploadPictureFromUrl($wechatUser['avatar']);
+
+            if($avatarInfo['status'] == 'error') {
+                return $avatarInfo;
+            }
+
+            $data['avatar'] = $avatarInfo['data']['id'];
             $data['wechat_openid'] = $wechatUser['original']['openid'];
             
             if(isset($wechatUser['original']['unionid'])) {

@@ -28,7 +28,7 @@ class PictureController extends Controller
             $this->error('参数错误！');
         }
 
-        if(Helper::getConfig('OSS_OPEN') == 'on') {
+        if(Helper::config('OSS_OPEN') == 'on') {
             $this->error('云存储暂不此操作！');
         }
 
@@ -52,7 +52,7 @@ class PictureController extends Controller
      */
     public function upload(Request $request)
     {
-        $ossOpen = Helper::getConfig('OSS_OPEN');
+        $ossOpen = Helper::config('OSS_OPEN');
 
         if($ossOpen == 'on') {
             $driver = 'oss';
@@ -123,7 +123,7 @@ class PictureController extends Controller
         // 图片名称
         $name = Helper::makeRand(40,true).$fileType;
 
-        $ossOpen = Helper::getConfig('OSS_OPEN');
+        $ossOpen = Helper::config('OSS_OPEN');
 
         if($ossOpen == 'on') {
             $driver = 'oss';
@@ -135,12 +135,12 @@ class PictureController extends Controller
             case 'oss':
 
                 // 阿里云上传
-                $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
-                $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
-                $endpoint = Helper::getConfig('OSS_ENDPOINT');
-                $bucket = Helper::getConfig('OSS_BUCKET');
+                $accessKeyId = Helper::config('OSS_ACCESS_KEY_ID');
+                $accessKeySecret = Helper::config('OSS_ACCESS_KEY_SECRET');
+                $endpoint = Helper::config('OSS_ENDPOINT');
+                $bucket = Helper::config('OSS_BUCKET');
                 // 设置自定义域名。
-                $myDomain = Helper::getConfig('OSS_MYDOMAIN');
+                $myDomain = Helper::config('OSS_MYDOMAIN');
         
                 try {
                     $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
@@ -253,6 +253,18 @@ class PictureController extends Controller
     }
 
     /**
+     * 通过远程url上传图片
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function urlUpload(Request $request)
+    {
+        $url = $request->input('url');
+        return Helper::uploadPictureFromUrl($url);
+    }
+
+    /**
      * 本地上传图片
      *
      * @param  Request  $request
@@ -331,12 +343,12 @@ class PictureController extends Controller
             return $this->error('只能上传jpg、png、gif格式的图片！');
         }
 
-        $accessKeyId = Helper::getConfig('OSS_ACCESS_KEY_ID');
-        $accessKeySecret = Helper::getConfig('OSS_ACCESS_KEY_SECRET');
-        $endpoint = Helper::getConfig('OSS_ENDPOINT');
-        $bucket = Helper::getConfig('OSS_BUCKET');
+        $accessKeyId = Helper::config('OSS_ACCESS_KEY_ID');
+        $accessKeySecret = Helper::config('OSS_ACCESS_KEY_SECRET');
+        $endpoint = Helper::config('OSS_ENDPOINT');
+        $bucket = Helper::config('OSS_BUCKET');
         // 设置自定义域名。
-        $myDomain = Helper::getConfig('OSS_MYDOMAIN');
+        $myDomain = Helper::config('OSS_MYDOMAIN');
 
         try {
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);

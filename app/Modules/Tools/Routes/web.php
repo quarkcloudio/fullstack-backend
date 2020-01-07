@@ -18,6 +18,7 @@ Route::group(['prefix' => 'tools'], function ($router) {
     $router->get('picture/getPicture', 'PictureController@getPicture')->name('tools/picture/getPicture');
     $router->post('picture/upload', 'PictureController@upload')->name('tools/picture/upload');
     $router->post('picture/base64Upload', 'PictureController@base64Upload')->name('tools/picture/base64Upload');
+    $router->get('picture/urlUpload', 'PictureController@urlUpload')->name('tools/picture/urlUpload');
     $router->get('picture/insert', 'PictureController@insert')->name('tools/picture/insert');
     $router->post('file/upload', 'FileController@upload')->name('tools/file/upload');
     $router->any('git/webhook', 'GitController@webhook')->name('tools/git/webhook');

@@ -22,7 +22,7 @@ class SmsController extends Controller
         $type = $request->input('type');
         $getCaptcha = Session::get('captcha');
 
-        // 暂时关掉图形验证码
+        // 图形验证码
         if (empty($captcha) || ($captcha != $getCaptcha)) {
             return $this->error('验证码错误！');
         }
@@ -64,7 +64,7 @@ class SmsController extends Controller
                 break;
             
             default: // 默认阿里大鱼短信验证码
-                $templateCode = Helper::getConfig('ALIDAYU_TEMPLATE_CODE');
+                $templateCode = Helper::config('ALIDAYU_TEMPLATE_CODE');
                 $smsParam = [ 'code' => $code];
                 $result = Helper::alidayuSendSms($templateCode,$phone,$smsParam);
                 break;
