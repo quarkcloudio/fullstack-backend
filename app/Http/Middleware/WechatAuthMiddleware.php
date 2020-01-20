@@ -11,7 +11,6 @@ use App\Models\Config;
 use Illuminate\Support\Facades\Route;
 use Session;
 
-
 class WechatAuthMiddleware
 {
     /**
