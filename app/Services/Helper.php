@@ -451,7 +451,7 @@ class Helper
         .$uid
         ."&password=".md5($password)
         ."&mobile=".$phone
-        ."&msg=".$content;
+        ."&msg=".$msg;
 
         $client = new HttpClient();
 
