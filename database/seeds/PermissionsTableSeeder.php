@@ -14,7 +14,7 @@ class PermissionsTableSeeder extends Seeder
         DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['1', '0', 'api/admin/login', 'admin']);
         DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['2', '0', 'api/admin/logout', 'admin']);
         DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['3', '0', 'api/admin/loginErrorTimes', 'admin']);
-        DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['4', '0', 'api/admin/console/index', 'admin']);
+        DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['4', '0', 'api/admin/dashboard/index', 'admin']);
         DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['5', '0', 'api/admin/account/info', 'admin']);
         DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['6', '0', 'api/admin/account/profile', 'admin']);
         DB::insert('INSERT INTO permissions (id,menu_id,name,guard_name) VALUES (?,?,?,?)', ['7', '0', 'api/admin/account/password', 'admin']);

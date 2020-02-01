@@ -23,14 +23,14 @@ Route::get('admin/test/index', 'Admin\\TestController@index')->name('api/admin/t
 // 后台登录后认证路由
 Route::group(['middleware' => ['admin']], function() {
 
-    Route::get('admin/console/index', 'Admin\\ConsoleController@index')->name('api/admin/console/index');
-    Route::get('admin/console/clearCache', 'Admin\\ConsoleController@clearCache')->name('api/admin/console/clearCache');
-    Route::get('admin/console/update', 'Admin\\ConsoleController@update')->name('api/admin/console/update');
-    Route::get('admin/console/download', 'Admin\\ConsoleController@download')->name('api/admin/console/download');
-    Route::get('admin/console/extract', 'Admin\\ConsoleController@extract')->name('api/admin/console/extract');
-    Route::get('admin/console/updateFile', 'Admin\\ConsoleController@updateFile')->name('api/admin/console/updateFile');
-    Route::get('admin/console/updateDatabase', 'Admin\\ConsoleController@updateDatabase')->name('api/admin/console/updateDatabase');
-    Route::get('admin/console/finish', 'Admin\\ConsoleController@finish')->name('api/admin/console/finish');
+    Route::get('admin/dashboard/index', 'Admin\\DashboardController@index')->name('api/admin/dashboard/index');
+    Route::get('admin/dashboard/clearCache', 'Admin\\DashboardController@clearCache')->name('api/admin/dashboard/clearCache');
+    Route::get('admin/dashboard/update', 'Admin\\DashboardController@update')->name('api/admin/dashboard/update');
+    Route::get('admin/dashboard/download', 'Admin\\DashboardController@download')->name('api/admin/dashboard/download');
+    Route::get('admin/dashboard/extract', 'Admin\\DashboardController@extract')->name('api/admin/dashboard/extract');
+    Route::get('admin/dashboard/updateFile', 'Admin\\DashboardController@updateFile')->name('api/admin/dashboard/updateFile');
+    Route::get('admin/dashboard/updateDatabase', 'Admin\\DashboardController@updateDatabase')->name('api/admin/dashboard/updateDatabase');
+    Route::get('admin/dashboard/finish', 'Admin\\DashboardController@finish')->name('api/admin/dashboard/finish');
     
     Route::any('admin/account/info', 'Admin\\AccountController@info')->name('api/admin/account/info');
     Route::post('admin/account/profile', 'Admin\\AccountController@profile')->name('api/admin/account/profile');

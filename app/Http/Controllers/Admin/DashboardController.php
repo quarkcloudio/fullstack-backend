@@ -11,7 +11,7 @@ use App\Models\Post;
 use App\Services\Helper;
 use Artisan;
 
-class ConsoleController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Show the application dashboard.
