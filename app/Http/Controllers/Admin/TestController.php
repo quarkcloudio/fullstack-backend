@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Helper;
-use App\Planet\Model\Form;
-use App\Planet\Model\Table;
+use App\Planet\Form;
+use App\Planet\Table;
 use App\Models\Post;
 use App\Models\Category;
 

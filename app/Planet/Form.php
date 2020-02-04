@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Planet\Model;
+namespace App\Planet;
 
 class Form
 {

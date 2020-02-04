@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form;
 
-class Control
+class Item
 {
-    public  $labelName,
-            $name,
-            $value,
+    public  $colon,
+            $dependencies,
+            $extra,
             $placeholder,
             $size,
             $rules,
@@ -14,7 +14,7 @@ class Control
             $labelCol,
             $style,
             $extra,
-            $componentName;
+            $component;
 
     function __construct() {
         $this->size = 'default';

@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class InputNumber extends Control
+use App\Planet\Form\Item;
+
+class TextArea extends Item
 {
-    public  $min,
-            $max,
-            $step;
+    public  $autosize,
+            $rows;
 
     function __construct() {
-        $this->componentName = 'inputNumber';
+        $this->componentName = 'textArea';
     }
 
     static function make($labelName,$name)
@@ -26,21 +27,15 @@ class InputNumber extends Control
         return $self;
     }
 
-    public function min($min)
+    public function autosize($autosize)
     {
-        $this->min = $min;
+        $this->autosize = $autosize;
         return $this;
     }
 
-    public function max($max)
+    public function rows($rows)
     {
-        $this->max = $max;
-        return $this;
-    }
-
-    public function step($step)
-    {
-        $this->step = $step;
+        $this->rows = $rows;
         return $this;
     }
 }

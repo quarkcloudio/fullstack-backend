@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class SwitchButton extends Control
+use App\Planet\Form\Item;
+
+class Select extends Item
 {
-    public  $checkedChildren,
-            $unCheckedChildren;
+    public  $options,
+            $mode;
 
     function __construct() {
-        $this->componentName = 'switch';
+        $this->componentName = 'select';
     }
 
     static function make($labelName,$name)
@@ -18,20 +20,22 @@ class SwitchButton extends Control
         $self->labelName = $labelName;
         $self->name = $name;
 
+        $self->placeholder = '请选择'.$labelName;
+
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
     }
 
-    public function checkedText($text)
+    public function options($options)
     {
-        $this->checkedChildren = $text;
+        $this->options = $options;
         return $this;
     }
 
-    public function unCheckedText($text)
+    public function mode($mode)
     {
-        $this->unCheckedChildren = $text;
+        $this->mode = $mode;
         return $this;
     }
 }

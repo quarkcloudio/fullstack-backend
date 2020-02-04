@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class Button extends Control
+use App\Planet\Form\Item;
+
+class Button extends Item
 {
     public  $href,$icon,$target,$type,$onClick,$render,$extendButtons;
 

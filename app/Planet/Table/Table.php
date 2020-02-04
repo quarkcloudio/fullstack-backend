@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Planet\UI\Table;
+namespace App\Planet\Table;
 
 class Table
 {

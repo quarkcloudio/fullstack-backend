@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class Image extends Control
+use App\Planet\Form\Item;
+
+class Image extends Item
 {
     public  $mode,$list,$button,$limitSize,$limitType,$limitNum;
 

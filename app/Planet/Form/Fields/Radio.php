@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class Checkbox extends Control
+use App\Planet\Form\Item;
+
+class Radio extends Item
 {
-    public  $list;
+    public  $options;
 
     function __construct() {
-        $this->componentName = 'checkbox';
+        $this->componentName = 'radio';
     }
 
     static function make($labelName,$name)

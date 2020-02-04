@@ -1,14 +1,18 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class Select extends Control
+use App\Planet\Form\Item;
+
+class DatePicker extends Item
 {
-    public  $options,
-            $mode;
+    public  $format,
+            $showTime;
 
     function __construct() {
-        $this->componentName = 'select';
+        $this->componentName = 'datePicker';
+        $this->showTime = true;
+        $this->value = date('Y-m-d H:i:s');
     }
 
     static function make($labelName,$name)
@@ -25,15 +29,15 @@ class Select extends Control
         return $self;
     }
 
-    public function options($options)
+    public function showTime($showTime)
     {
-        $this->options = $options;
+        $this->showTime = $showTime;
         return $this;
     }
 
-    public function mode($mode)
+    public function format($format)
     {
-        $this->mode = $mode;
+        $this->format = $format;
         return $this;
     }
 }

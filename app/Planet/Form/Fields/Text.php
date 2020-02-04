@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class Text extends Control
+use App\Planet\Form\Item;
+
+class Text extends Item
 {
     public  $type;
 

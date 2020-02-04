@@ -1,13 +1,16 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class Tree extends Control
+use App\Planet\Form\Item;
+
+class Input extends Item
 {
-    public  $list;
+    public  $type;
 
     function __construct() {
-        $this->componentName = 'tree';
+        $this->componentName = 'input';
+        $this->type = 'text';
     }
 
     static function make($labelName,$name)
@@ -17,14 +20,16 @@ class Tree extends Control
         $self->labelName = $labelName;
         $self->name = $name;
 
+        $self->placeholder = '请输入'.$labelName;
+
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
     }
 
-    public function list($list)
+    public function type($type)
     {
-        $this->list = $list;
+        $this->type = $type;
         return $this;
     }
 }

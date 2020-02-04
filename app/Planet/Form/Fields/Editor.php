@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class ID extends Control
+use App\Planet\Form\Item;
+
+class Editor extends Item
 {
-    public  $display;
-
     function __construct() {
-        $this->componentName = 'id';
-        $this->display = 'none';
+        $this->componentName = 'editor';
+        $this->style = ['height' => 400, 'boxShadow' => 'inset 0 1px 3px rgba(0,0,0,.1)'];
     }
 
     static function make($labelName,$name)
@@ -23,11 +23,5 @@ class ID extends Control
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
-    }
-
-    public function display($display)
-    {
-        $this->display = $display;
-        return $this;
     }
 }

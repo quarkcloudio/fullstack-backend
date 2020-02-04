@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Planet\UI\Layout;
+namespace App\Planet\Layout;
 
 class Content
 {

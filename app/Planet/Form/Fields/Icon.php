@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class Icon extends Control
+use App\Planet\Form\Item;
+
+class Icon extends Item
 {
     public  $options;
 

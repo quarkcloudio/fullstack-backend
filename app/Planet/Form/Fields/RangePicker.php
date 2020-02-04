@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Planet\UI\Form\Controls;
+namespace App\Planet\Form\Fields;
 
-class DatePicker extends Control
+use App\Planet\Form\Item;
+
+class RangePicker extends Item
 {
     public  $format,
             $showTime;
 
     function __construct() {
-        $this->componentName = 'datePicker';
+        $this->componentName = 'rangePicker';
         $this->showTime = true;
-        $this->value = date('Y-m-d H:i:s');
+        $this->value = [null,null];
     }
 
     static function make($labelName,$name)
@@ -19,8 +21,6 @@ class DatePicker extends Control
 
         $self->labelName = $labelName;
         $self->name = $name;
-
-        $self->placeholder = '请选择'.$labelName;
 
         // 删除空属性
         $self->unsetNullProperty();
