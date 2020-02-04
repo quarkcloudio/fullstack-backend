@@ -13,7 +13,6 @@ class Item
             $wrapperCol,
             $labelCol,
             $style,
-            $extra,
             $component;
 
     function __construct() {
