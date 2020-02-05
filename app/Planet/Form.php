@@ -2,15 +2,24 @@
 
 namespace App\Planet;
 
+use App\Planet\Form\Fields\Input;
+
 class Form
 {
-    public  $name,$tabPanes,$componentName;
+    public  $name,$tabPanes,$component;
 
     function __construct() {
-        $this->componentName = 'tabs';
+        $this->component = 'form';
     }
 
-    static function make($name)
+    /**
+     * text组件
+     *
+     * @param  string $label
+     * @param  string $name
+     * @return $this
+     */
+    static function text($name,$label = '')
     {
         $self = new self();
 
@@ -19,18 +28,6 @@ class Form
         // 删除空属性
         $self->unsetNullProperty();
         return $self;
-    }
-
-    public function defaultActiveKey($key = 1)
-    {
-        $this->key = $key;
-        return $this;
-    }
-
-    public function tabPanes($tabPanes)
-    {
-        $this->tabPanes = $tabPanes;
-        return $this;
     }
 
     protected function unsetNullProperty()

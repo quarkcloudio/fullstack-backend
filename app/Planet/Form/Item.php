@@ -6,7 +6,7 @@ use Exception;
 
 class Item
 {
-    public  $colon, // 配合 label 属性使用，表示是否显示 label 后面的冒号
+    public  $colon,
             $dependencies,
             $extra,
             $getValueFromEvent,
@@ -35,10 +35,10 @@ class Item
     }
 
     /**
-     *  配合 label 属性使用，表示是否显示 label 后面的冒号
+     * 配合 label 属性使用，表示是否显示 label 后面的冒号
      *
-     * @param  boolean $show
-     * @return object
+     * @param  bool $show
+     * @return $this
      */
     public function colon($show = true)
     {
@@ -47,15 +47,15 @@ class Item
     }
 
     /**
-     *  配合 label 属性使用，表示是否显示 label 后面的冒号
+     * 配合 label 属性使用，表示是否显示 label 后面的冒号
      *
-     * @param  boolean $show
-     * @return object
+     * @param  bool $show
+     * @return $this
      */
     public function dependencies($fileds)
     {
         if(!is_array($fileds)) {
-            throw new Exception('Argument must be an array!');
+            throw new Exception('argument must be an array!');
         }
 
         $this->dependencies = $fileds;
@@ -63,10 +63,10 @@ class Item
     }
 
     /**
-     *  额外的提示信息，和 help 类似，当需要错误信息和提示文案同时出现时，可以使用这个。
+     * 额外的提示信息，和 help 类似，当需要错误信息和提示文案同时出现时，可以使用这个。
      *
      * @param  string $extra
-     * @return object
+     * @return $this
      */
     public function extra($extra)
     {
@@ -79,10 +79,10 @@ class Item
     }
 
     /**
-     *  配合 validateStatus 属性使用，展示校验状态图标，建议只配合 Input 组件使用
+     * 配合 validateStatus 属性使用，展示校验状态图标，建议只配合 Input 组件使用
      *
-     * @param  boolean $hasFeedback
-     * @return object
+     * @param  bool $hasFeedback
+     * @return $this
      */
     public function hasFeedback($hasFeedback = true)
     {
@@ -91,12 +91,12 @@ class Item
     }
 
     /**
-     *  配合 validateStatus 属性使用，展示校验状态图标，建议只配合 Input 组件使用
+     * 配合 validateStatus 属性使用，展示校验状态图标，建议只配合 Input 组件使用
      *
-     * @param  boolean $hasFeedback
-     * @return object
+     * @param  bool $hasFeedback
+     * @return $this
      */
-    public function help($help)
+    public function help($help = '')
     {
         if(empty($help)) {
             throw new Exception('argument cannot be empty!');
@@ -107,9 +107,9 @@ class Item
     }
 
     /**
-     *  为 true 时不带样式，作为纯字段控件使用
+     * 为 true 时不带样式，作为纯字段控件使用
      *
-     * @return object
+     * @return $this
      */
     public function noStyle()
     {
@@ -118,10 +118,10 @@ class Item
     }
 
     /**
-     *  label 标签的文本
+     * label 标签的文本
      *
      * @param  string $label
-     * @return object
+     * @return $this
      */
     public function label($label = '')
     {
@@ -130,15 +130,15 @@ class Item
     }
 
     /**
-     *  标签文本对齐方式
+     * 标签文本对齐方式
      *
      * @param  left|right $align
-     * @return object
+     * @return $this
      */
     public function labelAlign($align = 'right')
     {
         if(!in_array($align,['left','right'])) {
-            throw new Exception('Argument must be an array!');
+            throw new Exception("argument must be 'left' or 'right'!");
         }
 
         $this->labelAlign = $labelAlign;
@@ -146,11 +146,11 @@ class Item
     }
 
     /**
-     *  label 标签布局，同 <Col> 组件，设置 span offset 值，如 {span: 3, offset: 12} 或 sm: {span: 3, offset: 12}。
-     *  你可以通过 Form 的 labelCol 进行统一设置。当和 Form 同时设置时，以 Item 为准
+     * label 标签布局，同 <Col> 组件，设置 span offset 值，如 {span: 3, offset: 12} 或 sm: {span: 3, offset: 12}。
+     * 你可以通过 Form 的 labelCol 进行统一设置。当和 Form 同时设置时，以 Item 为准
      *
-     * @param  array|object $col
-     * @return object
+     * @param  array|$this $col
+     * @return $this
      */
     public function labelCol($col)
     {
@@ -158,24 +158,75 @@ class Item
             throw new Exception("argument must be an array!");
         }
 
-        $this->col = $col;
+        $this->labelCol = $col;
         return $this;
     }
 
     /**
-     *  label 标签布局，同 <Col> 组件，设置 span offset 值，如 {span: 3, offset: 12} 或 sm: {span: 3, offset: 12}。
-     *  你可以通过 Form 的 labelCol 进行统一设置。当和 Form 同时设置时，以 Item 为准
+     * 字段名，支持数组
      *
-     * @param  array|object $col
-     * @return object
+     * @param  string $name
+     * @return $this
      */
-    public function name($name)
+    public function name($name = '')
     {
-        if(!is_array($name)) {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * 是否必填，如不设置，则会根据校验规则自动生成
+     * 
+     * @return $this
+     */
+    public function required()
+    {
+        $this->required = true;
+        return $this;
+    }
+
+    /**
+     * 校验规则，设置字段的校验逻辑
+     * 
+     * @param  array|$this $rules
+     * @return $this
+     */
+    public function rule($rules)
+    {
+        if(!is_array($rules)) {
             throw new Exception("argument must be an array!");
         }
 
-        $this->name = $name;
+        $this->rules = $rules;
+        return $this;
+    }
+
+    /**
+     * 子节点的值的属性，如 Switch 的是 'checked'
+     * 
+     * @param  string $valuePropName
+     * @return $this
+     */
+    public function valuePropName($valuePropName = '')
+    {
+        $this->valuePropName = $valuePropName;
+        return $this;
+    }
+
+    /**
+     * 需要为输入控件设置布局样式时，使用该属性，用法同 labelCol。
+     * 你可以通过 Form 的 wrapperCol 进行统一设置。当和 Form 同时设置时，以 Item 为准。
+     *
+     * @param  array|$this $col
+     * @return $this
+     */
+    public function wrapperCol($col)
+    {
+        if(!is_array($col)) {
+            throw new Exception("argument must be an array!");
+        }
+
+        $this->wrapperCol = $col;
         return $this;
     }
 
